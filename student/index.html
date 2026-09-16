@@ -1,0 +1,1988 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>راهنمای کارگاه طراحی سایت با هوش مصنوعی</title>
+<meta name="description" content="راهنمای کامل و عملی ساخت سایت با هوش مصنوعی — از صفر تا انتشار روی هاست، همراه با فایل‌های آماده">
+<meta name="theme-color" content="#050e18">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚀</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#050e18; --ink:#071726; --panel:#0a1f30; --panel2:#0d2a3e;
+  --line:#143a52; --line2:#1d5878;
+  --cy:#31e0d4; --cy-dk:#0f8f90; --gd:#ffc857; --gd-dk:#b3801f;
+  --vi:#a78bfa; --gr:#4ade80; --rd:#fb7185;
+  --txt:#e9f5fb; --dim:#96b8cb; --dim2:#5d7f95;
+  --code-bg:#030d16; --chip:rgba(49,224,212,.1);
+  --mono:'JetBrains Mono','SFMono-Regular',Consolas,monospace;
+  --r:18px; --r2:13px; --r3:10px; --sbw:270px;
+}
+:root[data-theme="light"]{
+  --bg:#f4f8fb; --ink:#fff; --panel:#fff; --panel2:#eaf2f7;
+  --line:#d7e4ed; --line2:#b9d2e0;
+  --cy:#0b7f85; --cy-dk:#0b7f85; --gd:#9a6c07; --gd-dk:#9a6c07;
+  --vi:#6d4ed6; --gr:#17803d; --rd:#c2334d;
+  --txt:#0e2233; --dim:#4a657a; --dim2:#7691a5;
+  --code-bg:#0a1f2e; --chip:rgba(11,127,133,.09);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:86px}
+body{margin:0;font-family:'Vazirmatn',Tahoma,system-ui,sans-serif;background:var(--bg);
+  color:var(--txt);line-height:2.05;font-size:17px;-webkit-font-smoothing:antialiased;overflow-wrap:break-word}
+a{color:var(--cy);text-underline-offset:3px}
+b,strong{color:var(--txt);font-weight:700}
+:root:not([data-theme="light"]) b,:root:not([data-theme="light"]) strong{color:#fff}
+img{max-width:100%}
+code{direction:ltr;unicode-bidi:isolate;display:inline-block;font-family:var(--mono);font-size:.86em;
+  background:var(--chip);border:1px solid var(--line);border-radius:7px;padding:0 7px;color:var(--cy)}
+.ltr{direction:ltr;unicode-bidi:isolate}
+
+/* ---------- HEADER ---------- */
+.top{position:fixed;inset-inline:0;top:0;height:60px;z-index:80;display:flex;align-items:center;gap:10px;
+  padding:0 14px;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(16px);
+  border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:9px;font-weight:900;font-size:15px;white-space:nowrap}
+.brand i{width:10px;height:10px;border-radius:3px;background:var(--cy);box-shadow:0 0 14px var(--cy)}
+.grow{flex:1}
+.btn{background:var(--panel);border:1px solid var(--line);color:var(--txt);border-radius:11px;
+  padding:7px 13px;font-family:inherit;font-size:13.5px;cursor:pointer;display:inline-flex;
+  align-items:center;gap:6px;transition:.15s;white-space:nowrap}
+.btn:hover{border-color:var(--cy);color:var(--cy)}
+.btn.gd{background:var(--gd);color:#2f2000;border-color:var(--gd);font-weight:700}
+:root[data-theme="light"] .btn.gd{color:#fff}
+.btn.sm{padding:5px 10px;font-size:12.5px}
+.btn.on{background:var(--cy);color:#04222a;border-color:var(--cy);font-weight:700}
+#search{background:var(--panel);border:1px solid var(--line);color:var(--txt);border-radius:11px;
+  padding:7px 13px;font-family:inherit;font-size:14px;width:210px;transition:.2s}
+#search:focus{outline:none;border-color:var(--cy);width:280px}
+@media(max-width:1000px){#search{width:130px}#search:focus{width:170px}}
+@media(max-width:620px){#search,.brand span{display:none}}
+
+/* progress ring */
+.ring{position:relative;width:38px;height:38px;flex:none}
+.ring svg{transform:rotate(-90deg)}
+.ring circle{fill:none;stroke-width:4}
+.ring .bgc{stroke:var(--line)}
+.ring .fgc{stroke:var(--gd);stroke-linecap:round;transition:stroke-dasharray .45s}
+.ring b{position:absolute;inset:0;display:grid;place-items:center;font-size:10.5px;
+  font-family:var(--mono);color:var(--gd)}
+
+/* ---------- LAYOUT ---------- */
+.wrap{display:flex;gap:0;padding-top:60px}
+.side{position:fixed;inset-block:60px 0;inset-inline-start:0;width:var(--sbw);overflow:auto;
+  border-inline-end:1px solid var(--line);padding:18px 14px 40px;background:var(--ink)}
+.sideX{display:none;width:100%;justify-content:center;margin-bottom:12px}
+@media(max-width:980px){.sideX{display:inline-flex}}
+.side h4{margin:16px 0 6px;font-size:11.5px;letter-spacing:.6px;color:var(--gd);font-weight:700}
+.side h4:first-child{margin-top:0}
+.side a{display:block;padding:6px 11px;border-radius:9px;color:var(--dim);text-decoration:none;
+  font-size:14.5px;line-height:1.7;border-inline-start:2px solid transparent}
+.side a:hover{background:var(--chip);color:var(--txt)}
+.side a.cur{color:var(--cy);border-inline-start-color:var(--cy);background:var(--chip);font-weight:700}
+.side .done::after{content:'✓';color:var(--gr);float:inline-start;font-weight:900}
+main{flex:1;margin-inline-start:var(--sbw);padding:26px 22px 100px;min-width:0}
+.col{max-width:880px;margin:0 auto}
+@media(max-width:980px){
+  .side{transform:translateX(-100%);transition:.25s;z-index:75;width:min(300px,86vw);box-shadow:0 0 60px rgba(0,0,0,.5)}
+  :root[dir="rtl"] .side{transform:translateX(100%)}
+  .side.open{transform:none!important}
+  main{margin-inline-start:0;padding:18px 15px 90px}
+  /* the closed drawer sits off-screen; keep it out of the scroll area */
+  html,body{overflow-x:hidden}
+  .scrim{position:fixed;inset:60px 0 0;background:rgba(2,8,14,.6);z-index:74;display:none}
+  .scrim.on{display:block}
+}
+
+/* ---------- TYPE ---------- */
+h1{font-size:clamp(27px,5vw,42px);line-height:1.4;margin:.1em 0 .3em;font-weight:900;
+  background:linear-gradient(100deg,var(--txt) 15%,var(--cy) 80%);-webkit-background-clip:text;
+  background-clip:text;color:transparent}
+h2{font-size:clamp(21px,3.4vw,29px);margin:0 0 .35em;font-weight:900;line-height:1.45}
+h3{font-size:18.5px;margin:1.6em 0 .5em;font-weight:700;display:flex;align-items:center;gap:9px}
+h3::before{content:'';width:4px;height:17px;background:var(--cy);border-radius:3px;flex:none}
+p{margin:0 0 1em}
+.lead{font-size:18.5px;color:var(--dim);margin-bottom:1.2em}
+.cy{color:var(--cy);font-weight:700}.gd{color:var(--gd);font-weight:700}.rd{color:var(--rd);font-weight:700}
+.dim{color:var(--dim)}.sm{font-size:14.8px}.center{text-align:center}
+
+.sec{scroll-margin-top:80px;padding:34px 0;border-top:1px solid var(--line)}
+.sec:first-of-type{border-top:0;padding-top:10px}
+.sec.hide{display:none}
+.kicker{display:inline-flex;align-items:center;gap:8px;font-size:12.5px;font-weight:700;color:var(--gd);
+  background:rgba(255,200,87,.1);border:1px solid var(--gd-dk);padding:4px 13px;border-radius:30px;margin-bottom:11px}
+.kicker.cy{color:var(--cy);background:var(--chip);border-color:var(--cy-dk)}
+
+/* ---------- CARDS ---------- */
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:17px 19px}
+.card h4{margin:0 0 6px;font-size:16.5px;display:flex;align-items:center;gap:9px}
+.card p{margin:0;color:var(--dim);font-size:15.2px}
+.grid{display:grid;gap:12px;margin:14px 0}
+.g2{grid-template-columns:repeat(2,1fr)}.g3{grid-template-columns:repeat(3,1fr)}
+.g4{grid-template-columns:repeat(4,1fr)}
+@media(max-width:820px){.g2,.g3,.g4{grid-template-columns:1fr}}
+.ic{width:33px;height:33px;flex:none;border-radius:10px;display:grid;place-items:center;font-size:16px;
+  background:var(--chip);border:1px solid var(--cy-dk);font-family:var(--mono);font-weight:700;color:var(--cy)}
+.ic.g{background:rgba(255,200,87,.12);border-color:var(--gd-dk);color:var(--gd)}
+.ic.w{width:auto;padding:0 11px;font-size:13px;white-space:nowrap}
+
+ul.b{list-style:none;padding:0;margin:12px 0}
+ul.b li{position:relative;padding-inline-start:25px;margin-bottom:9px}
+ul.b li::before{content:'';position:absolute;inset-inline-start:4px;top:14px;width:7px;height:7px;
+  border-radius:2px;background:var(--cy);transform:rotate(45deg)}
+ol.st{counter-reset:s;list-style:none;padding:0;margin:12px 0}
+ol.st li{counter-increment:s;position:relative;padding-inline-start:40px;margin-bottom:11px}
+ol.st li::before{content:counter(s);position:absolute;inset-inline-start:0;top:4px;width:27px;height:27px;
+  border-radius:8px;background:var(--cy);color:#04222a;font-weight:900;display:grid;place-items:center;
+  font-size:13.5px;font-family:var(--mono)}
+:root[data-theme="light"] ol.st li::before{color:#fff}
+
+/* ---------- STEP (checkable) ---------- */
+.step{display:flex;gap:13px;align-items:flex-start;background:var(--panel);border:1px solid var(--line);
+  border-radius:var(--r2);padding:13px 16px;margin:11px 0;cursor:pointer;transition:.18s}
+.step:hover{border-color:var(--cy-dk)}
+.step input{appearance:none;width:23px;height:23px;flex:none;margin-top:7px;border:2px solid var(--line2);
+  border-radius:7px;cursor:pointer;position:relative;transition:.16s;background:transparent}
+.step input:checked{background:var(--gr);border-color:var(--gr)}
+.step input:checked::after{content:'✓';position:absolute;inset:0;display:grid;place-items:center;
+  color:#04240f;font-weight:900;font-size:14px}
+.step.ok{border-color:rgba(74,222,128,.45);background:color-mix(in srgb,var(--gr) 7%,var(--panel))}
+.step .tx{flex:1}
+.step .tx b{display:block;font-size:16px;margin-bottom:1px}
+.step .tx span{color:var(--dim);font-size:14.7px;line-height:1.85;display:block}
+
+/* ---------- CODE / PREVIEW ---------- */
+.codebox{background:var(--code-bg);border:1px solid var(--line);border-radius:var(--r2);overflow:hidden;margin:13px 0}
+.codebox .hd{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:7px 12px;
+  background:color-mix(in srgb,var(--code-bg) 80%,#0d2a3e);border-bottom:1px solid var(--line);font-size:12.5px;color:#8fb3c7}
+.codebox .hd .fn{font-family:var(--mono);color:#31e0d4;direction:ltr}
+.codebox pre{margin:0;padding:14px 16px;overflow:auto;direction:ltr;text-align:left;font-family:var(--mono);
+  font-size:13px;line-height:1.9;color:#cfe9f5;max-height:var(--mh,none)}
+.codebox pre::-webkit-scrollbar{height:8px;width:8px}
+.codebox pre::-webkit-scrollbar-thumb{background:#1d5878;border-radius:8px}
+.cm{color:#537b93}.tg{color:#7fd6ff}.at{color:#ffc857}.st{color:#a5e8a5}
+.kw{color:#f472b6}.fn2{color:#a78bfa}.nm{color:#fb923c}
+.codebox pre.fa{font-family:'Vazirmatn',Tahoma,sans-serif;direction:rtl;text-align:right;font-size:15px;line-height:2.1}
+.copy{background:#0d2a3e;border:1px solid #1d5878;color:#e9f5fb;border-radius:8px;padding:3px 11px;
+  font-family:inherit;font-size:12px;cursor:pointer}
+.copy:hover{background:#31e0d4;color:#04222a}
+.copy.done{background:#4ade80;color:#04240f;border-color:#4ade80}
+
+.split{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:14px 0}
+@media(max-width:880px){.split{grid-template-columns:1fr}}
+.split .codebox{--mh:300px;margin:0}
+.browser{background:var(--panel);border:1px solid var(--line);border-radius:var(--r2);overflow:hidden;display:flex;flex-direction:column}
+.chrome{display:flex;align-items:center;gap:7px;padding:8px 12px;background:var(--panel2);border-bottom:1px solid var(--line)}
+.chrome .d{width:10px;height:10px;border-radius:50%;background:#2c4a5e}
+.chrome .d:nth-child(1){background:#fb7185}.chrome .d:nth-child(2){background:#ffc857}.chrome .d:nth-child(3){background:#4ade80}
+.chrome .url{flex:1;background:var(--bg);border:1px solid var(--line);border-radius:20px;padding:2px 12px;
+  font-family:var(--mono);font-size:11px;color:var(--dim2);direction:ltr;text-align:left;margin-inline-start:6px}
+.browser iframe{flex:1;width:100%;min-height:300px;border:0;background:#fff;display:block}
+
+.play{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:14px 0}
+@media(max-width:880px){.play{grid-template-columns:1fr}}
+.play textarea{width:100%;min-height:300px;background:var(--code-bg);color:#cfe9f5;border:1px solid var(--line);
+  border-radius:var(--r2);padding:14px 16px;font-family:var(--mono);font-size:13px;line-height:1.85;
+  direction:ltr;text-align:left;resize:vertical}
+.play textarea:focus{outline:2px solid var(--cy);border-color:transparent}
+
+/* ---------- SQL ---------- */
+.sql{margin:13px 0;border:1px solid var(--line);border-radius:var(--r2);overflow:hidden;background:var(--panel)}
+.sql .q{background:var(--code-bg);padding:12px 16px;font-family:var(--mono);font-size:13.5px;direction:ltr;
+  text-align:left;color:#cfe9f5;line-height:1.85;border-bottom:1px solid var(--line);white-space:pre-wrap}
+.sql .rh{padding:6px 14px;font-size:12.5px;color:var(--dim);background:var(--panel2);
+  border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:10px;align-items:center}
+.res{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:12.5px;direction:ltr}
+.res th{background:var(--panel2);color:var(--cy);padding:7px 11px;text-align:left;border:1px solid var(--line);white-space:nowrap}
+.res td{padding:6px 11px;border:1px solid var(--line);color:var(--dim);white-space:nowrap}
+.res td.fa{font-family:'Vazirmatn',Tahoma,sans-serif;direction:rtl;text-align:right}
+.qbtns{display:flex;flex-wrap:wrap;gap:7px;margin:12px 0}
+.qbtn{background:var(--panel);border:1px solid var(--line);color:var(--dim);border-radius:9px;
+  padding:6px 12px;font-family:inherit;font-size:13px;cursor:pointer}
+.qbtn:hover{border-color:var(--cy);color:var(--txt)}
+.qbtn.cur{background:var(--cy);color:#04222a;border-color:var(--cy);font-weight:700}
+:root[data-theme="light"] .qbtn.cur{color:#fff}
+
+.term{background:var(--code-bg);border:1px solid var(--line);border-radius:var(--r2);padding:13px 16px;
+  font-family:var(--mono);font-size:13px;direction:ltr;text-align:left;color:#b9ecd2;line-height:1.9;margin:12px 0;overflow:auto}
+.term .p{color:#4ade80}.term .o{color:#537b93}
+
+/* ---------- CALLOUTS ---------- */
+.note{border-inline-start:3px solid var(--cy);background:var(--chip);padding:12px 16px;
+  border-radius:0 var(--r3) var(--r3) 0;margin:13px 0;font-size:16px}
+.note.w{border-color:var(--gd);background:rgba(255,200,87,.09)}
+.note.d{border-color:var(--rd);background:rgba(251,113,133,.09)}
+.note.g{border-color:var(--gr);background:rgba(74,222,128,.09)}
+.note b:first-child{display:block;margin-bottom:2px}
+
+details{background:var(--panel);border:1px solid var(--line);border-radius:var(--r3);margin:10px 0;overflow:hidden}
+details[open]{border-color:var(--cy-dk)}
+summary{cursor:pointer;padding:11px 16px;font-weight:700;color:var(--cy);list-style:none;
+  display:flex;align-items:center;gap:9px;font-size:15.8px}
+summary::-webkit-details-marker{display:none}
+summary::before{content:'▸';color:var(--gd);font-size:13px;transition:.2s;flex:none}
+details[open] summary::before{transform:rotate(90deg)}
+summary:hover{background:var(--chip)}
+details .in{padding:4px 16px 15px;border-top:1px solid var(--line);color:var(--dim)}
+
+table.t{width:100%;border-collapse:collapse;margin:13px 0;font-size:15.2px}
+table.t th,table.t td{padding:10px 13px;border:1px solid var(--line);text-align:right;vertical-align:top}
+table.t th{background:var(--panel2);font-weight:700}
+table.t td{background:var(--panel);color:var(--dim)}
+table.t td b{color:var(--txt)}
+.scrollx{overflow-x:auto}
+
+.pill{display:inline-block;background:var(--chip);border:1px solid var(--line2);border-radius:20px;
+  padding:2px 12px;font-size:13px;margin:3px 3px 3px 0;color:var(--cy)}
+.pill.g{background:rgba(255,200,87,.1);border-color:var(--gd-dk);color:var(--gd)}
+
+/* hero */
+.hero{text-align:center;padding:18px 0 6px}
+.hero .meta{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:18px}
+.hero .meta div{background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:9px 16px;font-size:14.5px}
+.hero .meta b{display:block;color:var(--gd);font-size:12.5px}
+
+/* next-step FAB */
+.fab{position:fixed;inset-block-end:18px;inset-inline-end:18px;z-index:70;background:var(--gd);color:#2f2000;
+  border:0;border-radius:30px;padding:11px 20px;font-family:inherit;font-weight:700;font-size:14.5px;
+  cursor:pointer;box-shadow:0 10px 30px rgba(0,0,0,.35);display:none;align-items:center;gap:8px}
+.fab.on{display:inline-flex}
+:root[data-theme="light"] .fab{color:#fff}
+
+.ov{position:fixed;inset:0;z-index:90;background:rgba(2,8,14,.82);backdrop-filter:blur(6px);display:none;overflow:auto}
+.ov.open{display:block}
+.ov .sheet{max-width:840px;margin:26px auto;background:var(--ink);border:1px solid var(--line);
+  border-radius:var(--r);padding:22px 24px}
+.filelist{list-style:none;padding:0;margin:14px 0}
+.filelist li{display:flex;align-items:center;gap:10px;padding:10px 13px;border:1px solid var(--line);
+  border-radius:var(--r3);margin-bottom:8px;background:var(--panel);flex-wrap:wrap}
+.filelist .nm2{font-family:var(--mono);color:var(--cy);font-size:13.5px;direction:ltr;min-width:110px}
+.filelist .ds{color:var(--dim);font-size:13.2px;flex:1;min-width:160px}
+
+/* ---------- TREE ---------- */
+.tree,.tree ul{list-style:none;margin:0;padding:0}
+.tree{font-size:15.5px}
+.tree ul{padding-inline-start:26px;position:relative}
+.tree ul::before{content:'';position:absolute;inset-block:0 18px;inset-inline-start:9px;
+  border-inline-start:2px solid var(--line2)}
+.tree li{position:relative;padding:5px 0}
+.tree ul>li::before{content:'';position:absolute;inset-inline-start:-17px;top:23px;width:15px;
+  border-top:2px solid var(--line2)}
+.tree .node{display:inline-flex;align-items:center;gap:9px;background:var(--panel);
+  border:1px solid var(--line);border-radius:11px;padding:7px 14px;line-height:1.7}
+.tree .node b{font-weight:700}
+.tree .node small{color:var(--dim);font-size:13.2px}
+.tree .q>.node{border-color:var(--gd-dk);background:rgba(255,200,87,.08)}
+.tree .y>.node{border-color:#2f6a4a;background:rgba(74,222,128,.08)}
+.tree .end>.node{border-color:var(--cy-dk);background:var(--chip);font-weight:700}
+.tree .tag2{font-family:var(--mono);font-size:11.5px;padding:1px 8px;border-radius:20px;
+  background:var(--panel2);color:var(--dim);border:1px solid var(--line);flex:none}
+@media(max-width:620px){.tree{font-size:14.5px}.tree ul{padding-inline-start:20px}
+  .tree ul>li::before{inset-inline-start:-13px;width:11px}.tree .node{padding:6px 11px}}
+
+#noRes{display:none;text-align:center;padding:50px 20px;color:var(--dim)}
+#noRes.on{display:block}
+
+@media print{
+  .top,.side,.fab,.ov,.copy,.scrim{display:none!important}
+  main{margin:0;padding:0}
+  body{background:#fff;color:#111;font-size:11pt}
+  .sec.hide{display:block!important}
+  .card,details,.codebox,.sql,.note,.step{background:#f7f9fb!important;border-color:#ccd!important}
+  h1{color:#07314a!important;-webkit-text-fill-color:#07314a}
+  .browser iframe{min-height:200px}
+  .sec{page-break-inside:avoid}
+}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="brand"><i></i><span>راهنمای طراحی سایت با AI</span></div>
+  <div class="grow"></div>
+  <input id="search" type="search" placeholder="جست‌وجو در راهنما…" aria-label="جست‌وجو">
+  <div class="ring" title="پیشرفت شما">
+    <svg width="38" height="38"><circle class="bgc" cx="19" cy="19" r="15"></circle>
+    <circle class="fgc" id="ringFg" cx="19" cy="19" r="15" stroke-dasharray="0 94"></circle></svg>
+    <b id="ringTxt">۰٪</b>
+  </div>
+  <button class="btn gd" id="bFiles">📦 فایل‌ها</button>
+  <button class="btn" id="bTheme" title="تغییر تم">🌙</button>
+  <button class="btn" id="bMenu" title="فهرست">☰</button>
+</header>
+
+<div class="scrim" id="scrim"></div>
+
+<div class="wrap">
+<nav class="side" id="side"><button class="btn sideX" id="sideX">✕ بستن</button></nav>
+<main><div class="col" id="content">
+
+<section class="sec" id="start" data-part="شروع" data-title="خروجی و فایل‌ها">
+  <div class="hero">
+    <span class="kicker cy">راهنمای عملی کارگاه</span>
+    <h1>طراحی سایت با هوش مصنوعی</h1>
+    <p class="lead" style="max-width:56ch;margin:0 auto">کد، پرامپت و پیش‌نمایش زنده. هر قدم را که انجام دادید تیک بزنید.</p>
+    <div class="meta">
+      <div><b>خروجی</b> سایت زنده روی اینترنت</div>
+      <div><b>پیش‌نیاز</b> ندارد</div>
+      <div><b>فایل‌ها</b> دکمه 📦 بالای صفحه</div>
+    </div>
+  </div>
+  <h3>چیزی که می‌سازیم</h3>
+  <div class="split">
+    <div class="codebox"><div class="hd"><span class="fn">index.html</span><button class="copy">کپی</button></div><pre><code></code></pre></div>
+    <div class="browser"><div class="chrome"><span class="d"></span><span class="d"></span><span class="d"></span><span class="url">https://your-name.ir</span></div>
+      <iframe sandbox="allow-scripts" loading="lazy"></iframe></div>
+    <script type="text/plain" class="src">
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head><meta charset="utf-8">
+<style>
+  body{font-family:Tahoma;margin:0;background:#f7fafc;color:#14212b}
+  .hero{background:linear-gradient(140deg,#0e4f6e,#0a3549);color:#fff;padding:34px 22px;text-align:center}
+  .hero h1{margin:0 0 6px;font-size:23px}
+  .hero p{margin:0;color:#bcd9e8;font-size:13px}
+  .btn{display:inline-block;margin-top:14px;background:#ffc857;color:#2f2000;
+       padding:8px 20px;border-radius:20px;font-weight:bold;font-size:13px}
+  .wrap{padding:18px;max-width:520px;margin:auto}
+  h2{font-size:16px;margin:16px 0 8px;border-right:4px solid #ffc857;padding-right:9px}
+  .cards{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .c{background:#fff;border:1px solid #e1e9f0;border-radius:12px;padding:12px;font-size:12px}
+  .c b{color:#0e4f6e;display:block;margin-bottom:3px}
+</style></head>
+<body>
+  <div class="hero">
+    <h1>سبحان عفتی</h1>
+    <p>دانشجوی پزشکی · علاقه‌مند به هوش مصنوعی در سلامت</p>
+    <span class="btn">تماس با من</span>
+  </div>
+  <div class="wrap">
+    <h2>فعالیت‌های پژوهشی</h2>
+    <div class="cards">
+      <div class="c"><b>مقاله اول</b>توضیح کوتاه پروژه.</div>
+      <div class="c"><b>مقاله دوم</b>توضیح کوتاه پروژه.</div>
+    </div>
+    <h2>پیام‌های دریافتی</h2>
+    <div class="c">۳ پیام جدید از فرم تماس — ذخیره‌شده در دیتابیس</div>
+  </div>
+</body>
+</html>
+    </script>
+  </div>
+  <label class="step"><input type="checkbox" data-step="p1"><span class="tx">
+    <b>بسته‌ی فایل‌ها را دانلود کردم</b>
+    <span>دکمه‌ی <b>📦 فایل‌ها</b> بالای صفحه ← «دانلود همه». کل پروژه‌ی کارکننده داخلش است.</span></span></label>
+  <label class="step"><input type="checkbox" data-step="p2"><span class="tx">
+    <b>در یکی از ابزارهای AI حساب دارم</b>
+    <span><a href="https://claude.ai" target="_blank" rel="noopener">Claude</a> ·
+      <a href="https://chatgpt.com" target="_blank" rel="noopener">ChatGPT</a> ·
+      <a href="https://gemini.google.com" target="_blank" rel="noopener">Gemini</a> — نسخه رایگان کافی است.</span></span></label>
+</section>
+
+<section class="sec" id="concepts" data-part="زیرساخت" data-title="چهار کلمه + چه بخرم">
+  <h2>چهار کلمه‌ای که لازم دارید</h2>
+  <div class="scrollx"><table class="t">
+    <tr><th>کلمه</th><th>یعنی</th></tr>
+    <tr><td><b>دامنه</b></td><td>آدرس سایت — <code>yoursite.ir</code></td></tr>
+    <tr><td><b>هاست</b></td><td>جایی که فایل‌ها نگه‌داری می‌شوند</td></tr>
+    <tr><td><b>DNS</b></td><td>پیوند دامنه به هاست (تا ۲۴ ساعت طول می‌کشد)</td></tr>
+    <tr><td><b>SSL</b></td><td>قفل و <code class="ltr">https</code> — رایگان است</td></tr>
+  </table></div>
+  <div class="note"><b>دو قانون</b>
+  فایل‌ها روی هاست باید داخل <code>public_html</code> باشند · معادل لوکالش <code>htdocs</code> است.</div>
+
+  <h3>چه بخرم</h3>
+  <div class="scrollx"><table class="t">
+    <tr><th>مورد</th><th>چه بگیرید</th><th>هزینه</th></tr>
+    <tr><td>دامنه</td><td><b class="ltr">.ir</b> از <a href="https://www.nic.ir" target="_blank" rel="noopener">ایرنیک</a></td><td>سالی ~۳۰ هزار تومان</td></tr>
+    <tr><td>هاست</td><td>اشتراکی لینوکس + <b>cPanel</b> + <b>PHP 8</b> + <b>MySQL</b></td><td>سالی ~۳۰۰ تا ۸۰۰ هزار</td></tr>
+    <tr><td>SSL</td><td>Let's Encrypt رایگان</td><td>۰</td></tr>
+  </table></div>
+  <p class="sm dim">هاست ندارید؟ <a href="#free">مسیر رایگان</a> در انتهای همین صفحه.</p>
+</section>
+
+<section class="sec" id="xampp" data-part="محیط کار" data-title="XAMPP">
+  <h2>XAMPP</h2>
+  <label class="step"><input type="checkbox" data-step="x1"><span class="tx">
+    <b>نصب</b><span>از <a href="https://www.apachefriends.org" target="_blank" rel="noopener">apachefriends.org</a>، با تنظیمات پیش‌فرض.</span></span></label>
+  <label class="step"><input type="checkbox" data-step="x2"><span class="tx">
+    <b>Apache و MySQL را Start کنید</b><span>هر دو باید سبز شوند.</span></span></label>
+  <label class="step"><input type="checkbox" data-step="x3"><span class="tx">
+    <b>فایل‌ها را در <code>C:\xampp\htdocs\mysite</code> بریزید</b><span>محتویات zip بسته‌ی آماده.</span></span></label>
+  <label class="step"><input type="checkbox" data-step="x4"><span class="tx">
+    <b><code>http://localhost/mysite</code> را باز کنید</b><span>سایت باید بالا بیاید.</span></span></label>
+
+  <div class="term">
+C:\xampp\htdocs\mysite\index.html  <span class="p">→</span>  http://localhost/mysite
+public_html/index.html             <span class="p">→</span>  https://yoursite.ir
+  </div>
+
+  <details><summary>Apache روشن نمی‌شود — Port 80 in use</summary><div class="in">
+    <ol class="st">
+      <li>XAMPP ← روبه‌روی Apache دکمه <b>Config</b> ← <b>httpd.conf</b></li>
+      <li><code>Listen 80</code> را به <code>Listen 8080</code> تغییر دهید</li>
+      <li><code>ServerName localhost:80</code> را به <code>localhost:8080</code> تغییر دهید</li>
+      <li>ذخیره، Start دوباره. آدرس جدید: <code>http://localhost:8080/mysite</code></li>
+    </ol>
+  </div></details>
+  <details><summary>MySQL روشن نمی‌شود</summary><div class="in">
+    <p>یک نسخه‌ی دیگر MySQL پورت ۳۳۰۶ را گرفته. در ویندوز <b>Services</b> را باز کنید، سرویس MySQL را متوقف کنید، دوباره Start بزنید.</p>
+  </div></details>
+</section>
+
+<section class="sec" id="html" data-part="محیط کار" data-title="HTML">
+  <h2>HTML — ۸ تگ</h2>
+  <div class="split">
+    <div class="codebox"><div class="hd"><span class="fn">tags.html</span><button class="copy">کپی</button></div><pre><code></code></pre></div>
+    <div class="browser"><div class="chrome"><span class="d"></span><span class="d"></span><span class="d"></span><span class="url">localhost/mysite</span></div>
+      <iframe sandbox="allow-scripts" loading="lazy"></iframe></div>
+    <script type="text/plain" class="src">
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <style>body{font-family:Tahoma;padding:14px;line-height:2;font-size:13px}</style>
+</head>
+<body>
+
+  <h1>تیتر اصلی (h1)</h1>
+  <h2>تیتر فرعی (h2)</h2>
+
+  <p>پاراگراف متن. داخلش <strong>پررنگ</strong> یا <em>مورب</em>.</p>
+
+  <a href="https://nic.ir">لینک (a)</a>
+
+  <br><br>
+  <img alt="تصویر" width="150" height="62"
+       src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='150' height='62'%3E%3Crect width='150' height='62' rx='8' fill='%230e4f6e'/%3E%3Ctext x='75' y='38' font-size='15' fill='%23fff' text-anchor='middle' font-family='Tahoma'%3EIMG%3C/text%3E%3C/svg%3E">
+
+  <ul>
+    <li>آیتم لیست (li)</li>
+    <li>آیتم دوم</li>
+  </ul>
+
+  <div style="background:#eef5fa;padding:10px;border-radius:8px">
+    div — جعبه‌ای برای گروه‌بندی.
+  </div>
+
+  <button onclick="alert('سلام!')">دکمه (button)</button>
+
+</body>
+</html>
+    </script>
+  </div>
+  <div class="note"><b>الگو</b> باز شدن <code>&lt;p&gt;</code> ← محتوا ← بسته شدن <code>&lt;/p&gt;</code>.</div>
+  <div class="note d"><b>ذخیره با Notepad</b>
+  Encoding روی <b>UTF-8</b> و Save as type روی <b>All Files</b> — وگرنه فایل <code>index.html.txt</code> می‌شود و فارسی خراب.</div>
+</section>
+
+<section class="sec" id="css" data-part="محیط کار" data-title="CSS">
+  <h2>CSS — ۶ مفهوم</h2>
+  <div class="split">
+    <div class="codebox"><div class="hd"><span class="fn">style.css</span><button class="copy">کپی</button></div><pre><code></code></pre></div>
+    <div class="browser"><div class="chrome"><span class="d"></span><span class="d"></span><span class="d"></span><span class="url">localhost/mysite</span></div>
+      <iframe sandbox="allow-scripts" loading="lazy"></iframe></div>
+    <script type="text/plain" class="src">
+<!DOCTYPE html>
+<html lang="fa" dir="rtl"><head><meta charset="utf-8">
+<style>
+/* 1) رنگ و فونت */
+body{ font-family:Tahoma; background:#f2f7fa; color:#14212b;
+      padding:14px; font-size:13px; line-height:2 }
+
+/* 2) فاصله: padding داخلی، margin بیرونی */
+.box{ background:#fff; padding:14px; margin-bottom:12px;
+      border:1px solid #dde7ee; border-radius:12px }
+
+/* 3) گرادیان و سایه */
+.hero{ background:linear-gradient(120deg,#0e4f6e,#0a3549);
+       color:#fff; box-shadow:0 8px 20px rgba(14,79,110,.25) }
+
+/* 4) چیدمان کنار هم */
+.row{ display:flex; gap:10px }
+.row > div{ flex:1; text-align:center }
+
+/* 5) حالت hover */
+.btn{ background:#ffc857; color:#2f2000; padding:7px 18px;
+      border-radius:20px; display:inline-block; transition:.2s }
+.btn:hover{ transform:translateY(-3px); background:#ffb020 }
+
+/* 6) موبایل */
+@media (max-width:500px){ .row{ flex-direction:column } }
+</style></head>
+<body>
+  <div class="box hero"><b>جعبه‌ی اصلی</b><br>گرادیان + سایه</div>
+  <div class="row">
+    <div class="box">ستون ۱</div>
+    <div class="box">ستون ۲</div>
+    <div class="box">ستون ۳</div>
+  </div>
+  <span class="btn">موس را روی من ببر</span>
+</body></html>
+    </script>
+  </div>
+  <div class="note"><b>در پرامپت به کار می‌آید</b>
+  «فاصله را بیشتر کن» = <code>margin</code> · «کنار هم بچین» = <code>flex</code> · «در موبایل زیر هم» = <code class="ltr">@media</code></div>
+</section>
+
+<section class="sec" id="playground" data-part="محیط کار" data-title="زمین بازی">
+  <h2>زمین بازی</h2>
+  <div class="play">
+    <textarea id="pgCode" spellcheck="false" aria-label="ویرایشگر کد"></textarea>
+    <div class="browser"><div class="chrome"><span class="d"></span><span class="d"></span><span class="d"></span><span class="url">playground</span></div>
+      <iframe id="pgOut" sandbox="allow-scripts"></iframe></div>
+  </div>
+  <div style="display:flex;gap:8px;flex-wrap:wrap">
+    <button class="btn sm" id="pgReset">↺ حالت اول</button>
+    <button class="btn sm" id="pgDark">🌙 تم تیره</button>
+    <button class="btn sm" id="pgCard">🃏 کارت پروفایل</button>
+    <button class="btn gd sm" id="pgSave">💾 دانلود فایل</button>
+  </div>
+</section>
+
+<section class="sec" id="prompts" data-part="هوش مصنوعی" data-title="پرامپت‌ها">
+  <h2>پرامپت‌نویسی</h2>
+  <div class="scrollx"><table class="t">
+    <tr><th>جزء</th><th>مثال</th></tr>
+    <tr><td><b>نقش</b></td><td>تو یک طراح وب حرفه‌ای فارسی‌زبانی</td></tr>
+    <tr><td><b>هدف و جزئیات</b></td><td>صفحه رزومه با بخش‌های معرفی، تحصیلات، پژوهش، تماس</td></tr>
+    <tr><td><b>قالب خروجی</b></td><td>یک فایل کامل، بدون توضیح اضافه</td></tr>
+    <tr><td><b>محدودیت</b></td><td>راست‌چین، ریسپانسیو، بدون کتابخانه خارجی</td></tr>
+    <tr><td><b>زمینه اجرا</b></td><td>روی هاست اشتراکی با PHP 8.2</td></tr>
+  </table></div>
+
+  <h3>۱. ساخت سایت</h3>
+  <div class="codebox"><div class="hd"><span class="fn">prompt-01-build</span><button class="copy">📋 کپی</button></div>
+<pre class="fa">تو یک طراح وب حرفه‌ای هستی که در ساخت سایت‌های فارسی و راست‌چین تخصص داری.
+
+یک صفحه وب تک‌صفحه‌ای شخصی برای من بساز:
+
+• نام: [نام و نام خانوادگی من]
+• عنوان: دانشجوی [رشته] دانشگاه [نام دانشگاه]
+• بخش‌ها: هدر با منوی چسبان، معرفی با عکس دایره‌ای، سوابق تحصیلی،
+  فعالیت‌های پژوهشی (۳ کارت)، مهارت‌ها، فرم تماس، فوتر
+
+الزامات فنی:
+• کل کد در یک فایل index.html با CSS داخلی
+• راست‌چین (dir="rtl")، charset UTF-8، فونت وزیرمتن از Google Fonts
+• رنگ اصلی #0e4f6e و رنگ تأکیدی #ffc857
+• ریسپانسیو؛ زیر ۷۶۸ پیکسل ستون‌ها زیر هم و منو همبرگری
+• رنگ‌ها را با CSS Variables تعریف کن
+• بدون هیچ کتابخانه یا فریم‌ورک خارجی
+
+زمینه اجرا: روی هاست اشتراکی با PHP 8.2.
+خروجی: فقط کد کامل و آماده اجرا، بدون توضیح اضافه.</pre></div>
+
+  <h3>۲. اصلاح</h3>
+  <div class="codebox"><div class="hd"><span class="fn">prompt-02-refine</span><button class="copy">📋 کپی</button></div>
+<pre class="fa">همان کد قبلی را نگه دار و فقط این تغییرات را اعمال کن:
+
+۱. هدر هنگام اسکرول چسبان بماند، نیمه‌شفاف با افکت بلور
+۲. زیر بخش معرفی دکمه‌ی «دانلود رزومه» با رنگ طلایی اضافه کن
+۳. فاصله‌ی عمودی بین بخش‌ها را دو برابر کن
+۴. دکمه‌ی تغییر حالت روز/شب اضافه کن که در localStorage ذخیره شود
+۵. در موبایل منو همبرگری شود
+
+کل فایل کامل و اصلاح‌شده را دوباره بده، نه فقط بخش تغییریافته.</pre></div>
+  <div class="note w"><b>همیشه بنویسید «کل فایل کامل را دوباره بده»</b> — وگرنه تکه‌کد می‌دهد و باید دستی بچسبانید.</div>
+
+  <h3>۳. رفع خطا</h3>
+  <div class="codebox"><div class="hd"><span class="fn">prompt-03-debug</span><button class="copy">📋 کپی</button></div>
+<pre class="fa">این کد را تو برایم نوشتی ولی کار نمی‌کند.
+
+۱) کدی که اجرا کردم:
+[کد کامل]
+
+۲) خطایی که می‌بینم (عین متن):
+[متن دقیق خطا]
+
+۳) چه انتظاری داشتم:
+[...]
+
+۴) چه اتفاقی واقعاً افتاد:
+[...]
+
+محیط من: XAMPP روی ویندوز، PHP 8.2، MySQL
+اول بگو مشکل از کجاست، بعد کل فایل اصلاح‌شده را بده.</pre></div>
+
+  <details><summary>📱 ریسپانسیو کردن</summary><div class="in">
+    <div class="codebox"><div class="hd"><span class="fn">responsive</span><button class="copy">کپی</button></div>
+<pre class="fa">این کد در موبایل به‌هم می‌ریزد. کل فایل را طوری بازنویسی کن که:
+• زیر ۷۶۸ پیکسل ستون‌ها زیر هم بیایند
+• فونت‌ها با clamp متناسب کوچک شوند
+• منو همبرگری شود
+• اسکرول افقی ایجاد نشود
+کل فایل کامل را بده.</pre></div></div></details>
+  <details><summary>🎨 تغییر ظاهر بدون دست زدن به محتوا</summary><div class="in">
+    <div class="codebox"><div class="hd"><span class="fn">restyle</span><button class="copy">کپی</button></div>
+<pre class="fa">محتوا و ساختار HTML را دقیقاً حفظ کن و فقط CSS را بازنویسی کن:
+ظاهر مینیمال و آکادمیک، پس‌زمینه سفید، متن خاکستری تیره،
+رنگ تأکیدی سرمه‌ای، سایه‌های خیلی ملایم.
+کل فایل کامل را بده.</pre></div></div></details>
+  <details><summary>🔍 سئو</summary><div class="in">
+    <div class="codebox"><div class="hd"><span class="fn">seo</span><button class="copy">کپی</button></div>
+<pre class="fa">این صفحه را از نظر سئو بهینه کن: title و meta description فارسی،
+تگ‌های Open Graph، فقط یک h1، متن alt برای تصاویر،
+و اسکیمای Person به صورت JSON-LD. کل فایل کامل را بده.</pre></div></div></details>
+  <details><summary>📄 صفحه دوم</summary><div class="in">
+    <div class="codebox"><div class="hd"><span class="fn">page2</span><button class="copy">کپی</button></div>
+<pre class="fa">یک صفحه‌ی جدید به نام articles.html بساز با همین استایل و همین هدر و فوتر
+که لیست مقالاتم را به شکل کارت نشان بدهد. لینکش را به منوی index.html اضافه کن.
+هر دو فایل کامل را بده.</pre></div></div></details>
+  <details><summary>🗄 فرم تماس امن با دیتابیس</summary><div class="in">
+    <div class="codebox"><div class="hd"><span class="fn">contact-form</span><button class="copy">کپی</button></div>
+<pre class="fa">یک فرم تماس کامل و امن بساز شامل:
+۱. HTML فرم (نام، ایمیل، موضوع، پیام) هماهنگ با سایت راست‌چین من
+۲. contact.php که اطلاعات را در MySQL ذخیره کند
+۳. دستور SQL ساخت جدول
+
+الزامات امنیتی:
+• PDO با Prepared Statement
+• اعتبارسنجی با filter_var و پاک‌سازی با htmlspecialchars
+• اطلاعات اتصال در فایل جداگانه config.php
+• پیام موفقیت یا خطا به فارسی
+
+هر فایل را جداگانه و کامل بده با نام فایل.</pre></div></div></details>
+
+  <label class="step"><input type="checkbox" data-step="b1"><span class="tx">
+    <b>سایتم را با پرامپت ۱ ساختم و در مرورگر دیدم</b>
+    <span>کد را در <code>index.html</code> ذخیره کنید و <code>http://localhost/mysite</code> را باز کنید.</span></span></label>
+</section>
+
+<section class="sec" id="db" data-part="دیتابیس" data-title="دیتابیس و SQL">
+  <h2>دیتابیس</h2>
+  <p class="lead">چهار فعل: <span class="pill">SELECT بخوان</span><span class="pill">INSERT بنویس</span><span class="pill">UPDATE تغییر بده</span><span class="pill">DELETE پاک کن</span></p>
+
+  <h3>۱. ساخت جدول</h3>
+  <div class="codebox"><div class="hd"><span class="fn">database.sql</span><button class="copy">کپی</button></div>
+<pre><span class="kw">CREATE DATABASE IF NOT EXISTS</span> mysite_db
+  <span class="kw">DEFAULT CHARACTER SET</span> utf8mb4
+  <span class="kw">COLLATE</span> utf8mb4_persian_ci;
+
+<span class="kw">USE</span> mysite_db;
+
+<span class="kw">CREATE TABLE IF NOT EXISTS</span> messages (
+  id         <span class="fn2">INT</span> <span class="kw">AUTO_INCREMENT PRIMARY KEY</span>,
+  name       <span class="fn2">VARCHAR</span>(100) <span class="kw">NOT NULL</span>,
+  email      <span class="fn2">VARCHAR</span>(150) <span class="kw">NOT NULL</span>,
+  subject    <span class="fn2">VARCHAR</span>(200) <span class="kw">NOT NULL</span>,
+  message    <span class="fn2">TEXT</span>         <span class="kw">NOT NULL</span>,
+  is_read    <span class="fn2">TINYINT</span>(1)   <span class="kw">DEFAULT</span> <span class="nm">0</span>,
+  created_at <span class="fn2">TIMESTAMP</span>    <span class="kw">DEFAULT</span> <span class="fn2">CURRENT_TIMESTAMP</span>
+) <span class="kw">ENGINE</span>=InnoDB <span class="kw">DEFAULT CHARSET</span>=utf8mb4 <span class="kw">COLLATE</span>=utf8mb4_persian_ci;</pre></div>
+  <div class="note w"><b>utf8mb4_persian_ci</b> را حذف نکنید — بدون آن فارسی به‌صورت <span class="ltr">????</span> ذخیره می‌شود.</div>
+  <div class="scrollx"><table class="t sm">
+    <tr><th>نوع</th><th>کاربرد</th></tr>
+    <tr><td><b class="ltr">INT</b></td><td>عدد صحیح</td></tr>
+    <tr><td><b class="ltr">VARCHAR(n)</b></td><td>متن کوتاه</td></tr>
+    <tr><td><b class="ltr">TEXT</b></td><td>متن بلند</td></tr>
+    <tr><td><b class="ltr">TINYINT(1)</b></td><td>بله/خیر</td></tr>
+    <tr><td><b class="ltr">DATETIME</b></td><td>تاریخ و زمان</td></tr>
+    <tr><td><b class="ltr">DECIMAL(10,2)</b></td><td>عدد اعشاری (قیمت)</td></tr>
+  </table></div>
+
+  <h3>۲. نوشتن داده</h3>
+  <div class="codebox"><div class="hd"><span class="fn">insert.sql</span><button class="copy">کپی</button></div>
+<pre><span class="kw">INSERT INTO</span> messages (name, email, subject, message) <span class="kw">VALUES</span>
+(<span class="st">'مریم احمدی'</span>, <span class="st">'maryam@example.com'</span>, <span class="st">'سؤال درباره نوبت'</span>, <span class="st">'سلام...'</span>),
+(<span class="st">'علی رضایی'</span>,  <span class="st">'ali@example.com'</span>,    <span class="st">'همکاری پژوهشی'</span>,    <span class="st">'پیشنهاد...'</span>);</pre></div>
+  <p class="sm dim"><code>id</code> و <code>created_at</code> را ننوشتیم — دیتابیس خودش پر می‌کند.</p>
+
+  <h3>۳. خواندن داده — روی دکمه‌ها بزنید</h3>
+  <div class="qbtns" id="qbtns"></div>
+  <div class="sql">
+    <div class="q" id="qText"></div>
+    <div class="rh"><span id="qDesc"></span><span id="qRows" class="ltr"></span></div>
+    <div class="scrollx" style="max-height:290px"><table class="res" id="qRes"></table></div>
+  </div>
+  <div class="note"><span class="ltr" style="font-family:var(--mono);font-size:14px">SELECT <span class="dim">ستون‌ها</span> FROM <span class="dim">جدول</span> WHERE <span class="dim">شرط</span> ORDER BY <span class="dim">مرتب‌سازی</span> LIMIT <span class="dim">تعداد</span></span></div>
+
+  <h3>۴. تغییر و حذف</h3>
+  <div class="grid g2">
+    <div class="codebox" style="margin:0"><div class="hd"><span class="fn">update.sql</span><button class="copy">کپی</button></div>
+<pre><span class="kw">UPDATE</span> messages <span class="kw">SET</span> is_read = <span class="nm">1</span> <span class="kw">WHERE</span> id = <span class="nm">2</span>;
+
+<span class="kw">DELETE FROM</span> messages <span class="kw">WHERE</span> id = <span class="nm">7</span>;</pre></div>
+    <div class="codebox" style="margin:0;border-color:#7a3845"><div class="hd"><span class="fn" style="color:#fb7185">☠ بدون WHERE اجرا نکنید</span></div>
+<pre><span class="kw">UPDATE</span> messages <span class="kw">SET</span> is_read = <span class="nm">1</span>;   <span class="cm">-- همه‌ی سطرها</span>
+<span class="kw">DELETE FROM</span> messages;                <span class="cm">-- کل جدول خالی</span>
+<span class="kw">DROP TABLE</span> messages;                 <span class="cm">-- جدول نابود</span></pre></div>
+  </div>
+  <div class="note d"><b>قبل از UPDATE/DELETE</b>
+  همان شرط را اول با <span class="ltr">SELECT</span> بزنید تا ببینید چند سطر برمی‌گردد. بکاپ هم: phpMyAdmin ← <b>Export</b> ← <b>Go</b>.</div>
+
+  <h3>۵. JOIN — اتصال دو جدول</h3>
+  <div class="split">
+    <div class="codebox" style="margin:0"><div class="hd"><span class="fn">join.sql</span><button class="copy">کپی</button></div>
+<pre><span class="kw">SELECT</span> a.title, c.name, a.views
+<span class="kw">FROM</span> articles a
+<span class="kw">JOIN</span> categories c <span class="kw">ON</span> a.category_id = c.id
+<span class="kw">ORDER BY</span> a.views <span class="kw">DESC</span>;</pre></div>
+    <div class="sql" style="margin:0"><div class="rh"><span>نتیجه</span><span class="ltr">4 rows</span></div>
+      <div class="scrollx"><table class="res">
+        <tr><th>title</th><th>name</th><th>views</th></tr>
+        <tr><td class="fa">کاربرد یادگیری ماشین...</td><td class="fa">هوش مصنوعی در پزشکی</td><td>780</td></tr>
+        <tr><td class="fa">شبکه عصبی در تصویربرداری</td><td class="fa">هوش مصنوعی در پزشکی</td><td>510</td></tr>
+        <tr><td class="fa">تشخیص زودهنگام...</td><td class="fa">قلب و عروق</td><td>320</td></tr>
+        <tr><td class="fa">روش‌های نوین تدریس...</td><td class="fa">آموزش پزشکی</td><td>145</td></tr>
+      </table></div></div>
+  </div>
+  <p class="sm dim"><code>category_id</code> در جدول مقالات به <code>id</code> در جدول دسته‌ها اشاره می‌کند.</p>
+
+  <label class="step"><input type="checkbox" data-step="d1"><span class="tx">
+    <b><code>database.sql</code> را در phpMyAdmin ایمپورت کردم</b>
+    <span><code>http://localhost/phpmyadmin</code> ← تب <b>Import</b> ← فایل ← <b>Go</b></span></span></label>
+</section>
+
+<section class="sec" id="php" data-part="اتصال PHP" data-title="PHP و امنیت">
+  <h2>اتصال PHP به دیتابیس</h2>
+  <div class="grid g2">
+    <div class="codebox" style="margin:0"><div class="hd"><span class="fn">config.php</span><button class="copy">کپی</button></div>
+<pre><span class="cm">&lt;?php</span>
+<span class="cm">// روی هاست فقط این ۴ خط عوض می‌شود</span>
+<span class="kw">define</span>(<span class="st">'DB_HOST'</span>, <span class="st">'localhost'</span>);
+<span class="kw">define</span>(<span class="st">'DB_NAME'</span>, <span class="st">'mysite_db'</span>);
+<span class="kw">define</span>(<span class="st">'DB_USER'</span>, <span class="st">'root'</span>);
+<span class="kw">define</span>(<span class="st">'DB_PASS'</span>, <span class="st">''</span>);
+
+<span class="kw">function</span> <span class="fn2">db</span>() {
+    <span class="kw">static</span> <span class="at">$pdo</span> = <span class="kw">null</span>;
+    <span class="kw">if</span> (<span class="at">$pdo</span> === <span class="kw">null</span>) {
+        <span class="at">$dsn</span> = <span class="st">'mysql:host='</span>.DB_HOST
+              .<span class="st">';dbname='</span>.DB_NAME
+              .<span class="st">';charset=utf8mb4'</span>;
+        <span class="at">$pdo</span> = <span class="kw">new</span> <span class="fn2">PDO</span>(<span class="at">$dsn</span>, DB_USER, DB_PASS, [
+            PDO::ATTR_ERRMODE =&gt; PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_DEFAULT_FETCH_MODE =&gt; PDO::FETCH_ASSOC,
+            PDO::ATTR_EMULATE_PREPARES =&gt; <span class="kw">false</span>,
+        ]);
+    }
+    <span class="kw">return</span> <span class="at">$pdo</span>;
+}</pre></div>
+    <div class="codebox" style="margin:0"><div class="hd"><span class="fn">contact.php</span><button class="copy">کپی</button></div>
+<pre><span class="cm">&lt;?php</span>
+<span class="kw">require</span> __DIR__ . <span class="st">'/config.php'</span>;
+
+<span class="at">$name</span>    = <span class="fn2">trim</span>(<span class="at">$_POST</span>[<span class="st">'name'</span>]    ?? <span class="st">''</span>);
+<span class="at">$email</span>   = <span class="fn2">trim</span>(<span class="at">$_POST</span>[<span class="st">'email'</span>]   ?? <span class="st">''</span>);
+<span class="at">$subject</span> = <span class="fn2">trim</span>(<span class="at">$_POST</span>[<span class="st">'subject'</span>] ?? <span class="st">''</span>);
+<span class="at">$message</span> = <span class="fn2">trim</span>(<span class="at">$_POST</span>[<span class="st">'message'</span>] ?? <span class="st">''</span>);
+
+<span class="at">$errors</span> = [];
+<span class="kw">if</span> (<span class="fn2">mb_strlen</span>(<span class="at">$name</span>) &lt; <span class="nm">3</span>)
+    <span class="at">$errors</span>[] = <span class="st">'نام را کامل وارد کنید.'</span>;
+<span class="kw">if</span> (!<span class="fn2">filter_var</span>(<span class="at">$email</span>, FILTER_VALIDATE_EMAIL))
+    <span class="at">$errors</span>[] = <span class="st">'ایمیل معتبر نیست.'</span>;
+<span class="kw">if</span> (<span class="fn2">mb_strlen</span>(<span class="at">$message</span>) &lt; <span class="nm">10</span>)
+    <span class="at">$errors</span>[] = <span class="st">'متن پیام کوتاه است.'</span>;
+
+<span class="kw">if</span> (!<span class="at">$errors</span>) {
+    <span class="at">$sql</span> = <span class="st">'INSERT INTO messages
+            (name, email, subject, message)
+            VALUES (?, ?, ?, ?)'</span>;
+    <span class="fn2">db</span>()-&gt;<span class="fn2">prepare</span>(<span class="at">$sql</span>)-&gt;<span class="fn2">execute</span>(
+        [<span class="at">$name</span>, <span class="at">$email</span>, <span class="at">$subject</span>, <span class="at">$message</span>]
+    );
+    <span class="kw">echo</span> <span class="st">'پیام شما ثبت شد'</span>;
+}</pre></div>
+  </div>
+
+  <h3>خواندن و نمایش</h3>
+  <div class="split">
+    <div class="codebox" style="margin:0"><div class="hd"><span class="fn">inbox.php</span><button class="copy">کپی</button></div>
+<pre><span class="cm">&lt;?php</span>
+<span class="kw">require</span> __DIR__ . <span class="st">'/config.php'</span>;
+
+<span class="at">$rows</span> = <span class="fn2">db</span>()-&gt;<span class="fn2">query</span>(
+    <span class="st">'SELECT name, subject, is_read, created_at
+      FROM messages ORDER BY created_at DESC LIMIT 10'</span>
+)-&gt;<span class="fn2">fetchAll</span>();
+<span class="cm">?&gt;</span>
+
+&lt;<span class="tg">table</span>&gt;
+  &lt;<span class="tg">tr</span>&gt;&lt;<span class="tg">th</span>&gt;فرستنده&lt;/<span class="tg">th</span>&gt;&lt;<span class="tg">th</span>&gt;موضوع&lt;/<span class="tg">th</span>&gt;
+      &lt;<span class="tg">th</span>&gt;وضعیت&lt;/<span class="tg">th</span>&gt;&lt;/<span class="tg">tr</span>&gt;
+
+<span class="cm">&lt;?php foreach (</span><span class="at">$rows</span> <span class="cm">as </span><span class="at">$r</span><span class="cm">): ?&gt;</span>
+  &lt;<span class="tg">tr</span>&gt;
+    &lt;<span class="tg">td</span>&gt;<span class="cm">&lt;?= </span><span class="fn2">htmlspecialchars</span>(<span class="at">$r</span>[<span class="st">'name'</span>])<span class="cm"> ?&gt;</span>&lt;/<span class="tg">td</span>&gt;
+    &lt;<span class="tg">td</span>&gt;<span class="cm">&lt;?= </span><span class="fn2">htmlspecialchars</span>(<span class="at">$r</span>[<span class="st">'subject'</span>])<span class="cm"> ?&gt;</span>&lt;/<span class="tg">td</span>&gt;
+    &lt;<span class="tg">td</span>&gt;<span class="cm">&lt;?= </span><span class="at">$r</span>[<span class="st">'is_read'</span>] ? <span class="st">'خوانده‌شده'</span> : <span class="st">'جدید'</span><span class="cm"> ?&gt;</span>&lt;/<span class="tg">td</span>&gt;
+  &lt;/<span class="tg">tr</span>&gt;
+<span class="cm">&lt;?php endforeach; ?&gt;</span>
+&lt;/<span class="tg">table</span>&gt;</pre></div>
+    <div class="browser"><div class="chrome"><span class="d"></span><span class="d"></span><span class="d"></span><span class="url">localhost/mysite/inbox.php</span></div>
+      <iframe sandbox="allow-scripts" loading="lazy"></iframe></div>
+    <script type="text/plain" class="src">
+<!DOCTYPE html>
+<html lang="fa" dir="rtl"><head><meta charset="utf-8"><style>
+body{font-family:Tahoma;padding:14px;background:#f6f9fc;color:#14212b;font-size:12.5px}
+h3{margin:0 0 12px;color:#0e4f6e;font-size:15px}
+table{width:100%;border-collapse:collapse;background:#fff;border-radius:10px;overflow:hidden;
+      box-shadow:0 4px 14px rgba(14,79,110,.08)}
+th{background:#0e4f6e;color:#fff;padding:9px;text-align:right;font-size:12px}
+td{padding:9px;border-bottom:1px solid #eef3f7}
+.new{background:#ffc857;color:#2f2000;padding:1px 9px;border-radius:12px;font-size:11px}
+.old{color:#8aa2b3;font-size:11px}
+</style></head><body>
+<h3>صندوق پیام‌ها</h3>
+<table>
+  <tr><th>فرستنده</th><th>موضوع</th><th>وضعیت</th></tr>
+  <tr><td>رضا کریمی</td><td>همکاری پژوهشی</td><td><span class="new">جدید</span></td></tr>
+  <tr><td>سارا یزدانی</td><td>تشکر</td><td><span class="new">جدید</span></td></tr>
+  <tr><td>حسین نوری</td><td>سؤال درباره نوبت</td><td><span class="old">خوانده‌شده</span></td></tr>
+  <tr><td>نگار شریفی</td><td>همکاری پژوهشی</td><td><span class="new">جدید</span></td></tr>
+</table>
+</body></html>
+    </script>
+  </div>
+  <div class="note"><b>الگو</b> یک <span class="ltr">SELECT</span> ← آرایه ← <span class="ltr">foreach</span> ← قالب HTML. هر لیست و جدولی در هر سایتی همین است.</div>
+
+  <h3>امنیت</h3>
+  <div class="grid g2">
+    <div class="codebox" style="margin:0;border-color:#7a3845"><div class="hd"><span class="fn" style="color:#fb7185">✕ آسیب‌پذیر</span></div>
+<pre><span class="at">$sql</span> = <span class="st">"SELECT * FROM users
+        WHERE user = '</span><span class="at">$user</span><span class="st">'
+          AND pass = '</span><span class="at">$pass</span><span class="st">'"</span>;
+<span class="fn2">db</span>()-&gt;<span class="fn2">query</span>(<span class="at">$sql</span>);</pre></div>
+    <div class="codebox" style="margin:0;border-color:#2f6a4a"><div class="hd"><span class="fn" style="color:#4ade80">✓ امن</span></div>
+<pre><span class="at">$sql</span>  = <span class="st">'SELECT * FROM users
+         WHERE user = ? AND pass = ?'</span>;
+<span class="at">$stmt</span> = <span class="fn2">db</span>()-&gt;<span class="fn2">prepare</span>(<span class="at">$sql</span>);
+<span class="at">$stmt</span>-&gt;<span class="fn2">execute</span>([<span class="at">$user</span>, <span class="at">$pass</span>]);</pre></div>
+  </div>
+  <div class="sql">
+    <div class="rh"><span>اگر کاربر در فیلد رمز این را بنویسد</span></div>
+    <div class="q" style="color:#fb7185">' OR '1'='1</div>
+    <div class="rh"><span>در کد آسیب‌پذیر این دستور اجرا می‌شود</span></div>
+    <div class="q">SELECT * FROM users WHERE user = 'admin' AND pass = '<span style="color:#fb7185">' OR '1'='1</span>'</div>
+    <div class="rh"><span>نتیجه</span><span style="color:#fb7185">ورود بدون دانستن رمز</span></div>
+  </div>
+  <ul class="b g">
+    <li>در پرامپت بنویسید: «از PDO با Prepared Statement استفاده کن، ورودی‌ها را با <span class="ltr">filter_var</span> اعتبارسنجی کن، خروجی را با <span class="ltr">htmlspecialchars</span> پاک‌سازی کن.»</li>
+    <li>رمز عبور را با <code class="ltr">password_hash()</code> ذخیره کنید، نه متن ساده.</li>
+    <li>روی هاست، نمایش خطاها را خاموش کنید.</li>
+  </ul>
+</section>
+
+<section class="sec" id="deploy" data-part="انتشار" data-title="انتقال به هاست">
+  <h2>انتقال به هاست</h2>
+  <label class="step"><input type="checkbox" data-step="u1"><span class="tx">
+    <b>Nameserver دامنه را به هاست وصل کردم</b>
+    <span>در پنل <b>دامنه</b> (نه پنل هاست). تا ۲۴ ساعت طول می‌کشد.</span></span></label>
+  <label class="step"><input type="checkbox" data-step="u2"><span class="tx">
+    <b>فایل‌ها را در <code>public_html</code> آپلود و Extract کردم</b>
+    <span>cPanel ← File Manager ← public_html ← Upload ← راست‌کلیک روی zip ← Extract</span></span></label>
+  <label class="step"><input type="checkbox" data-step="u3"><span class="tx">
+    <b>دیتابیس را ساختم و ایمپورت کردم</b>
+    <span>cPanel ← MySQL Databases: یک دیتابیس و یک کاربر بسازید، کاربر را با <b>All Privileges</b> وصل کنید.
+    بعد phpMyAdmin ← Import ← فایل <code>.sql</code></span></span></label>
+  <label class="step"><input type="checkbox" data-step="u4"><span class="tx">
+    <b><code>config.php</code> را با اطلاعات هاست به‌روز کردم</b>
+    <span>نام دیتابیس و کاربر روی هاست معمولاً پیشوند نام اکانت دارند: <code class="ltr">username_mysite</code></span></span></label>
+  <label class="step"><input type="checkbox" data-step="u5"><span class="tx">
+    <b>SSL را فعال کردم</b>
+    <span>cPanel ← SSL/TLS Status ← <b>Run AutoSSL</b> ← بعد <b>Force HTTPS Redirect</b> را روشن کنید.</span></span></label>
+
+  <div class="note d"><b>ساختار درست پوشه</b>
+  <div class="term" style="margin:8px 0 0">
+<span class="o">✕</span> public_html/mysite/index.html   <span class="o">→ yoursite.ir/mysite</span>
+<span class="p">✓</span> public_html/index.html          <span class="o">→ yoursite.ir</span>
+  </div></div>
+
+  <h3>خطاهای رایج</h3>
+  <div class="scrollx"><table class="t">
+    <tr><th>خطا</th><th>راه‌حل</th></tr>
+    <tr><td><b>صفحه سفید</b></td><td>موقتاً بالای فایل: <code class="ltr">error_reporting(E_ALL); ini_set('display_errors',1);</code></td></tr>
+    <tr><td><b class="ltr">404</b></td><td><code>index.html</code> باید مستقیماً در <code>public_html</code> باشد، با حروف کوچک</td></tr>
+    <tr><td><b class="ltr">403</b></td><td>پوشه‌ها ۷۵۵، فایل‌ها ۶۴۴ (راست‌کلیک ← Change Permissions)</td></tr>
+    <tr><td><b class="ltr">500</b></td><td>cPanel ← Errors را ببینید؛ متن خطا را به AI بدهید</td></tr>
+    <tr><td><b class="ltr">SQLSTATE[HY000] [1045]</b></td><td>نام کاربری یا رمز دیتابیس در <code>config.php</code> غلط است</td></tr>
+    <tr><td><b class="ltr">SQLSTATE[42S02]</b></td><td>جدول وجود ندارد — فایل <code>.sql</code> را ایمپورت کنید</td></tr>
+    <tr><td><b>فارسی به‌هم‌ریخته</b></td><td>فایل UTF-8 · دیتابیس <code class="ltr">utf8mb4_persian_ci</code> · اتصال <code class="ltr">charset=utf8mb4</code></td></tr>
+    <tr><td><b>تغییرات دیده نمی‌شود</b></td><td><code class="ltr">Ctrl+Shift+R</code> یا حالت ناشناس</td></tr>
+  </table></div>
+</section>
+
+<section class="sec" id="free" data-part="انتشار" data-title="مسیر رایگان">
+  <h2>انتشار رایگان (بدون هاست)</h2>
+  <div class="grid g3">
+    <div class="card"><h4><span class="ic">GH</span> GitHub Pages</h4><p><a href="https://github.com" target="_blank" rel="noopener">github.com</a> ← مخزن جدید ← آپلود فایل‌ها ← Settings ← Pages ← فعال. آدرس: <code class="ltr">username.github.io</code></p></div>
+    <div class="card"><h4><span class="ic">NL</span> Netlify</h4><p><a href="https://netlify.com" target="_blank" rel="noopener">netlify.com</a> ← پوشه‌ی سایت را drag & drop کنید.</p></div>
+    <div class="card"><h4><span class="ic">VC</span> Vercel</h4><p><a href="https://vercel.com" target="_blank" rel="noopener">vercel.com</a> ← مشابه Netlify، با https خودکار.</p></div>
+  </div>
+  <div class="note w"><b>محدودیت</b> این سه سرویس <b>PHP و MySQL اجرا نمی‌کنند</b>. صفحات HTML/CSS/JS کار می‌کنند، ولی فرم تماس PHP نه. برای فرم از Formspree یا Google Forms استفاده کنید.</div>
+</section>
+
+<section class="sec" id="tree" data-part="جمع‌بندی" data-title="جمع‌بندی — چه کار کنم">
+  <span class="kicker">جمع‌بندی</span>
+  <h2>🌳 از اینجا به بعد چه کار کنم</h2>
+  <p class="lead">کل مسیر در یک نگاه. از بالا شروع کنید و هر شاخه‌ای که به شما مربوط است را دنبال کنید.</p>
+
+  <ul class="tree">
+    <li class="q"><span class="node"><span class="tag2">۱</span><b>چه نوع سایتی می‌خواهم؟</b></span>
+      <ul>
+        <li class="y"><span class="node"><b>فقط معرفی و رزومه</b> <small>بدون فرم و دیتابیس</small></span>
+          <ul>
+            <li><span class="node"><span class="tag2">A</span>پرامپت ۱ را بفرست ← کد را در <code>index.html</code> ذخیره کن</span></li>
+            <li><span class="node"><span class="tag2">B</span>با مرورگر بازش کن و اصلاحش کن (پرامپت ۲)</span></li>
+            <li class="end"><span class="node">✅ روی <b>GitHub Pages</b> یا <b>Netlify</b> منتشر کن — تمام</span>
+              <ul><li><span class="node"><small>نه XAMPP لازم است، نه هاست، نه هزینه</small></span></li></ul></li>
+          </ul>
+        </li>
+        <li><span class="node"><b>فرم تماس و دیتابیس می‌خواهم</b></span>
+          <ul><li><span class="node">مسیر کامل را از قدم ۲ ادامه بده ↓</span></li></ul>
+        </li>
+      </ul>
+    </li>
+
+    <li><span class="node"><span class="tag2">۲</span><b>محیط کار را آماده کن</b></span>
+      <ul>
+        <li><span class="node">XAMPP را نصب کن</span></li>
+        <li><span class="node">Apache و MySQL را Start کن <small>هر دو سبز</small></span></li>
+        <li><span class="node">فایل‌های بسته را در <code>htdocs\mysite</code> بریز</span></li>
+        <li><span class="node"><code>http://localhost/mysite</code> باید باز شود</span>
+          <ul><li class="q"><span class="node">باز نشد؟ <small>← بخش XAMPP، قسمت «Port 80 in use»</small></span></li></ul></li>
+      </ul>
+    </li>
+
+    <li><span class="node"><span class="tag2">۳</span><b>ظاهر سایت را بساز</b></span>
+      <ul>
+        <li><span class="node"><b>پرامپت ۱</b> ← کد بگیر ← در <code>index.html</code> ذخیره کن</span>
+          <ul><li><span class="node"><small>Notepad: Encoding = UTF-8 · Save as type = All Files</small></span></li></ul></li>
+        <li class="q"><span class="node">راضی نبودی؟ <b>پرامپت ۲</b> با درخواست دقیق ← تکرار تا وقتی خوب شود</span></li>
+      </ul>
+    </li>
+
+    <li><span class="node"><span class="tag2">۴</span><b>دیتابیس را بساز</b></span>
+      <ul>
+        <li><span class="node"><code>http://localhost/phpmyadmin</code> ← تب <b>Import</b> ← <code>database.sql</code> ← <b>Go</b></span></li>
+        <li><span class="node">جدول <code>messages</code> باید ساخته شود</span></li>
+      </ul>
+    </li>
+
+    <li><span class="node"><span class="tag2">۵</span><b>فرم را به دیتابیس وصل کن</b></span>
+      <ul>
+        <li><span class="node"><code>config.php</code> — لوکال: کاربر <code>root</code> و رمز خالی</span></li>
+        <li><span class="node">فرم تماس را پر کن و بفرست</span></li>
+        <li><span class="node"><code>inbox.php</code> را باز کن — پیام باید آنجا باشد</span>
+          <ul><li class="q"><span class="node">خطا گرفتی؟ <b>پرامپت ۳</b> + جدول خطاها</span></li></ul></li>
+      </ul>
+    </li>
+
+    <li class="q"><span class="node"><span class="tag2">۶</span><b>منتشر کن — هاست داری؟</b></span>
+      <ul>
+        <li class="y"><span class="node"><b>بله</b></span>
+          <ul>
+            <li><span class="node">Nameserver دامنه را به هاست وصل کن <small>تا ۲۴ ساعت</small></span></li>
+            <li><span class="node">فایل‌ها را در <code>public_html</code> آپلود و Extract کن</span></li>
+            <li><span class="node">در cPanel دیتابیس و کاربر بساز ← <code>.sql</code> را Import کن</span></li>
+            <li><span class="node"><code>config.php</code> را با اطلاعات هاست عوض کن</span></li>
+            <li><span class="node">SSL را با <b>Run AutoSSL</b> فعال کن و <b>Force HTTPS</b> بزن</span></li>
+            <li class="end"><span class="node">✅ سایت روی دامنه‌ی خودت بالاست</span></li>
+          </ul>
+        </li>
+        <li><span class="node"><b>نه</b></span>
+          <ul>
+            <li><span class="node">GitHub Pages یا Netlify <small>فقط HTML/CSS/JS — بدون PHP</small></span></li>
+            <li><span class="node">برای فرم: Formspree یا Google Forms</span></li>
+            <li class="end"><span class="node">✅ سایت رایگان آنلاین است</span></li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+
+    <li class="end"><span class="node"><span class="tag2">۷</span><b>لینک سایت را در رزومه و لینکدین بگذار</b></span></li>
+  </ul>
+
+  <h3>اگر فقط ۳۰ دقیقه وقت دارید</h3>
+  <ol class="st">
+    <li>بسته‌ی فایل‌ها را دانلود کنید (دکمه 📦)</li>
+    <li>پرامپت ۱ را با اطلاعات خودتان بفرستید</li>
+    <li>کد را در <code>index.html</code> ذخیره کنید</li>
+    <li>در Netlify پوشه را drag & drop کنید</li>
+    <li>سایتتان آنلاین است</li>
+  </ol>
+</section>
+
+<section class="sec" id="links" data-part="جمع‌بندی" data-title="ابزارها">
+  <h2>ابزارها</h2>
+  <div class="grid g4">
+    <div class="card"><h4>هوش مصنوعی</h4><p class="sm"><a href="https://claude.ai" target="_blank" rel="noopener">Claude</a> · <a href="https://chatgpt.com" target="_blank" rel="noopener">ChatGPT</a> · <a href="https://gemini.google.com" target="_blank" rel="noopener">Gemini</a></p></div>
+    <div class="card"><h4>ابزار کار</h4><p class="sm"><a href="https://code.visualstudio.com" target="_blank" rel="noopener">VS Code</a> · <a href="https://www.apachefriends.org" target="_blank" rel="noopener">XAMPP</a> · <a href="https://codepen.io" target="_blank" rel="noopener">CodePen</a></p></div>
+    <div class="card"><h4>یادگیری</h4><p class="sm"><a href="https://developer.mozilla.org/fa/" target="_blank" rel="noopener">MDN</a> · <a href="https://www.w3schools.com/sql/" target="_blank" rel="noopener">W3Schools SQL</a> · <a href="https://sqlbolt.com" target="_blank" rel="noopener">SQLBolt</a></p></div>
+    <div class="card"><h4>محتوا</h4><p class="sm"><a href="https://fonts.google.com/?subset=arabic" target="_blank" rel="noopener">Google Fonts</a> · <a href="https://unsplash.com" target="_blank" rel="noopener">Unsplash</a> · <a href="https://coolors.co" target="_blank" rel="noopener">Coolors</a></p></div>
+  </div>
+  <p class="dim sm" style="margin-top:20px">کارگاه طراحی سایت با هوش مصنوعی · سبحان عفتی · شهریور ۱۴۰۵ ·
+  <a href="slides.html">نسخه‌ی اسلایدی ←</a></p>
+</section>
+
+<div id="noRes">چیزی پیدا نشد. کلمه‌ی دیگری امتحان کنید.</div>
+</div></main>
+</div>
+
+<button class="fab" id="fab">▶ قدم بعدی</button>
+
+<div class="ov" id="ovFiles"><div class="sheet">
+  <button class="btn" id="filesX" style="float:inline-end">✕</button>
+  <h2 style="margin-top:0">📦 فایل‌های آماده</h2>
+  <p class="lead">پروژه‌ی کامل و کارکننده. همه را یک‌جا بگیرید یا هر فایل را جدا.</p>
+  <div style="display:flex;gap:9px;flex-wrap:wrap;margin:14px 0">
+    <button class="btn gd" id="dlZip">⬇ دانلود همه (zip)</button>
+  </div>
+  <ul class="filelist" id="fileList"></ul>
+  <div class="note g"><b>راه‌اندازی</b>
+  zip را باز کنید ← محتویاتش را در <code>C:\xampp\htdocs\mysite</code> بریزید ← XAMPP را روشن کنید ←
+  در phpMyAdmin فایل <code>database.sql</code> را Import کنید ← <code>http://localhost/mysite</code></div>
+</div></div>
+
+<!-- ================= FILE PAYLOADS ================= -->
+<textarea hidden class="payload" data-file="index.html" data-desc="صفحه اصلی سایت — راست‌چین و ریسپانسیو">
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>سبحان عفتی | دانشجوی پزشکی</title>
+<meta name="description" content="صفحه شخصی، سوابق پژوهشی و راه‌های ارتباطی">
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700;900&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header id="top">
+  <nav class="container">
+    <a class="logo" href="#top">سبحان عفتی</a>
+    <button class="burger" aria-label="منو">☰</button>
+    <ul class="menu">
+      <li><a href="#about">درباره من</a></li>
+      <li><a href="#edu">تحصیلات</a></li>
+      <li><a href="#research">پژوهش</a></li>
+      <li><a href="#contact">تماس</a></li>
+    </ul>
+  </nav>
+</header>
+
+<section class="hero">
+  <div class="container hero-in">
+    <div>
+      <p class="eyebrow">خوش آمدید</p>
+      <h1>سلام، من <span>سبحان عفتی</span> هستم</h1>
+      <p class="lead">دانشجوی پزشکی دانشگاه علوم پزشکی شهید صدوقی یزد،
+         علاقه‌مند به هوش مصنوعی در سلامت.</p>
+      <a class="btn" href="#contact">در ارتباط باشیم</a>
+      <a class="btn ghost" href="#research">پژوهش‌های من</a>
+    </div>
+    <div class="avatar">👨‍⚕️</div>
+  </div>
+</section>
+
+<main>
+  <section id="about" class="container sec">
+    <h2>درباره من</h2>
+    <p>اینجا در دو یا سه جمله خودتان را معرفی کنید: چه می‌خوانید،
+       به چه علاقه دارید و دنبال چه فرصت‌هایی هستید.</p>
+  </section>
+
+  <section id="edu" class="container sec">
+    <h2>سوابق تحصیلی</h2>
+    <div class="timeline">
+      <div class="item"><b>دکترای حرفه‌ای پزشکی</b><span>دانشگاه علوم پزشکی شهید صدوقی یزد · ۱۴۰۲ تا کنون</span></div>
+      <div class="item"><b>دیپلم علوم تجربی</b><span>۱۴۰۱</span></div>
+    </div>
+  </section>
+
+  <section id="research" class="container sec">
+    <h2>فعالیت‌های پژوهشی</h2>
+    <div class="cards">
+      <article class="card"><h3>عنوان مقاله یا پروژه</h3><p>توضیح کوتاه درباره پروژه و نقش شما در آن.</p></article>
+      <article class="card"><h3>عنوان دوم</h3><p>توضیح کوتاه درباره پروژه و نقش شما در آن.</p></article>
+      <article class="card"><h3>عنوان سوم</h3><p>توضیح کوتاه درباره پروژه و نقش شما در آن.</p></article>
+    </div>
+  </section>
+
+  <section id="contact" class="container sec">
+    <h2>تماس با من</h2>
+    <form class="form" action="contact.php" method="post">
+      <div class="row">
+        <input type="text"  name="name"    placeholder="نام و نام خانوادگی" required>
+        <input type="email" name="email"   placeholder="ایمیل" required>
+      </div>
+      <input type="text" name="subject" placeholder="موضوع" required>
+      &lt;textarea name="message" rows="5" placeholder="متن پیام شما..." required>&lt;/textarea>
+      <button type="submit" class="btn">ارسال پیام</button>
+    </form>
+    <p class="hint">پیام‌های ثبت‌شده را می‌توانید در <a href="inbox.php">inbox.php</a> ببینید.</p>
+  </section>
+</main>
+
+<footer>
+  <div class="container">
+    <p>تمام حقوق محفوظ است — ۱۴۰۵</p>
+    <p class="muted">ساخته‌شده در کارگاه طراحی سایت با هوش مصنوعی</p>
+  </div>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>
+</textarea>
+
+<textarea hidden class="payload" data-file="style.css" data-desc="استایل‌ها — رنگ‌ها را از بالای فایل عوض کنید">
+/* ---- متغیرهای رنگ: فقط این‌ها را عوض کنید تا کل سایت عوض شود ---- */
+:root{
+  --bg:#f6f9fc; --surface:#fff; --text:#12232e; --muted:#5b7181;
+  --brand:#0e4f6e; --accent:#ffc857; --line:#dfe8ef; --radius:16px;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:'Vazirmatn',Tahoma,sans-serif;background:var(--bg);
+     color:var(--text);line-height:2}
+.container{max-width:1080px;margin:0 auto;padding:0 20px}
+a{color:var(--brand);text-decoration:none}
+h1,h2,h3{line-height:1.5}
+
+/* هدر چسبان */
+header{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.88);
+       backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+header nav{display:flex;align-items:center;justify-content:space-between;height:66px}
+.logo{font-weight:900;font-size:19px;color:var(--brand)}
+.menu{display:flex;gap:22px;list-style:none;margin:0;padding:0}
+.menu a{color:var(--muted);font-size:15px}
+.menu a:hover{color:var(--brand)}
+.burger{display:none;background:none;border:0;font-size:24px;cursor:pointer;color:var(--brand)}
+
+/* بخش معرفی */
+.hero{background:linear-gradient(160deg,#0e4f6e,#0a3549);color:#fff;padding:70px 0}
+.hero-in{display:flex;align-items:center;gap:40px;justify-content:space-between}
+.eyebrow{color:var(--accent);font-weight:700;margin:0}
+.hero h1{font-size:clamp(28px,5vw,44px);margin:8px 0 14px;font-weight:900}
+.hero h1 span{color:var(--accent)}
+.lead{color:#cfe2ee;max-width:52ch;font-size:18px}
+.avatar{width:170px;height:170px;flex:none;border-radius:50%;
+        background:rgba(255,255,255,.12);display:grid;place-items:center;
+        font-size:72px;border:3px solid var(--accent)}
+
+.btn{display:inline-block;background:var(--accent);color:#2f2000;font-weight:700;
+     padding:11px 26px;border-radius:30px;margin:18px 0 0 10px;border:0;
+     cursor:pointer;font-family:inherit;font-size:16px}
+.btn.ghost{background:transparent;color:#fff;border:1px solid rgba(255,255,255,.45)}
+.btn:hover{opacity:.9}
+
+/* بخش‌ها */
+.sec{padding:56px 20px}
+.sec h2{font-size:28px;margin:0 0 18px;position:relative;padding-bottom:10px}
+.sec h2::after{content:'';position:absolute;bottom:0;right:0;width:56px;height:4px;
+               background:var(--accent);border-radius:4px}
+
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+      padding:22px;transition:.2s}
+.card:hover{transform:translateY(-4px);box-shadow:0 12px 30px rgba(14,79,110,.12)}
+.card h3{margin:0 0 8px;color:var(--brand);font-size:18px}
+.card p{margin:0;color:var(--muted);font-size:15px}
+
+.timeline .item{background:var(--surface);border:1px solid var(--line);
+                border-inline-start:4px solid var(--accent);border-radius:var(--radius);
+                padding:16px 20px;margin-bottom:12px}
+.timeline .item b{display:block}
+.timeline .item span{color:var(--muted);font-size:14px}
+
+/* فرم */
+.form{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+      padding:24px;max-width:660px}
+.form .row{display:flex;gap:12px}
+.form input,.form textarea{width:100%;font-family:inherit;font-size:15px;padding:12px 14px;
+      margin-bottom:12px;border:1px solid var(--line);border-radius:10px;
+      background:#fbfdff;color:var(--text)}
+.form input:focus,.form textarea:focus{outline:2px solid var(--brand);border-color:transparent}
+.hint{color:var(--muted);font-size:14px}
+
+footer{background:#0a3549;color:#cfe2ee;padding:28px 0;text-align:center;margin-top:30px}
+footer p{margin:4px 0;font-size:15px}
+.muted{color:#7fa3b8;font-size:13px}
+
+/* انیمیشن ورود هنگام اسکرول */
+.reveal{opacity:0;transform:translateY(22px);transition:.6s ease}
+.reveal.show{opacity:1;transform:none}
+
+/* ---------- موبایل ---------- */
+@media (max-width:820px){
+  .menu{display:none;position:absolute;top:66px;right:0;left:0;background:#fff;
+        flex-direction:column;gap:0;padding:10px 20px;border-bottom:1px solid var(--line)}
+  .menu.open{display:flex}
+  .burger{display:block}
+  .hero-in{flex-direction:column-reverse;text-align:center}
+  .avatar{width:130px;height:130px;font-size:56px}
+  .cards{grid-template-columns:1fr}
+  .form .row{flex-direction:column;gap:0}
+}
+</textarea>
+
+<textarea hidden class="payload" data-file="script.js" data-desc="منوی موبایل، اسکرول نرم، انیمیشن ورود">
+// منوی همبرگری در موبایل
+document.querySelector('.burger').addEventListener('click', function () {
+  document.querySelector('.menu').classList.toggle('open');
+});
+
+// بستن منو بعد از کلیک روی لینک
+document.querySelectorAll('.menu a').forEach(function (a) {
+  a.addEventListener('click', function () {
+    document.querySelector('.menu').classList.remove('open');
+  });
+});
+
+// اسکرول نرم
+document.querySelectorAll('a[href^="#"]').forEach(function (a) {
+  a.addEventListener('click', function (e) {
+    var el = document.querySelector(a.getAttribute('href'));
+    if (!el) { return; }
+    e.preventDefault();
+    el.scrollIntoView({ behavior: 'smooth' });
+  });
+});
+
+// انیمیشن نمایان‌شدن هنگام اسکرول
+document.querySelectorAll('.sec').forEach(function (s) { s.classList.add('reveal'); });
+var io = new IntersectionObserver(function (entries) {
+  entries.forEach(function (en) {
+    if (en.isIntersecting) { en.target.classList.add('show'); }
+  });
+}, { threshold: 0.12 });
+document.querySelectorAll('.reveal').forEach(function (el) { io.observe(el); });
+</textarea>
+
+<textarea hidden class="payload" data-file="config.php" data-desc="اتصال به دیتابیس — روی هاست فقط ۴ خط اول را عوض کنید">
+<?php
+/**
+ * تنظیمات اتصال به دیتابیس
+ * -------------------------------------------------
+ * روی لوکال‌هاست (XAMPP) مقادیر پیش‌فرض زیر کار می‌کند.
+ * بعد از انتقال به هاست، این چهار مقدار را با اطلاعاتی که در
+ * cPanel -> MySQL Databases ساختید جایگزین کنید.
+ */
+
+define('DB_HOST', 'localhost');
+define('DB_NAME', 'mysite_db');   // نام دیتابیس
+define('DB_USER', 'root');        // روی هاست: نام کاربر دیتابیس
+define('DB_PASS', '');            // روی هاست: رمز کاربر دیتابیس
+
+function db() {
+    static $pdo = null;
+    if ($pdo === null) {
+        $dsn = 'mysql:host=' . DB_HOST . ';dbname=' . DB_NAME . ';charset=utf8mb4';
+        $pdo = new PDO($dsn, DB_USER, DB_PASS, [
+            PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+            PDO::ATTR_EMULATE_PREPARES   => false,
+        ]);
+    }
+    return $pdo;
+}
+</textarea>
+
+<textarea hidden class="payload" data-file="contact.php" data-desc="دریافت فرم و ذخیره امن در دیتابیس (PDO + Prepared Statement)">
+<?php
+/**
+ * دریافت و ذخیره‌ی پیام فرم تماس
+ * -------------------------------------------------
+ * نکات امنیتی رعایت‌شده:
+ *  ۱) PDO + Prepared Statement  -> جلوگیری از SQL Injection
+ *  ۲) اعتبارسنجی ورودی‌ها با filter_var
+ *  ۳) پاک‌سازی خروجی با htmlspecialchars -> جلوگیری از XSS
+ *  ۴) اطلاعات اتصال در فایل جداگانه config.php
+ */
+
+require __DIR__ . '/config.php';
+
+$errors  = [];
+$success = false;
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
+    $name    = trim($_POST['name']    ?? '');
+    $email   = trim($_POST['email']   ?? '');
+    $subject = trim($_POST['subject'] ?? '');
+    $message = trim($_POST['message'] ?? '');
+
+    if (mb_strlen($name) < 3) {
+        $errors[] = 'لطفاً نام خود را کامل وارد کنید.';
+    }
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $errors[] = 'آدرس ایمیل معتبر نیست.';
+    }
+    if ($subject === '') {
+        $errors[] = 'موضوع پیام را وارد کنید.';
+    }
+    if (mb_strlen($message) < 10) {
+        $errors[] = 'متن پیام باید حداقل ۱۰ کاراکتر باشد.';
+    }
+
+    if (!$errors) {
+        try {
+            $sql  = 'INSERT INTO messages (name, email, subject, message)
+                     VALUES (?, ?, ?, ?)';
+            $stmt = db()->prepare($sql);          // Prepared Statement
+            $stmt->execute([$name, $email, $subject, $message]);
+            $success = true;
+        } catch (PDOException $e) {
+            error_log('DB error: ' . $e->getMessage());
+            $errors[] = 'خطایی در ثبت پیام رخ داد. لطفاً بعداً دوباره تلاش کنید.';
+        }
+    }
+}
+?>
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>نتیجه ارسال پیام</title>
+  <style>
+    body{font-family:Tahoma,sans-serif;background:#f6f9fc;color:#12232e;
+         display:grid;place-items:center;height:100vh;margin:0;line-height:2}
+    .box{background:#fff;border:1px solid #dfe8ef;border-radius:16px;padding:34px 40px;
+         max-width:520px;text-align:center;box-shadow:0 12px 30px rgba(14,79,110,.08)}
+    .ok{color:#0f9d58;font-size:52px}
+    .err{color:#d93025;font-size:52px}
+    ul{text-align:right;color:#d93025;padding-inline-start:20px}
+    a{display:inline-block;margin-top:18px;background:#ffc857;color:#2f2000;
+      padding:10px 26px;border-radius:30px;text-decoration:none;font-weight:700}
+  </style>
+</head>
+<body>
+  <div class="box">
+  <?php if ($success): ?>
+    <div class="ok">✓</div>
+    <h2>پیام شما با موفقیت ثبت شد</h2>
+    <p>ممنون از تماس شما، در اولین فرصت پاسخ می‌دهم.</p>
+  <?php elseif ($errors): ?>
+    <div class="err">!</div>
+    <h2>پیام ارسال نشد</h2>
+    <ul>
+      <?php foreach ($errors as $e): ?>
+        <li><?= htmlspecialchars($e, ENT_QUOTES, 'UTF-8') ?></li>
+      <?php endforeach; ?>
+    </ul>
+  <?php else: ?>
+    <h2>این صفحه مستقیماً قابل مشاهده نیست</h2>
+    <p>لطفاً از طریق فرم تماس سایت اقدام کنید.</p>
+  <?php endif; ?>
+    <a href="index.html#contact">بازگشت به سایت</a>
+  </div>
+</body>
+</html>
+</textarea>
+
+<textarea hidden class="payload" data-file="inbox.php" data-desc="نمایش پیام‌های ذخیره‌شده — الگوی SELECT سپس حلقه">
+<?php
+/**
+ * صندوق پیام‌ها — خواندن داده از دیتابیس و نمایش آن
+ * الگوی اصلی: یک SELECT بزن، با foreach روی نتیجه بچرخ.
+ */
+require __DIR__ . '/config.php';
+
+$rows = db()->query(
+    'SELECT id, name, email, subject, is_read, created_at
+     FROM messages
+     ORDER BY created_at DESC
+     LIMIT 20'
+)->fetchAll();
+
+$unread = db()->query('SELECT COUNT(*) AS c FROM messages WHERE is_read = 0')
+              ->fetch()['c'];
+?>
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>صندوق پیام‌ها</title>
+<style>
+  body{font-family:Tahoma,sans-serif;background:#f6f9fc;color:#12232e;padding:24px;line-height:2}
+  h1{color:#0e4f6e;font-size:22px;margin:0 0 6px}
+  .sub{color:#5b7181;font-size:14px;margin:0 0 18px}
+  table{width:100%;border-collapse:collapse;background:#fff;border-radius:12px;
+        overflow:hidden;box-shadow:0 6px 20px rgba(14,79,110,.08)}
+  th{background:#0e4f6e;color:#fff;padding:11px;text-align:right;font-size:14px}
+  td{padding:11px;border-bottom:1px solid #eef3f7;font-size:14px}
+  .new{background:#ffc857;color:#2f2000;padding:2px 10px;border-radius:12px;font-size:12px}
+  .old{color:#8aa2b3;font-size:12px}
+  .empty{background:#fff;border-radius:12px;padding:30px;text-align:center;color:#5b7181}
+</style>
+</head>
+<body>
+  <h1>صندوق پیام‌ها</h1>
+  <p class="sub"><?= (int)$unread ?> پیام خوانده‌نشده</p>
+
+  <?php if (!$rows): ?>
+    <div class="empty">هنوز پیامی ثبت نشده است.</div>
+  <?php else: ?>
+    <table>
+      <tr><th>فرستنده</th><th>ایمیل</th><th>موضوع</th><th>تاریخ</th><th>وضعیت</th></tr>
+      <?php foreach ($rows as $r): ?>
+      <tr>
+        <td><?= htmlspecialchars($r['name']) ?></td>
+        <td><?= htmlspecialchars($r['email']) ?></td>
+        <td><?= htmlspecialchars($r['subject']) ?></td>
+        <td><?= htmlspecialchars($r['created_at']) ?></td>
+        <td><?= $r['is_read'] ? '<span class="old">خوانده‌شده</span>'
+                              : '<span class="new">جدید</span>' ?></td>
+      </tr>
+      <?php endforeach; ?>
+    </table>
+  <?php endif; ?>
+</body>
+</html>
+</textarea>
+
+<textarea hidden class="payload" data-file="database.sql" data-desc="ساخت دیتابیس و جدول‌ها + داده نمونه — در phpMyAdmin ایمپورت کنید">
+-- ============================================================
+--  کارگاه طراحی سایت با هوش مصنوعی
+--  در phpMyAdmin: تب Import -> این فایل -> Go
+--  یا: تب SQL -> کل محتوا را پیست کنید -> Go
+-- ============================================================
+
+CREATE DATABASE IF NOT EXISTS mysite_db
+  DEFAULT CHARACTER SET utf8mb4
+  COLLATE utf8mb4_persian_ci;
+
+USE mysite_db;
+
+-- ---------- جدول پیام‌های فرم تماس ----------
+CREATE TABLE IF NOT EXISTS messages (
+  id         INT AUTO_INCREMENT PRIMARY KEY,
+  name       VARCHAR(100) NOT NULL,
+  email      VARCHAR(150) NOT NULL,
+  subject    VARCHAR(200) NOT NULL,
+  message    TEXT         NOT NULL,
+  is_read    TINYINT(1)   DEFAULT 0,
+  created_at TIMESTAMP    DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_persian_ci;
+
+-- ---------- داده نمونه برای تمرین SELECT ----------
+INSERT INTO messages (name, email, subject, message, is_read) VALUES
+('مریم احمدی',  'maryam@example.com',  'سؤال درباره نوبت',   'سلام، وقت بخیر. می‌خواستم بپرسم...', 1),
+('علی رضایی',   'ali@example.com',     'همکاری پژوهشی',      'پیشنهاد همکاری در یک طرح...',       0),
+('زهرا موسوی',  'zahra@example.com',   'سؤال درباره مقاله',  'در مورد مقاله‌ی اخیرتان...',        1),
+('امیر کاظمی',  'amir@example.com',    'درخواست مشاوره',     'امکان مشاوره در زمینه...',          0),
+('نگار شریفی',  'negar@example.com',   'همکاری پژوهشی',      'طرح پژوهشی مشترک...',               0),
+('حسین نوری',   'hossein@example.com', 'سؤال درباره نوبت',   'برای گرفتن نوبت چه کنم؟',           1),
+('سارا یزدانی', 'sara@example.com',    'تشکر',               'بابت راهنمایی‌تان ممنونم.',         0),
+('رضا کریمی',   'reza@example.com',    'همکاری پژوهشی',      'علاقه‌مند به همکاری هستم.',          0);
+
+-- ---------- جدول‌های نمونه برای تمرین JOIN ----------
+CREATE TABLE IF NOT EXISTS categories (
+  id   INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(120) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_persian_ci;
+
+CREATE TABLE IF NOT EXISTS articles (
+  id           INT AUTO_INCREMENT PRIMARY KEY,
+  title        VARCHAR(220) NOT NULL,
+  category_id  INT          NOT NULL,
+  views        INT          DEFAULT 0,
+  published_at DATE,
+  FOREIGN KEY (category_id) REFERENCES categories(id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_persian_ci;
+
+INSERT INTO categories (name) VALUES
+('قلب و عروق'), ('هوش مصنوعی در پزشکی'), ('آموزش پزشکی');
+
+INSERT INTO articles (title, category_id, views, published_at) VALUES
+('تشخیص زودهنگام بیماری‌های قلبی',        1, 320, '2026-02-11'),
+('کاربرد یادگیری ماشین در تشخیص',         2, 780, '2026-03-04'),
+('روش‌های نوین تدریس در آموزش پزشکی',      3, 145, '2026-04-19'),
+('شبکه عصبی در تصویربرداری پزشکی',        2, 510, '2026-05-22');
+
+-- ============================================================
+--  تمرین: این کوئری‌ها را یکی‌یکی اجرا کنید
+-- ============================================================
+-- SELECT * FROM messages;
+-- SELECT name, subject FROM messages WHERE is_read = 0;
+-- SELECT * FROM messages ORDER BY created_at DESC LIMIT 3;
+-- SELECT COUNT(*) AS total FROM messages WHERE is_read = 0;
+-- SELECT subject, COUNT(*) AS tedad FROM messages GROUP BY subject ORDER BY tedad DESC;
+-- SELECT * FROM messages WHERE name LIKE 'ز%';
+-- UPDATE messages SET is_read = 1 WHERE id = 2;
+-- SELECT a.title, c.name, a.views FROM articles a
+--   JOIN categories c ON a.category_id = c.id ORDER BY a.views DESC;
+</textarea>
+
+<textarea hidden class="payload" data-file="prompts.txt" data-desc="همه‌ی پرامپت‌های کارگاه، آماده کپی">
+================================================================
+  جعبه‌ابزار پرامپت — کارگاه طراحی سایت با هوش مصنوعی
+  جاهای داخل [...] را با اطلاعات خودتان جایگزین کنید.
+================================================================
+
+--- ۰) فرمول پرامپت خوب ---------------------------------------
+نقش + هدف و جزئیات + قالب خروجی + محدودیت + زمینه اجرا
+
+--- ۱) ساخت صفحه اصلی -----------------------------------------
+تو یک طراح وب حرفه‌ای هستی که در ساخت سایت‌های فارسی و راست‌چین تخصص داری.
+
+یک صفحه وب تک‌صفحه‌ای شخصی برای من بساز:
+
+- نام: [نام و نام خانوادگی من]
+- عنوان: دانشجوی پزشکی دانشگاه [نام دانشگاه]
+- بخش‌ها به ترتیب: هدر با منوی چسبان، معرفی با عکس دایره‌ای، سوابق تحصیلی،
+  فعالیت‌های پژوهشی (۳ کارت)، مهارت‌ها، فرم تماس، فوتر
+
+الزامات فنی:
+- کل کد در یک فایل index.html با CSS داخلی
+- راست‌چین (dir="rtl")، charset UTF-8، فونت وزیرمتن از Google Fonts
+- رنگ اصلی آبی نفتی #0e4f6e و رنگ تأکیدی طلایی #ffc857
+- کاملاً ریسپانسیو؛ زیر ۷۶۸ پیکسل ستون‌ها زیر هم و منو همبرگری
+- انیمیشن ملایم هنگام اسکرول با IntersectionObserver
+- بدون هیچ کتابخانه یا فریم‌ورک خارجی
+- رنگ‌ها را با CSS Variables تعریف کن تا بعداً راحت عوض شوند
+
+زمینه اجرا: این فایل روی هاست اشتراکی با PHP 8.2 اجرا می‌شود.
+خروجی: فقط کد کامل و آماده اجرا، بدون توضیح اضافه.
+
+--- ۲) اصلاح و تغییر ------------------------------------------
+همان کد قبلی را نگه دار و فقط این تغییرات را اعمال کن:
+۱. هدر هنگام اسکرول چسبان بماند، نیمه‌شفاف با افکت بلور
+۲. زیر بخش معرفی یک دکمه‌ی «دانلود رزومه» با رنگ طلایی اضافه کن
+۳. فاصله‌ی عمودی بین بخش‌ها را دو برابر کن
+۴. یک دکمه‌ی تغییر حالت روز/شب اضافه کن که انتخاب کاربر در localStorage ذخیره شود
+۵. در موبایل منو به شکل همبرگری جمع شود
+
+کل فایل کامل و اصلاح‌شده را دوباره بده، نه فقط بخش تغییریافته.
+
+  *** مهم‌ترین جمله: «کل فایل کامل را دوباره بده» ***
+
+--- ۳) ریسپانسیو کردن -----------------------------------------
+این کد در موبایل به‌هم می‌ریزد. کل فایل را طوری بازنویسی کن که:
+- در عرض‌های زیر ۷۶۸ پیکسل ستون‌ها زیر هم بیایند
+- اندازه‌ی فونت‌ها با clamp متناسب کوچک شود
+- منو به دکمه‌ی همبرگری تبدیل شود
+- هیچ اسکرول افقی ایجاد نشود
+کل فایل کامل را بده.
+
+--- ۴) تغییر کامل ظاهر بدون دست زدن به محتوا ------------------
+محتوا و ساختار HTML را دقیقاً حفظ کن و فقط CSS را بازنویسی کن تا سایت
+ظاهری مینیمال، روشن و آکادمیک پیدا کند: پس‌زمینه سفید، متن خاکستری تیره،
+رنگ تأکیدی سرمه‌ای، گوشه‌های کمی گرد، سایه‌های خیلی ملایم.
+کل فایل کامل را بده.
+
+--- ۵) دیتابیس: ساخت جدول ------------------------------------
+برای یک سایت شخصی فارسی، دستور SQL ساخت جدول [نام جدول] را بنویس با
+ستون‌های [ستون‌ها]. حتماً:
+- از utf8mb4 و utf8mb4_persian_ci استفاده کن
+- یک ستون id از نوع INT AUTO_INCREMENT PRIMARY KEY داشته باش
+- یک ستون created_at با DEFAULT CURRENT_TIMESTAMP داشته باش
+- جلوی هر ستون با کامنت فارسی توضیح بده چرا این نوع را انتخاب کردی
+
+--- ۶) دیتابیس: نوشتن کوئری ----------------------------------
+جدول messages را با این ستون‌ها دارم: id, name, email, subject, message,
+is_read, created_at
+
+کوئری‌های زیر را بنویس و کنار هرکدام با یک جمله توضیح بده چه می‌کند:
+۱. ۱۰ پیام آخر
+۲. فقط پیام‌های خوانده‌نشده
+۳. تعداد پیام‌ها به تفکیک موضوع، از زیاد به کم
+۴. علامت‌زدن یک پیام مشخص به‌عنوان خوانده‌شده
+۵. جست‌وجو در نام و موضوع بر اساس یک عبارت
+
+--- ۷) فرم تماس امن با PHP و MySQL ---------------------------
+یک فرم تماس کامل و امن برایم بساز شامل:
+۱. بخش HTML فرم (نام، ایمیل، موضوع، پیام) هماهنگ با سایت راست‌چین من
+۲. فایل contact.php که اطلاعات را در MySQL ذخیره کند
+۳. دستور SQL ساخت جدول
+
+الزامات امنیتی (مهم):
+- حتماً PDO با Prepared Statement تا جلوی SQL Injection گرفته شود
+- اعتبارسنجی ورودی با filter_var و پاک‌سازی خروجی با htmlspecialchars
+- اطلاعات اتصال در فایل جداگانه config.php
+- پیام موفقیت یا خطا به شکل فارسی و کاربرپسند
+
+هر فایل را جداگانه و کامل بده و بنویس هرکدام با چه نامی ذخیره شود.
+
+--- ۸) قالب گزارش خطا (مهم‌ترین پرامپت) ----------------------
+این کد را تو برایم نوشتی ولی کار نمی‌کند.
+
+۱) کدی که اجرا کردم:
+[کد کامل را اینجا پیست کنید]
+
+۲) خطایی که می‌بینم (عین متن):
+[متن دقیق خطا را اینجا پیست کنید]
+
+۳) چه انتظاری داشتم:
+[مثلاً: انتظار داشتم پیام در دیتابیس ذخیره شود]
+
+۴) چه اتفاقی واقعاً افتاد:
+[مثلاً: صفحه سفید شد و چیزی ذخیره نشد]
+
+محیط من: XAMPP روی ویندوز، PHP نسخه ۸.۲، MySQL
+لطفاً اول بگو دقیقاً مشکل از کجاست و چرا، بعد کل فایل اصلاح‌شده را بده.
+
+--- ۹) بهینه‌سازی برای گوگل ----------------------------------
+این صفحه را از نظر سئو بهینه کن: title و meta description فارسی مناسب،
+تگ‌های Open Graph، ساختار درست هدینگ‌ها (فقط یک h1)، متن alt برای تصاویر،
+و اسکیمای Person به صورت JSON-LD. کل فایل کامل را بده.
+</textarea>
+
+<textarea hidden class="payload" data-file="README.txt" data-desc="راهنمای راه‌اندازی پروژه در ۴ قدم">
+================================================================
+  پروژه‌ی کارگاه «طراحی سایت با هوش مصنوعی»
+================================================================
+
+فایل‌ها
+-------
+index.html    صفحه‌ی اصلی سایت (راست‌چین، ریسپانسیو)
+style.css     استایل‌ها — رنگ‌ها را از بخش :root بالای فایل عوض کنید
+script.js     منوی موبایل، اسکرول نرم، انیمیشن ورود
+config.php    اطلاعات اتصال به دیتابیس (۴ خط اول را روی هاست عوض کنید)
+contact.php   دریافت فرم تماس و ذخیره‌ی امن در دیتابیس
+inbox.php     نمایش پیام‌های ذخیره‌شده
+database.sql  ساخت دیتابیس و جدول‌ها + داده‌ی نمونه برای تمرین SQL
+prompts.txt   همه‌ی پرامپت‌های کارگاه
+
+راه‌اندازی روی لوکال‌هاست (۴ قدم)
+----------------------------------
+۱. این فایل‌ها را در مسیر زیر کپی کنید:
+   C:\xampp\htdocs\mysite
+
+۲. XAMPP را باز کنید و Apache و MySQL را Start کنید.
+
+۳. به آدرس http://localhost/phpmyadmin بروید،
+   تب Import را بزنید، فایل database.sql را انتخاب و Go کنید.
+
+۴. سایت را باز کنید:  http://localhost/mysite
+   صندوق پیام‌ها:      http://localhost/mysite/inbox.php
+
+انتقال به هاست
+--------------
+۱. همه‌ی فایل‌ها را در پوشه‌ی public_html آپلود و extract کنید.
+   (توجه: index.html باید مستقیماً داخل public_html باشد، نه در زیرپوشه)
+۲. در cPanel یک دیتابیس و یک کاربر بسازید و کاربر را با
+   دسترسی All Privileges به دیتابیس وصل کنید.
+۳. در phpMyAdmin هاست، فایل database.sql را import کنید.
+   (خط‌های CREATE DATABASE و USE را حذف کنید، چون دیتابیس را cPanel ساخته)
+۴. در config.php مقادیر DB_NAME و DB_USER و DB_PASS را عوض کنید.
+۵. در cPanel بخش SSL/TLS Status، گزینه Run AutoSSL را بزنید
+   و سپس Force HTTPS Redirect را روشن کنید.
+
+اگر به مشکل خوردید
+------------------
+متن دقیق خطا را کپی کنید و همراه با قالب شماره ۸ در prompts.txt
+به هوش مصنوعی بدهید. تقریباً همیشه جواب می‌گیرید.
+</textarea>
+
+<script>
+(function(){
+'use strict';
+var fa = function(n){ return String(n).replace(/\d/g, function(d){ return '۰۱۲۳۴۵۶۷۸۹'[d]; }); };
+var $  = function(s,r){ return (r||document).querySelector(s); };
+var $$ = function(s,r){ return Array.prototype.slice.call((r||document).querySelectorAll(s)); };
+
+/* ---------- code + live preview from one source ---------- */
+$$('.split').forEach(function(sp){
+  var src = sp.querySelector('script.src');
+  if (!src) return;
+  var raw = src.textContent.replace(/^\n/,'').replace(/\s+$/,'');
+  var code = sp.querySelector('pre code'), fr = sp.querySelector('iframe');
+  if (code) code.textContent = raw;
+  if (fr) fr.setAttribute('srcdoc', raw);
+});
+
+/* ---------- sidebar from sections ---------- */
+var secs = $$('.sec'), side = $('#side'), lastPart = null;
+secs.forEach(function(s){
+  var part = s.getAttribute('data-part');
+  if (part !== lastPart){
+    var h = document.createElement('h4'); h.textContent = part; side.appendChild(h); lastPart = part;
+  }
+  var a = document.createElement('a');
+  a.href = '#' + s.id; a.textContent = s.getAttribute('data-title');
+  a.setAttribute('data-for', s.id);
+  side.appendChild(a);
+});
+var navLinks = $$('a', side);
+function closeSide(){ side.classList.remove('open'); $('#scrim').classList.remove('on'); }
+$('#bMenu').addEventListener('click', function(){
+  var open = side.classList.toggle('open');
+  $('#scrim').classList.toggle('on', open);
+});
+$('#scrim').addEventListener('click', closeSide);
+$('#sideX').addEventListener('click', closeSide);
+navLinks.forEach(function(a){ a.addEventListener('click', closeSide); });
+
+/* highlight the section currently on screen */
+var io = new IntersectionObserver(function(es){
+  es.forEach(function(e){
+    if (!e.isIntersecting) return;
+    navLinks.forEach(function(a){ a.classList.toggle('cur', a.getAttribute('data-for') === e.target.id); });
+  });
+}, { rootMargin:'-70px 0px -65% 0px', threshold:0 });
+secs.forEach(function(s){ io.observe(s); });
+
+/* ---------- progress ---------- */
+var boxes = $$('.step input[type=checkbox]');
+var CIRC = 2 * Math.PI * 15;
+function paint(){
+  var done = boxes.filter(function(b){ return b.checked; }).length;
+  var pct = boxes.length ? Math.round(done / boxes.length * 100) : 0;
+  $('#ringFg').setAttribute('stroke-dasharray', (CIRC * pct / 100) + ' ' + CIRC);
+  $('#ringTxt').textContent = fa(pct) + '٪';
+  boxes.forEach(function(b){ b.closest('.step').classList.toggle('ok', b.checked); });
+  // mark finished sections in the sidebar
+  secs.forEach(function(s){
+    var bs = $$('.step input', s);
+    var a = side.querySelector('a[data-for="' + s.id + '"]');
+    if (a) a.classList.toggle('done', bs.length > 0 && bs.every(function(b){ return b.checked; }));
+  });
+  var next = boxes.find(function(b){ return !b.checked; });
+  $('#fab').classList.toggle('on', !!next);
+}
+boxes.forEach(function(b){
+  var k = 'sg_' + b.getAttribute('data-step');
+  try { b.checked = localStorage.getItem(k) === '1'; } catch(e){}
+  b.addEventListener('change', function(){
+    try { localStorage.setItem(k, b.checked ? '1' : '0'); } catch(e){}
+    paint();
+  });
+});
+paint();
+$('#fab').addEventListener('click', function(){
+  var next = boxes.find(function(b){ return !b.checked; });
+  if (!next) return;
+  next.closest('.step').scrollIntoView({ behavior:'smooth', block:'center' });
+  next.focus({ preventScroll:true });
+});
+
+/* ---------- theme ---------- */
+var root = document.documentElement;
+function setTheme(t){
+  root.setAttribute('data-theme', t);
+  $('#bTheme').textContent = t === 'light' ? '☀️' : '🌙';
+  try { localStorage.setItem('sg_theme', t); } catch(e){}
+}
+var saveT = null; try { saveT = localStorage.getItem('sg_theme'); } catch(e){}
+setTheme(saveT || 'dark');
+$('#bTheme').addEventListener('click', function(){
+  setTheme(root.getAttribute('data-theme') === 'light' ? 'dark' : 'light');
+});
+
+/* ---------- search ---------- */
+var sIn = $('#search');
+sIn.addEventListener('input', function(){
+  var q = sIn.value.trim().toLowerCase();
+  var hits = 0;
+  secs.forEach(function(s){
+    var hit = !q || s.innerText.toLowerCase().indexOf(q) !== -1;
+    s.classList.toggle('hide', !hit);
+    if (hit) hits++;
+    var a = side.querySelector('a[data-for="' + s.id + '"]');
+    if (a) a.style.display = hit ? '' : 'none';
+  });
+  $('#noRes').classList.toggle('on', hits === 0);
+});
+
+/* ---------- copy ---------- */
+function copyText(txt, btn){
+  var done = function(){
+    var old = btn.textContent;
+    btn.textContent = '✓ کپی شد'; btn.classList.add('done');
+    setTimeout(function(){ btn.textContent = old; btn.classList.remove('done'); }, 1500);
+  };
+  if (navigator.clipboard && navigator.clipboard.writeText)
+    navigator.clipboard.writeText(txt).then(done, function(){ fb(txt, done); });
+  else fb(txt, done);
+}
+function fb(txt, cb){
+  var ta = document.createElement('textarea');
+  ta.value = txt; ta.style.position = 'fixed'; ta.style.opacity = '0';
+  document.body.appendChild(ta); ta.select();
+  try { document.execCommand('copy'); cb(); } catch(e){}
+  document.body.removeChild(ta);
+}
+$$('.codebox .copy').forEach(function(b){
+  b.addEventListener('click', function(){
+    var pre = b.closest('.codebox').querySelector('pre');
+    if (pre) copyText(pre.innerText, b);
+  });
+});
+
+/* ---------- playground ---------- */
+var PG = {
+  start: '<!DOCTYPE html>\n<html lang="fa" dir="rtl">\n<head>\n  <meta charset="utf-8">\n  <style>\n    body{ font-family:Tahoma; background:#eef4f8; padding:20px; line-height:2 }\n    .card{ background:#fff; border-radius:14px; padding:20px;\n           box-shadow:0 6px 20px rgba(14,79,110,.12) }\n    h1{ color:#0e4f6e; margin:0 0 8px; font-size:20px }\n    .btn{ background:#ffc857; color:#2f2000; padding:8px 20px;\n          border-radius:20px; display:inline-block; margin-top:10px }\n  </style>\n</head>\n<body>\n\n  <div class="card">\n    <h1>سلام، من [اسم شما] هستم</h1>\n    <p>این متن را عوض کنید و نتیجه را همین‌جا ببینید.</p>\n    <span class="btn">تماس با من</span>\n  </div>\n\n</body>\n</html>',
+  dark:  '<!DOCTYPE html>\n<html lang="fa" dir="rtl">\n<head>\n  <meta charset="utf-8">\n  <style>\n    body{ font-family:Tahoma; background:#0f172a; color:#e2e8f0;\n          padding:20px; line-height:2 }\n    .card{ background:#1e293b; border:1px solid #334155;\n           border-radius:14px; padding:20px }\n    h1{ color:#38bdf8; margin:0 0 8px; font-size:20px }\n    .btn{ background:#38bdf8; color:#04222a; padding:8px 20px;\n          border-radius:20px; display:inline-block; margin-top:10px }\n  </style>\n</head>\n<body>\n  <div class="card">\n    <h1>حالت شب</h1>\n    <p>فقط رنگ‌ها عوض شد — ساختار همان است.</p>\n    <span class="btn">دکمه</span>\n  </div>\n</body>\n</html>',
+  card:  '<!DOCTYPE html>\n<html lang="fa" dir="rtl">\n<head>\n  <meta charset="utf-8">\n  <style>\n    body{ font-family:Tahoma; background:#f1f5f9; display:grid;\n          place-items:center; height:100vh; margin:0 }\n    .p{ background:#fff; border-radius:18px; padding:26px; text-align:center;\n        box-shadow:0 12px 34px rgba(2,32,56,.14); width:250px }\n    .av{ width:82px; height:82px; border-radius:50%; margin:0 auto 12px;\n         background:linear-gradient(140deg,#0e4f6e,#38bdf8); display:grid;\n         place-items:center; font-size:38px }\n    h2{ margin:0; font-size:17px; color:#0f2b3d }\n    p{ margin:4px 0 12px; color:#64748b; font-size:13px }\n    .t{ background:#e0f2fe; color:#0369a1; border-radius:20px;\n        padding:3px 12px; font-size:12px; display:inline-block; margin:2px }\n  </style>\n</head>\n<body>\n  <div class="p">\n    <div class="av">👩‍⚕️</div>\n    <h2>دکتر نمونه</h2>\n    <p>دانشجوی پزشکی</p>\n    <span class="t">پژوهش</span><span class="t">هوش مصنوعی</span>\n  </div>\n</body>\n</html>'
+};
+var pgCode = $('#pgCode'), pgOut = $('#pgOut'), pgT;
+function pgRender(){ pgOut.setAttribute('srcdoc', pgCode.value); }
+function pgSet(v){ pgCode.value = v; pgRender(); try { localStorage.setItem('sg_pg', v); } catch(e){} }
+var savedPg = null; try { savedPg = localStorage.getItem('sg_pg'); } catch(e){}
+pgSet(savedPg || PG.start);
+pgCode.addEventListener('input', function(){
+  clearTimeout(pgT);
+  pgT = setTimeout(function(){ pgRender(); try { localStorage.setItem('sg_pg', pgCode.value); } catch(e){} }, 400);
+});
+$('#pgReset').addEventListener('click', function(){ pgSet(PG.start); });
+$('#pgDark').addEventListener('click', function(){ pgSet(PG.dark); });
+$('#pgCard').addEventListener('click', function(){ pgSet(PG.card); });
+$('#pgSave').addEventListener('click', function(){ dl('my-page.html', pgCode.value, 'text/html'); });
+
+/* ---------- SQL explorer ---------- */
+var MSG = [
+  {id:1, name:'مریم احمدی',  email:'maryam@example.com',  subject:'سؤال درباره نوبت',  is_read:1, created_at:'2026-06-01 09:14'},
+  {id:2, name:'علی رضایی',   email:'ali@example.com',     subject:'همکاری پژوهشی',     is_read:0, created_at:'2026-06-03 11:02'},
+  {id:3, name:'زهرا موسوی',  email:'zahra@example.com',   subject:'سؤال درباره مقاله', is_read:1, created_at:'2026-06-05 16:40'},
+  {id:4, name:'امیر کاظمی',  email:'amir@example.com',    subject:'درخواست مشاوره',    is_read:0, created_at:'2026-06-07 08:25'},
+  {id:5, name:'نگار شریفی',  email:'negar@example.com',   subject:'همکاری پژوهشی',     is_read:0, created_at:'2026-06-09 13:55'},
+  {id:6, name:'حسین نوری',   email:'hossein@example.com', subject:'سؤال درباره نوبت',  is_read:1, created_at:'2026-06-11 10:07'},
+  {id:7, name:'سارا یزدانی', email:'sara@example.com',    subject:'تشکر',              is_read:0, created_at:'2026-06-12 18:30'},
+  {id:8, name:'رضا کریمی',   email:'reza@example.com',    subject:'همکاری پژوهشی',     is_read:0, created_at:'2026-06-14 07:48'}
+];
+function pick(rows, cols){
+  return rows.map(function(r){ var o = {}; cols.forEach(function(c){ o[c] = r[c]; }); return o; });
+}
+var QUERIES = [
+  { lbl:'همه چیز', desc:'بدون شرط: تمام سطرها و ستون‌ها', sql:'SELECT * FROM messages;',
+    run:function(){ return pick(MSG, ['id','name','subject','is_read','created_at']); } },
+  { lbl:'چند ستون', desc:'به‌جای * فقط ستون‌های لازم', sql:'SELECT name, subject FROM messages;',
+    run:function(){ return pick(MSG, ['name','subject']); } },
+  { lbl:'خوانده‌نشده‌ها', desc:'WHERE سطرها را فیلتر می‌کند',
+    sql:'SELECT id, name, subject\nFROM messages\nWHERE is_read = 0;',
+    run:function(){ return pick(MSG.filter(function(r){ return r.is_read === 0; }), ['id','name','subject']); } },
+  { lbl:'یک موضوع خاص', desc:'مقایسه‌ی متنی — مقدار داخل تک‌کوتیشن',
+    sql:"SELECT name, email, created_at\nFROM messages\nWHERE subject = 'همکاری پژوهشی';",
+    run:function(){ return pick(MSG.filter(function(r){ return r.subject === 'همکاری پژوهشی'; }), ['name','email','created_at']); } },
+  { lbl:'۳ تای آخر', desc:'ORDER BY مرتب می‌کند، DESC نزولی، LIMIT تعداد را محدود می‌کند',
+    sql:'SELECT name, subject, created_at\nFROM messages\nORDER BY created_at DESC\nLIMIT 3;',
+    run:function(){ var s = MSG.slice().sort(function(a,b){ return a.created_at < b.created_at ? 1 : -1; });
+      return pick(s.slice(0,3), ['name','subject','created_at']); } },
+  { lbl:'شمارش', desc:'COUNT یک عدد برمی‌گرداند، AS به آن نام می‌دهد',
+    sql:'SELECT COUNT(*) AS unread\nFROM messages\nWHERE is_read = 0;',
+    run:function(){ return [{ unread: MSG.filter(function(r){ return r.is_read === 0; }).length }]; } },
+  { lbl:'گروه‌بندی', desc:'GROUP BY سطرهای هم‌مقدار را در یک گروه جمع می‌کند',
+    sql:'SELECT subject, COUNT(*) AS tedad\nFROM messages\nGROUP BY subject\nORDER BY tedad DESC;',
+    run:function(){ var m = {};
+      MSG.forEach(function(r){ m[r.subject] = (m[r.subject] || 0) + 1; });
+      return Object.keys(m).map(function(k){ return { subject:k, tedad:m[k] }; })
+                   .sort(function(a,b){ return b.tedad - a.tedad; }); } },
+  { lbl:'جست‌وجو', desc:"LIKE جست‌وجوی الگویی است؛ % یعنی هرچیزی",
+    sql:"SELECT id, name, email\nFROM messages\nWHERE name LIKE 'ز%';",
+    run:function(){ return pick(MSG.filter(function(r){ return r.name.indexOf('ز') === 0; }), ['id','name','email']); } }
+];
+var qb = $('#qbtns');
+QUERIES.forEach(function(q, k){
+  var b = document.createElement('button');
+  b.className = 'qbtn'; b.textContent = q.lbl;
+  b.addEventListener('click', function(){ runQ(k); });
+  qb.appendChild(b);
+});
+function runQ(k){
+  var q = QUERIES[k], rows = q.run();
+  $$('.qbtn', qb).forEach(function(b, n){ b.classList.toggle('cur', n === k); });
+  $('#qText').textContent = q.sql;
+  $('#qDesc').textContent = q.desc;
+  $('#qRows').textContent = rows.length + (rows.length === 1 ? ' row' : ' rows');
+  var t = $('#qRes');
+  if (!rows.length){ t.innerHTML = '<tr><td>نتیجه‌ای برنگشت</td></tr>'; return; }
+  var cols = Object.keys(rows[0]), html = '<tr>';
+  cols.forEach(function(c){ html += '<th>' + c + '</th>'; });
+  html += '</tr>';
+  rows.forEach(function(r){
+    html += '<tr>';
+    cols.forEach(function(c){
+      var v = String(r[c]), isFa = /[؀-ۿ]/.test(v);
+      html += '<td class="' + (isFa ? 'fa' : '') + '">' + v.replace(/</g,'&lt;') + '</td>';
+    });
+    html += '</tr>';
+  });
+  t.innerHTML = html;
+}
+runQ(0);
+
+/* ---------- files + zip ---------- */
+var FILES = $$('.payload').map(function(t){
+  return { name:t.getAttribute('data-file'), desc:t.getAttribute('data-desc'),
+           body:t.value.replace(/^\n/,'') };
+});
+var fl = $('#fileList');
+FILES.forEach(function(f){
+  var li = document.createElement('li');
+  li.innerHTML = '<span class="nm2"></span><span class="ds"></span>';
+  li.querySelector('.nm2').textContent = f.name;
+  li.querySelector('.ds').textContent = f.desc;
+  var c = document.createElement('button'); c.className = 'copy'; c.textContent = 'کپی';
+  c.addEventListener('click', function(){ copyText(f.body, c); });
+  var d = document.createElement('button'); d.className = 'btn sm'; d.textContent = '⬇';
+  d.addEventListener('click', function(){ dl(f.name, f.body, 'text/plain'); });
+  li.appendChild(c); li.appendChild(d);
+  fl.appendChild(li);
+});
+function dl(name, text, type){
+  var url = URL.createObjectURL(new Blob([text], { type:(type || 'text/plain') + ';charset=utf-8' }));
+  var a = document.createElement('a');
+  a.href = url; a.download = name; document.body.appendChild(a); a.click();
+  document.body.removeChild(a); setTimeout(function(){ URL.revokeObjectURL(url); }, 4000);
+}
+var CRC = (function(){
+  var t = new Uint32Array(256);
+  for (var n = 0; n < 256; n++){
+    var c = n;
+    for (var k = 0; k < 8; k++) c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1);
+    t[n] = c >>> 0;
+  }
+  return t;
+})();
+function crc32(b){
+  var c = 0xFFFFFFFF;
+  for (var n = 0; n < b.length; n++) c = CRC[(c ^ b[n]) & 0xFF] ^ (c >>> 8);
+  return (c ^ 0xFFFFFFFF) >>> 0;
+}
+function zip(files){
+  var enc = new TextEncoder(), parts = [], cds = [], off = 0, d = new Date();
+  var dTime = ((d.getHours() << 11) | (d.getMinutes() << 5) | (d.getSeconds() >> 1)) & 0xFFFF;
+  var dDate = (((d.getFullYear() - 1980) << 9) | ((d.getMonth() + 1) << 5) | d.getDate()) & 0xFFFF;
+  files.forEach(function(f){
+    var nm = enc.encode(f.name), data = enc.encode(f.body), crc = crc32(data);
+    var lh = new Uint8Array(30 + nm.length), v = new DataView(lh.buffer);
+    v.setUint32(0, 0x04034b50, true); v.setUint16(4, 20, true); v.setUint16(6, 0x0800, true);
+    v.setUint16(8, 0, true); v.setUint16(10, dTime, true); v.setUint16(12, dDate, true);
+    v.setUint32(14, crc, true); v.setUint32(18, data.length, true); v.setUint32(22, data.length, true);
+    v.setUint16(26, nm.length, true); v.setUint16(28, 0, true);
+    lh.set(nm, 30);
+    parts.push(lh, data);
+    var cd = new Uint8Array(46 + nm.length), c = new DataView(cd.buffer);
+    c.setUint32(0, 0x02014b50, true); c.setUint16(4, 20, true); c.setUint16(6, 20, true);
+    c.setUint16(8, 0x0800, true); c.setUint16(10, 0, true);
+    c.setUint16(12, dTime, true); c.setUint16(14, dDate, true);
+    c.setUint32(16, crc, true); c.setUint32(20, data.length, true); c.setUint32(24, data.length, true);
+    c.setUint16(28, nm.length, true); c.setUint16(30, 0, true); c.setUint16(32, 0, true);
+    c.setUint16(34, 0, true); c.setUint16(36, 0, true); c.setUint32(38, 0, true);
+    c.setUint32(42, off, true);
+    cd.set(nm, 46);
+    cds.push(cd);
+    off += lh.length + data.length;
+  });
+  var cdSize = cds.reduce(function(a, b){ return a + b.length; }, 0);
+  var eo = new Uint8Array(22), e = new DataView(eo.buffer);
+  e.setUint32(0, 0x06054b50, true); e.setUint16(4, 0, true); e.setUint16(6, 0, true);
+  e.setUint16(8, files.length, true); e.setUint16(10, files.length, true);
+  e.setUint32(12, cdSize, true); e.setUint32(16, off, true); e.setUint16(20, 0, true);
+  return new Blob(parts.concat(cds, [eo]), { type:'application/zip' });
+}
+$('#dlZip').addEventListener('click', function(){
+  var url = URL.createObjectURL(zip(FILES));
+  var a = document.createElement('a');
+  a.href = url; a.download = 'workshop-site-files.zip';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  setTimeout(function(){ URL.revokeObjectURL(url); }, 6000);
+});
+$('#bFiles').addEventListener('click', function(){ $('#ovFiles').classList.add('open'); });
+$('#filesX').addEventListener('click', function(){ $('#ovFiles').classList.remove('open'); });
+$('#ovFiles').addEventListener('click', function(e){ if (e.target === $('#ovFiles')) $('#ovFiles').classList.remove('open'); });
+document.addEventListener('keydown', function(e){
+  if (e.key === 'Escape'){ $('#ovFiles').classList.remove('open'); closeSide(); }
+});
+})();
+</script>
+</body>
+</html>
