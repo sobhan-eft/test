@@ -1,0 +1,2498 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>کارگاه طراحی سایت با هوش مصنوعی — نسخه عملی</title>
+<meta name="description" content="دک ارائه‌ی عملی با پیش‌نمایش زنده، زمین بازی کد، و بخش کامل SQL">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#050e18; --ink:#071726; --panel:#0a1f30; --panel2:#0d2a3e;
+  --line:#143a52; --line2:#1d5878;
+  --cy:#31e0d4; --cy-dk:#0f8f90;
+  --gd:#ffc857; --gd-dk:#b3801f;
+  --vi:#a78bfa; --pk:#f472b6; --gr:#4ade80; --rd:#fb7185; --or:#fb923c;
+  --txt:#e9f5fb; --dim:#8fb3c7; --dim2:#5d7f95;
+  --mono:'JetBrains Mono','SFMono-Regular',Consolas,monospace;
+  --r:20px; --r2:14px; --r3:10px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;font-family:'Vazirmatn',Tahoma,system-ui,sans-serif;
+  background:var(--bg);color:var(--txt);line-height:1.95;font-size:16.5px;
+  -webkit-font-smoothing:antialiased;
+}
+body::before{
+  content:'';position:fixed;inset:0;z-index:-2;
+  background:
+    radial-gradient(900px 600px at 88% -8%, rgba(49,224,212,.13), transparent 62%),
+    radial-gradient(800px 560px at 6% 102%, rgba(255,200,87,.09), transparent 58%),
+    var(--bg);
+}
+body::after{
+  content:'';position:fixed;inset:0;z-index:-1;opacity:.35;
+  background-image:linear-gradient(rgba(29,88,120,.10) 1px,transparent 1px),
+                   linear-gradient(90deg,rgba(29,88,120,.10) 1px,transparent 1px);
+  background-size:46px 46px;
+  mask-image:radial-gradient(ellipse at 50% 40%,#000 30%,transparent 78%);
+}
+a{color:var(--cy);text-decoration-thickness:1px;text-underline-offset:3px}
+b,strong{color:#fff;font-weight:700}
+code{
+  direction:ltr;unicode-bidi:isolate;display:inline-block;font-family:var(--mono);
+  font-size:.88em;background:rgba(49,224,212,.1);border:1px solid var(--line);
+  border-radius:7px;padding:0 7px;color:#b8ecff;
+}
+.ltr{direction:ltr;unicode-bidi:isolate}
+
+/* ================= TOP BAR ================= */
+.bar{
+  position:fixed;inset-inline:0;top:0;height:56px;z-index:70;display:flex;align-items:center;gap:9px;
+  padding:0 14px;background:rgba(5,14,24,.9);backdrop-filter:blur(16px);border-bottom:1px solid var(--line);
+}
+.mark{display:flex;align-items:center;gap:9px;font-weight:900;white-space:nowrap;font-size:15px}
+.mark i{width:10px;height:10px;border-radius:3px;background:var(--cy);box-shadow:0 0 16px var(--cy);display:block}
+.mark em{font-style:normal;color:var(--dim);font-weight:400;font-size:12.5px}
+.grow{flex:1}
+.btn{
+  background:var(--panel);border:1px solid var(--line);color:var(--txt);border-radius:11px;
+  padding:7px 13px;font-family:inherit;font-size:13.5px;cursor:pointer;
+  display:inline-flex;align-items:center;gap:6px;transition:.15s;white-space:nowrap;
+}
+.btn:hover{border-color:var(--cy);color:#fff;transform:translateY(-1px)}
+.btn.on{background:var(--cy);color:#04222a;border-color:var(--cy);font-weight:700}
+.btn.gd{background:linear-gradient(180deg,var(--gd),#eaad34);color:#2f2000;border-color:var(--gd);font-weight:700}
+.btn.sm{padding:5px 10px;font-size:12.5px}
+#clock{font-variant-numeric:tabular-nums;font-weight:700;min-width:78px;justify-content:center;font-family:var(--mono)}
+#pace{font-size:12px;padding:4px 10px;border-radius:30px;border:1px solid var(--line);color:var(--dim)}
+#pace.ok{color:var(--gr);border-color:rgba(74,222,128,.5)}
+#pace.warn{color:var(--gd);border-color:rgba(255,200,87,.5)}
+#pace.bad{color:var(--rd);border-color:rgba(251,113,133,.5)}
+#prog{position:fixed;top:56px;inset-inline:0;height:3px;background:#0a2030;z-index:70}
+#prog i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--cy),var(--gd));transition:width .35s}
+
+/* ================= SECTION RAIL ================= */
+.rail{position:fixed;inset-inline-start:0;top:56px;bottom:0;width:58px;z-index:50;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;
+  border-inline-end:1px solid var(--line);background:rgba(7,23,38,.55);backdrop-filter:blur(8px)}
+.rail button{
+  width:30px;height:30px;border-radius:9px;border:1px solid var(--line);background:transparent;
+  color:var(--dim2);font-family:var(--mono);font-size:12px;cursor:pointer;transition:.18s;
+  display:grid;place-items:center;
+}
+.rail button:hover{color:var(--cy);border-color:var(--cy)}
+.rail button.cur{background:var(--cy);color:#04222a;border-color:var(--cy);font-weight:700;box-shadow:0 0 18px rgba(49,224,212,.45)}
+.rail .lbl{writing-mode:vertical-rl;font-size:10.5px;color:var(--dim2);letter-spacing:1px;margin-bottom:12px}
+@media(max-width:900px){.rail{display:none}}
+
+/* ================= STAGE ================= */
+.stage{padding:88px 24px 118px 24px;margin-inline-start:58px;min-height:100vh}
+@media(max-width:900px){.stage{margin-inline-start:0;padding:84px 16px 112px}}
+.slide{display:none;max-width:1120px;margin:0 auto;position:relative;animation:pop .3s cubic-bezier(.2,.8,.3,1) both}
+.slide.active{display:block}
+@keyframes pop{from{opacity:0;transform:translateY(16px) scale(.995)}to{opacity:1;transform:none}}
+.slide::before{
+  content:attr(data-watermark);position:absolute;top:-34px;inset-inline-end:-6px;z-index:-1;
+  font-family:var(--mono);font-size:150px;font-weight:700;line-height:1;
+  color:rgba(29,88,120,.18);pointer-events:none;user-select:none;
+}
+@media(max-width:700px){.slide::before{font-size:88px;top:-14px}}
+
+.tag{
+  display:inline-flex;align-items:center;gap:8px;font-size:12.5px;font-weight:700;
+  color:var(--gd);background:rgba(255,200,87,.09);border:1px solid rgba(255,200,87,.3);
+  padding:5px 14px;border-radius:30px;margin-bottom:12px;
+}
+.tag.cy{color:var(--cy);background:rgba(49,224,212,.09);border-color:rgba(49,224,212,.3)}
+.tag.rd{color:var(--rd);background:rgba(251,113,133,.09);border-color:rgba(251,113,133,.3)}
+h1{font-size:clamp(28px,4.6vw,46px);line-height:1.4;margin:.06em 0 .3em;font-weight:900;
+   background:linear-gradient(100deg,#fff 20%,var(--cy) 78%);-webkit-background-clip:text;background-clip:text;color:transparent}
+h2{font-size:clamp(22px,3.3vw,33px);line-height:1.45;margin:.06em 0 .45em;font-weight:900;color:#fff}
+h3{font-size:18.5px;margin:1.35em 0 .45em;color:var(--cy);font-weight:700;display:flex;align-items:center;gap:8px}
+h3::before{content:'';width:4px;height:17px;background:var(--cy);border-radius:3px;display:block}
+.lead{font-size:18px;color:var(--dim);max-width:66ch;margin:0}
+.cy{color:var(--cy);font-weight:700}.gd{color:var(--gd);font-weight:700}
+.vi{color:var(--vi);font-weight:700}.rd{color:var(--rd);font-weight:700}
+.dim{color:var(--dim)}.sm{font-size:14.5px}.center{text-align:center}
+
+/* ================= CARDS ================= */
+.card{background:linear-gradient(180deg,var(--panel),#081b29);border:1px solid var(--line);
+  border-radius:var(--r);padding:18px 20px}
+.card.tint{background:linear-gradient(180deg,rgba(49,224,212,.08),rgba(8,27,41,.6));border-color:var(--cy-dk)}
+.card.tintg{background:linear-gradient(180deg,rgba(255,200,87,.08),rgba(8,27,41,.6));border-color:var(--gd-dk)}
+.grid{display:grid;gap:13px;margin-top:12px}
+.g2{grid-template-columns:repeat(2,1fr)}.g3{grid-template-columns:repeat(3,1fr)}
+.g4{grid-template-columns:repeat(4,1fr)}.g23{grid-template-columns:2fr 3fr}.g32{grid-template-columns:3fr 2fr}
+@media(max-width:880px){.g2,.g3,.g4,.g23,.g32{grid-template-columns:1fr}}
+.card h4{margin:0 0 6px;font-size:16.5px;color:#fff;display:flex;align-items:center;gap:9px;font-weight:700}
+.card p{margin:0;color:var(--dim);font-size:15px}
+.ic{width:34px;height:34px;flex:none;border-radius:10px;display:grid;place-items:center;font-size:17px;
+  background:rgba(49,224,212,.12);border:1px solid rgba(49,224,212,.28);font-family:var(--mono);font-weight:700;color:var(--cy)}
+.ic.g{background:rgba(255,200,87,.12);border-color:rgba(255,200,87,.28);color:var(--gd)}
+.ic.v{background:rgba(167,139,250,.12);border-color:rgba(167,139,250,.28);color:var(--vi)}
+.ic.r{background:rgba(251,113,133,.12);border-color:rgba(251,113,133,.28);color:var(--rd)}
+.ic.w{width:auto;min-width:34px;padding:0 11px;font-size:13px;letter-spacing:.5px;white-space:nowrap}
+
+ul.b{list-style:none;padding:0;margin:12px 0}
+ul.b li{position:relative;padding-inline-start:26px;margin-bottom:9px}
+ul.b li::before{content:'';position:absolute;inset-inline-start:5px;top:13px;width:7px;height:7px;
+  border-radius:2px;background:var(--cy);box-shadow:0 0 9px rgba(49,224,212,.7);transform:rotate(45deg)}
+ul.b.g li::before{background:var(--gd);box-shadow:0 0 9px rgba(255,200,87,.7)}
+ol.st{counter-reset:s;list-style:none;padding:0;margin:12px 0}
+ol.st li{counter-increment:s;position:relative;padding-inline-start:42px;margin-bottom:12px}
+ol.st li::before{content:counter(s);position:absolute;inset-inline-start:0;top:3px;width:28px;height:28px;
+  border-radius:8px;background:var(--cy);color:#04222a;font-weight:900;display:grid;place-items:center;
+  font-size:14px;font-family:var(--mono)}
+
+/* ================= CODE & SPLIT PREVIEW ================= */
+.codebox{position:relative;background:#030d16;border:1px solid var(--line);border-radius:var(--r2);overflow:hidden}
+.codebox .hd{display:flex;align-items:center;justify-content:space-between;gap:8px;
+  padding:7px 12px;background:#081a28;border-bottom:1px solid var(--line);font-size:12.5px;color:var(--dim)}
+.codebox .hd .fn{font-family:var(--mono);color:var(--cy);direction:ltr}
+.codebox pre{margin:0;padding:14px 16px;overflow:auto;direction:ltr;text-align:left;
+  font-family:var(--mono);font-size:13px;line-height:1.85;color:#cfe9f5;max-height:var(--mh,none)}
+.codebox pre::-webkit-scrollbar{height:8px;width:8px}
+.codebox pre::-webkit-scrollbar-thumb{background:var(--line2);border-radius:8px}
+.cm{color:#537b93}.tg{color:#7fd6ff}.at{color:#ffc857}.st{color:#a5e8a5}.kw{color:#f472b6}.fn2{color:#a78bfa}.nm{color:#fb923c}
+.copy{background:var(--panel2);border:1px solid var(--line2);color:var(--txt);border-radius:8px;
+  padding:3px 10px;font-family:inherit;font-size:12px;cursor:pointer}
+.copy:hover{background:var(--cy);color:#04222a}
+.copy.done{background:var(--gr);color:#04240f;border-color:var(--gr)}
+
+.split{display:grid;grid-template-columns:1fr 1fr;gap:13px;margin:14px 0;align-items:stretch}
+@media(max-width:880px){.split{grid-template-columns:1fr}}
+.split .codebox{--mh:330px}
+.browser{background:#0a1f30;border:1px solid var(--line);border-radius:var(--r2);overflow:hidden;display:flex;flex-direction:column}
+.chrome{display:flex;align-items:center;gap:7px;padding:8px 12px;background:#081a28;border-bottom:1px solid var(--line)}
+.chrome .d{width:10px;height:10px;border-radius:50%;background:#2c4a5e}
+.chrome .d:nth-child(1){background:#fb7185}.chrome .d:nth-child(2){background:#ffc857}.chrome .d:nth-child(3){background:#4ade80}
+.chrome .url{flex:1;background:#040f18;border:1px solid var(--line);border-radius:20px;padding:2px 12px;
+  font-family:var(--mono);font-size:11px;color:var(--dim2);direction:ltr;text-align:left;margin-inline-start:6px}
+.browser iframe{flex:1;width:100%;min-height:330px;border:0;background:#fff;display:block}
+
+/* ================= PLAYGROUND ================= */
+.play{display:grid;grid-template-columns:1fr 1fr;gap:13px;margin:14px 0}
+@media(max-width:880px){.play{grid-template-columns:1fr}}
+.play textarea{
+  width:100%;min-height:330px;background:#030d16;color:#cfe9f5;border:1px solid var(--line);
+  border-radius:var(--r2);padding:14px 16px;font-family:var(--mono);font-size:13px;line-height:1.85;
+  direction:ltr;text-align:left;resize:vertical;
+}
+.play textarea:focus{outline:2px solid var(--cy);border-color:transparent}
+
+/* ================= SQL ================= */
+.sql{margin:14px 0;border:1px solid var(--line);border-radius:var(--r2);overflow:hidden;background:#071726}
+.sql .q{background:#030d16;padding:12px 16px;font-family:var(--mono);font-size:13.5px;direction:ltr;
+  text-align:left;color:#cfe9f5;line-height:1.85;border-bottom:1px solid var(--line);white-space:pre-wrap}
+.sql .rh{padding:6px 14px;font-size:12.5px;color:var(--dim);background:#081a28;border-bottom:1px solid var(--line);
+  display:flex;justify-content:space-between;align-items:center}
+.res{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:12.5px;direction:ltr}
+.res th{background:#0d2a3e;color:var(--cy);padding:7px 11px;text-align:left;border:1px solid var(--line);white-space:nowrap;font-weight:700}
+.res td{padding:6px 11px;border:1px solid var(--line);color:var(--dim);background:rgba(7,23,38,.6);white-space:nowrap}
+.res td.fa{font-family:'Vazirmatn',Tahoma,sans-serif;direction:rtl;text-align:right}
+.res tr:hover td{background:rgba(49,224,212,.07);color:#fff}
+.qbtns{display:flex;flex-wrap:wrap;gap:7px;margin:12px 0}
+.qbtn{background:var(--panel);border:1px solid var(--line);color:var(--dim);border-radius:9px;
+  padding:6px 12px;font-family:inherit;font-size:13px;cursor:pointer;transition:.15s}
+.qbtn:hover{border-color:var(--cy);color:#fff}
+.qbtn.cur{background:var(--cy);color:#04222a;border-color:var(--cy);font-weight:700}
+
+/* ================= TERMINAL ================= */
+.term{background:#02080e;border:1px solid var(--line);border-radius:var(--r2);padding:13px 16px;
+  font-family:var(--mono);font-size:13px;direction:ltr;text-align:left;color:#b9ecd2;line-height:1.9;margin:12px 0}
+.term .p{color:var(--gr)}.term .o{color:var(--dim2)}
+
+/* ================= NOTES / CALLOUTS ================= */
+.note{border-inline-start:3px solid var(--cy);background:rgba(49,224,212,.06);padding:12px 16px;
+  border-radius:0 var(--r3) var(--r3) 0;margin:13px 0;font-size:15.5px}
+.note.w{border-color:var(--gd);background:rgba(255,200,87,.07)}
+.note.d{border-color:var(--rd);background:rgba(251,113,133,.07)}
+.note.g{border-color:var(--gr);background:rgba(74,222,128,.07)}
+.note b:first-child{display:block;margin-bottom:2px}
+
+details{background:var(--panel);border:1px solid var(--line);border-radius:var(--r3);margin:10px 0;overflow:hidden}
+details[open]{border-color:var(--cy-dk)}
+summary{cursor:pointer;padding:11px 16px;font-weight:700;color:var(--cy);list-style:none;
+  display:flex;align-items:center;gap:9px;user-select:none;font-size:15.5px}
+summary::-webkit-details-marker{display:none}
+summary::before{content:'▸';color:var(--gd);font-size:13px;transition:.2s}
+details[open] summary::before{transform:rotate(90deg)}
+summary:hover{background:rgba(49,224,212,.05)}
+details .in{padding:4px 16px 15px;border-top:1px solid var(--line);color:var(--dim)}
+
+table.t{width:100%;border-collapse:collapse;margin:13px 0;font-size:15px}
+table.t th,table.t td{padding:10px 13px;border:1px solid var(--line);text-align:right;vertical-align:top}
+table.t th{background:var(--panel2);color:#fff;font-weight:700}
+table.t td{background:rgba(10,31,48,.55);color:var(--dim)}
+table.t td b{color:#fff}
+table.t tr:hover td{background:rgba(49,224,212,.06)}
+
+.pill{display:inline-block;background:rgba(49,224,212,.1);border:1px solid var(--line2);border-radius:20px;
+  padding:2px 12px;font-size:13px;margin:3px 3px 3px 0;color:var(--cy)}
+.pill.g{background:rgba(255,200,87,.1);border-color:var(--gd-dk);color:var(--gd)}
+
+.cl{list-style:none;padding:0;margin:10px 0}
+.cl li{padding:8px 0;border-bottom:1px dashed var(--line);display:flex;gap:10px;align-items:flex-start}
+.cl li:last-child{border:0}
+.cl input{margin-top:9px;accent-color:var(--cy);width:16px;height:16px;flex:none}
+.cl label{cursor:pointer;flex:1;font-size:15.5px}
+
+.notes{display:none}
+body.sn .notes{display:block;margin-top:18px;background:rgba(255,200,87,.06);border:1px dashed var(--gd-dk);
+  border-radius:var(--r3);padding:14px 17px;font-size:15.5px;color:#f5e5c4}
+body.sn .notes::before{content:'🎙 چی بگم';display:block;font-weight:900;color:var(--gd);margin-bottom:6px;font-size:13px}
+.notes .say{color:#fff;display:block;margin:8px 0;border-inline-start:3px solid var(--gd);padding-inline-start:11px}
+
+/* ================= NAV ================= */
+.nav{position:fixed;bottom:0;inset-inline:0;height:60px;z-index:70;display:flex;align-items:center;
+  justify-content:center;gap:11px;padding:0 16px;background:rgba(5,14,24,.92);
+  backdrop-filter:blur(16px);border-top:1px solid var(--line)}
+.nav .pos{font-size:13.5px;color:var(--dim);font-variant-numeric:tabular-nums;min-width:86px;
+  text-align:center;font-family:var(--mono)}
+.nav .sc{font-size:12.5px;color:var(--cy);max-width:250px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+@media(max-width:700px){.nav .sc{display:none}}
+
+/* ================= OVERLAYS ================= */
+.ov{position:fixed;inset:0;z-index:90;background:rgba(2,8,14,.82);backdrop-filter:blur(6px);display:none;overflow:auto}
+.ov.open{display:block}
+.ov .sheet{max-width:920px;margin:28px auto;background:#071726;border:1px solid var(--line);
+  border-radius:var(--r);padding:24px 26px;box-shadow:0 30px 70px rgba(0,0,0,.6)}
+.ov .x{float:inline-end;margin:-6px -6px 0 0}
+.drw{position:fixed;inset:0;z-index:95;background:rgba(2,8,14,.7);backdrop-filter:blur(4px);display:none}
+.drw.open{display:block}
+.drw .pn{position:absolute;inset-block:0;inset-inline-end:0;width:min(430px,93vw);background:#071726;
+  border-inline-start:1px solid var(--line);padding:18px;overflow:auto}
+.toc{list-style:none;padding:0;margin:0}
+.toc .s{margin:14px 0 5px;font-size:12px;font-weight:700;color:var(--gd);letter-spacing:.4px;
+  display:flex;justify-content:space-between}
+.toc .s em{font-style:normal;color:var(--dim2);font-weight:400}
+.toc a{display:flex;gap:9px;align-items:center;padding:6px 10px;border-radius:8px;color:var(--txt);
+  text-decoration:none;font-size:14.5px}
+.toc a:hover{background:rgba(49,224,212,.09)}
+.toc a.cur{background:var(--cy);color:#04222a;font-weight:700}
+.toc a i{font-style:normal;opacity:.5;font-size:11.5px;min-width:19px;font-family:var(--mono)}
+
+.filelist{list-style:none;padding:0;margin:14px 0}
+.filelist li{display:flex;align-items:center;gap:11px;padding:10px 13px;border:1px solid var(--line);
+  border-radius:var(--r3);margin-bottom:8px;background:var(--panel)}
+.filelist .nm2{font-family:var(--mono);color:var(--cy);font-size:14px;direction:ltr;flex:1}
+.filelist .ds{color:var(--dim);font-size:13px;flex:2}
+
+.cover{text-align:center;padding-top:6px}
+.cover .meta{display:flex;gap:11px;justify-content:center;flex-wrap:wrap;margin-top:22px}
+.cover .meta div{background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:10px 17px;font-size:14.5px}
+.cover .meta b{display:block;color:var(--gd);font-size:12.5px}
+.keys{margin-top:26px;font-size:13.5px;color:var(--dim)}
+.keys kbd{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:2px 8px;
+  margin:0 2px;font-family:var(--mono);font-size:12px}
+
+@media print{
+  .bar,.nav,#prog,.drw,.ov,.rail,.copy{display:none!important}
+  body{background:#fff;color:#111}body::before,body::after{display:none}
+  .stage{padding:0;margin:0}
+  .slide{display:block!important;page-break-after:always;max-width:none;padding-bottom:16px;border-bottom:1px solid #ccd}
+  .slide::before{display:none}
+  .card,details,.codebox,.sql,.note{background:#f7f9fb!important;border-color:#ccd!important}
+  h1{color:#07314a!important;-webkit-text-fill-color:#07314a}
+  h2,.card h4{color:#07314a!important}
+  .notes{display:block!important}
+  .browser iframe{min-height:220px}
+}
+</style>
+</head>
+<body>
+
+<div class="bar">
+  <div class="mark"><i></i> طراحی سایت با AI <em>— نسخه عملی ۲.۰</em></div>
+  <div class="grow"></div>
+  <span id="pace">تایمر خاموش</span>
+  <button class="btn" id="clock" title="تایمر (T)">۰۰:۰۰</button>
+  <button class="btn" id="bNotes" title="یادداشت مدرس (N)">🎙</button>
+  <button class="btn" id="bFiles" title="فایل‌های آماده (D)">📦 فایل‌ها</button>
+  <button class="btn gd" id="bPlan" title="پلن اجرا (G)">📋 پلن</button>
+  <button class="btn" id="bToc" title="فهرست (M)">☰</button>
+</div>
+<div id="prog"><i></i></div>
+<nav class="rail" id="rail"></nav>
+
+<main class="stage" id="stage">
+
+<!-- ===== 1 COVER ===== -->
+<section class="slide active" data-sec="شروع" data-min="0" data-watermark="00">
+  <div class="cover">
+    <div class="dim sm">کمیته تحقیقات و فناوری دانشجویی واحد پردیس بین‌الملل · با همکاری کمیته توسعه آموزش دانشگاه علوم پزشکی شهید صدوقی یزد</div>
+    <span class="tag cy" style="margin-top:14px">کارگاه عملی · بدون نیاز به دانش برنامه‌نویسی</span>
+    <h1>طراحی سایت با هوش مصنوعی</h1>
+    <p class="lead" style="margin:0 auto">امروز حرف نمی‌زنیم — <b class="cy">می‌سازیم</b>.<br>
+    یک سایت واقعی، با دیتابیس واقعی، روی اینترنت واقعی.</p>
+    <div class="meta">
+      <div><b>مدرس</b> سبحان عفتی</div>
+      <div><b>زمان</b> ۲۶ شهریور ۱۴۰۵ · ۱۰ تا ۱۲</div>
+      <div><b>فایل‌های آماده</b> دکمه 📦 بالای صفحه</div>
+      <div><b>گواهی</b> معتبر</div>
+    </div>
+    <p class="keys">
+      <kbd>←</kbd> بعدی · <kbd>→</kbd> قبلی · <kbd>N</kbd> یادداشت مدرس · <kbd>G</kbd> پلن اجرا ·
+      <kbd>D</kbd> دانلود فایل‌ها · <kbd>T</kbd> تایمر · <kbd>M</kbd> فهرست · <kbd>F</kbd> تمام‌صفحه
+    </p>
+  </div>
+  <div class="notes">
+    <span class="say">«سلام به همگی، خوش اومدین. من سبحان عفتی هستم، دانشجوی پزشکی شهید صدوقی یزد. تو دو ساعت آینده قراره یه سایت واقعی بسازیم — با دیتابیس، با فرم، و ببریمش رو اینترنت. بدون اینکه شما حتی یه خط کد بلد باشین.»</span>
+    اول از همه بگو که <b>همه‌ی فایل‌ها آماده است</b> و لازم نیست تند تایپ کنند. این استرس را از کلاس می‌گیرد:
+    <span class="say">«یه خبر خوب: تمام کدهایی که امروز می‌بینین، آماده‌ست. لازم نیست چیزی رو تند تایپ کنین یا عکس بگیرین. آخر کلاس همه‌شو با یه کلیک دانلود می‌کنین.»</span>
+    بعد یک سؤال گرم‌کننده در چت: «اسم + رشته + اگه سایت داشتین اولین چیزی که توش می‌ذاشتین چی بود؟»
+  </div>
+</section>
+
+<!-- ===== 2 THE PROMISE (live demo) ===== -->
+<section class="slide" data-sec="شروع" data-min="3" data-watermark="01">
+  <span class="tag">خروجی امروز</span>
+  <h2>این چیزی است که ساعت ۱۲ دارید</h2>
+  <p class="lead">همین حالا ببینیدش. سمت راست کد است، سمت چپ نتیجه‌ی <b class="cy">زنده</b>. این دقیقاً همان صفحه‌ای است که با هم می‌سازیم.</p>
+  <div class="split">
+    <div class="codebox">
+      <div class="hd"><span class="fn">index.html</span><button class="copy">کپی</button></div>
+      <pre><code></code></pre>
+    </div>
+    <div class="browser">
+      <div class="chrome"><span class="d"></span><span class="d"></span><span class="d"></span><span class="url">https://your-name.ir</span></div>
+      <iframe sandbox="allow-scripts" loading="lazy"></iframe>
+    </div>
+    <script type="text/plain" class="src">
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head><meta charset="utf-8">
+<style>
+  body{font-family:Tahoma;margin:0;background:#f7fafc;color:#14212b}
+  .hero{background:linear-gradient(140deg,#0e4f6e,#0a3549);color:#fff;padding:34px 22px;text-align:center}
+  .hero h1{margin:0 0 6px;font-size:23px}
+  .hero p{margin:0;color:#bcd9e8;font-size:13px}
+  .btn{display:inline-block;margin-top:14px;background:#ffc857;color:#2f2000;
+       padding:8px 20px;border-radius:20px;font-weight:bold;font-size:13px}
+  .wrap{padding:18px;max-width:520px;margin:auto}
+  h2{font-size:16px;margin:16px 0 8px;border-right:4px solid #ffc857;padding-right:9px}
+  .cards{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .c{background:#fff;border:1px solid #e1e9f0;border-radius:12px;padding:12px;font-size:12px}
+  .c b{color:#0e4f6e;display:block;margin-bottom:3px}
+</style></head>
+<body>
+  <div class="hero">
+    <h1>سبحان عفتی</h1>
+    <p>دانشجوی پزشکی · علاقه‌مند به هوش مصنوعی در سلامت</p>
+    <span class="btn">تماس با من</span>
+  </div>
+  <div class="wrap">
+    <h2>فعالیت‌های پژوهشی</h2>
+    <div class="cards">
+      <div class="c"><b>مقاله اول</b>توضیح کوتاه پروژه و نقش من در آن.</div>
+      <div class="c"><b>مقاله دوم</b>توضیح کوتاه پروژه و نقش من در آن.</div>
+    </div>
+    <h2>پیام‌های دریافتی</h2>
+    <div class="c">۳ پیام جدید از فرم تماس — ذخیره‌شده در دیتابیس ✅</div>
+  </div>
+</body>
+</html>
+    </script>
+  </div>
+  <div class="note g"><b>قرار ما</b> نه اسلاید خشک، نه تئوری اضافه. هر چیزی که امروز می‌گویم، <b>همان لحظه روی صفحه اجرا می‌شود</b> و کدش را می‌گیرید.</div>
+  <div class="notes">
+    این اسلاید <b>موتور انگیزه‌ی کل کارگاه</b> است. روی پیش‌نمایش زنده مکث کن، اسکرولش کن، نشان بده واقعی است.
+    <span class="say">«این چیزی که سمت چپ می‌بینین یه عکس نیست — یه صفحه‌ی وب واقعیه که همین الان داره اجرا می‌شه. و اون کد سمت راست، کل چیزیه که لازمشه. همین. نه بیشتر.»</span>
+  </div>
+</section>
+
+<!-- ===== 3 ROADMAP ===== -->
+<section class="slide" data-sec="شروع" data-min="6" data-watermark="02">
+  <span class="tag">مسیر</span>
+  <h2>۶ قدم تا سایت زنده</h2>
+  <div class="grid g3">
+    <div class="card tint"><h4><span class="ic">۱</span> زیرساخت</h4><p>دامنه و هاست چیست و <b>چه چیزی بخرم</b>. فقط در حد تصمیم‌گیری، بدون حفظیات.</p></div>
+    <div class="card"><h4><span class="ic">۲</span> محیط کار</h4><p>XAMPP روشن، اولین فایل اجرا، و آشنایی عملی با HTML و CSS.</p></div>
+    <div class="card"><h4><span class="ic">۳</span> ساخت با AI</h4><p>پرامپت دقیق بنویسیم، کد بگیریم، اصلاحش کنیم.</p></div>
+    <div class="card tintg"><h4><span class="ic g">۴</span> دیتابیس و SQL</h4><p>جدول بسازیم، داده ذخیره کنیم، کوئری بزنیم. <b>این بخش را جدی می‌گیریم.</b></p></div>
+    <div class="card"><h4><span class="ic">۵</span> اتصال PHP</h4><p>فرم واقعی که داده را در دیتابیس می‌نویسد و از آن می‌خواند.</p></div>
+    <div class="card"><h4><span class="ic">۶</span> انتشار</h4><p>آپلود روی هاست، انتقال دیتابیس، فعال‌سازی https.</p></div>
+  </div>
+  <div class="note w"><b>چرا روی دیتابیس تأکید می‌کنیم؟</b>
+  چون تفاوت یک «صفحه‌ی وب» با یک «سایت» همین است. صفحه فقط نشان می‌دهد؛ سایت <b>یادش می‌ماند</b>. هر چیزی که در اینترنت استفاده می‌کنید — از اینستاگرام تا سامانه‌ی نوبت‌دهی — پشتش یک دیتابیس است.</div>
+  <div class="notes">
+    از نوار کناری چپ (ریل) استفاده کن: هر بخش یک شماره دارد و هر لحظه معلوم است کجای مسیریم.
+    <span class="say">«این شش قدم رو یادتون باشه. سمت چپ صفحه‌ی من یه نوار هست که همیشه نشون می‌ده کجای این مسیریم، پس هیچ‌وقت گم نمی‌شین.»</span>
+  </div>
+</section>
+
+<!-- ===== 4 INFRA: one slide, decision-focused ===== -->
+<section class="slide" data-sec="زیرساخت" data-min="9" data-watermark="03">
+  <span class="tag cy">قدم ۱</span>
+  <h2>وقتی آدرس سایت را تایپ می‌کنید، چه اتفاقی می‌افتد؟</h2>
+  <div class="grid g4" style="margin-top:16px">
+    <div class="card center"><div style="font-size:26px">🔎</div><h4 style="justify-content:center">۱. مرورگر</h4><p class="sm">شما تایپ می‌کنید <code>site.ir</code></p></div>
+    <div class="card center"><div style="font-size:26px">🗺</div><h4 style="justify-content:center">۲. DNS</h4><p class="sm">اسم را به شماره‌ی سرور ترجمه می‌کند</p></div>
+    <div class="card center"><div style="font-size:26px">🖥</div><h4 style="justify-content:center">۳. هاست</h4><p class="sm">سروری که فایل‌ها رویش است، جواب می‌دهد</p></div>
+    <div class="card center"><div style="font-size:26px">📄</div><h4 style="justify-content:center">۴. index.html</h4><p class="sm">فایل برگشته و مرورگر نمایشش می‌دهد</p></div>
+  </div>
+  <div class="note"><b>کل ماجرا همین است.</b> دامنه = اسم · هاست = جایی که فایل‌ها هستند · DNS = پیوند این دو · SSL = قفلی که ارتباط را رمزنگاری می‌کند.
+  لازم نیست چیزی حفظ کنید؛ فقط این چهار قدم را تصویر کنید.</div>
+  <div class="grid g2">
+    <div class="card"><h4><span class="ic">📁</span> قانونی که باید بدانید</h4><p>روی هاست، فایل‌ها باید داخل پوشه‌ی <code>public_html</code> باشند. در لوکال‌هاست، معادلش <code>htdocs</code> است. هرچیزی بیرون این پوشه، از اینترنت دیده نمی‌شود.</p></div>
+    <div class="card"><h4><span class="ic g">⏱</span> نکته‌ای که همه را گیج می‌کند</h4><p>بعد از وصل کردن دامنه به هاست، تا <b>۲۴ ساعت</b> ممکن است طول بکشد. اگر سایت فوراً بالا نیامد، چیزی خراب نشده — فقط اینترنت هنوز خبردار نشده.</p></div>
+  </div>
+  <div class="notes">
+    این کل بخش تئوری کارگاه است — <b>عمداً فشرده</b> شده. وسوسه نشو بیشتر توضیح بدهی؛ ارزش واقعی در بخش‌های بعد است.
+    <span class="say">«این تنها بخش تئوری کارگاهه و عمداً کوتاهش کردم. چون شما قرار نیست مهندس شبکه بشین؛ قراره سایت بسازین.»</span>
+  </div>
+</section>
+
+<!-- ===== 5 WHAT TO BUY ===== -->
+<section class="slide" data-sec="زیرساخت" data-min="13" data-watermark="04">
+  <span class="tag">تصمیم عملی</span>
+  <h2>🛒 دقیقاً چه چیزی بخرم و چقدر هزینه دارد؟</h2>
+  <table class="t">
+    <tr><th>مورد</th><th>چه چیزی بگیرید</th><th>هزینه تقریبی</th></tr>
+    <tr><td><b>دامنه</b></td><td>پسوند <b class="ltr">.ir</b> برای شروع — از ایرنیک یا نمایندگی‌ها</td><td>سالی ~۳۰ هزار تومان</td></tr>
+    <tr><td><b>هاست</b></td><td>اشتراکی لینوکس، کنترل‌پنل <b>cPanel</b>، حداقل ۵۰۰ مگابایت</td><td>سالی ~۳۰۰ تا ۸۰۰ هزار تومان</td></tr>
+    <tr><td><b>SSL</b></td><td>رایگان (Let's Encrypt) — <b class="rd">بابتش پول ندهید</b></td><td>۰ تومان</td></tr>
+    <tr><td><b>ابزار AI</b></td><td>نسخه رایگان ChatGPT / Claude / Gemini برای این کارگاه کافی است</td><td>۰ تومان</td></tr>
+  </table>
+  <h3>چک‌لیست خرید هاست — قبل از پرداخت این ۵ تا را بپرسید</h3>
+  <div class="grid g3">
+    <div class="card"><p>✅ کنترل‌پنل <b>cPanel</b> دارد؟ (نه پنل اختصاصی ناشناخته)</p></div>
+    <div class="card"><p>✅ <b>PHP 8+</b> و <b>MySQL/MariaDB</b> پشتیبانی می‌شود؟</p></div>
+    <div class="card"><p>✅ <b>SSL رایگان</b> دارد؟</p></div>
+    <div class="card"><p>✅ <b>بکاپ خودکار</b> می‌گیرد؟</p></div>
+    <div class="card"><p>✅ <b>گارانتی بازگشت وجه</b> دارد؟</p></div>
+    <div class="card tintg"><p>💡 <b>قبل از خرید</b> یک تیکت پشتیبانی بزنید و ببینید چقدر طول می‌کشد جواب بدهند. این بهترین تست است.</p></div>
+  </div>
+  <div class="note g"><b>اگر امروز پول ندارید؟</b> کاملاً مشکلی نیست. در اسلایدهای پایانی یک مسیر <b>کاملاً رایگان</b> (GitHub Pages / Netlify) داریم که تا امشب سایتتان آنلاین می‌شود.</div>
+  <div class="notes">
+    <b>هیچ برندی را نام نبر.</b> فقط معیار بده. اگر پرسیدند «کدوم شرکت؟»:
+    <span class="say">«من اسم هیچ شرکتی رو نمی‌برم چون قرار نیست اینجا تبلیغ بشه. به‌جاش معیار می‌دم، خودتون مقایسه کنین.»</span>
+    عدد گفتن خیلی مهم است — «سالی سی هزار تومن» بهانه‌ی «گرونه» را از بین می‌برد.
+  </div>
+</section>
+
+<!-- ===== 6 XAMPP ===== -->
+<section class="slide" data-sec="محیط کار" data-min="17" data-watermark="05">
+  <span class="tag cy">قدم ۲</span>
+  <h2>⚙️ XAMPP — اتاق تمرین شما در ۹۰ ثانیه</h2>
+  <p class="lead">XAMPP سه چیز را یک‌جا نصب می‌کند: وب‌سرور (Apache)، دیتابیس (MySQL) و زبان سمت سرور (PHP). بدون این‌ها، فایل <code>.php</code> شما فقط یک متن است.</p>
+  <div class="grid g23">
+    <div>
+      <ol class="st">
+        <li>از <a href="https://www.apachefriends.org" target="_blank" rel="noopener">apachefriends.org</a> دانلود و با تنظیمات پیش‌فرض نصب کنید.</li>
+        <li>پنل کنترل را باز کنید و روبه‌روی <b>Apache</b> و <b>MySQL</b> دکمه <b>Start</b> بزنید — هر دو باید سبز شوند.</li>
+        <li>پوشه‌ی پروژه را بسازید: <code>C:\xampp\htdocs\mysite</code></li>
+        <li>در مرورگر باز کنید: <code>http://localhost/mysite</code></li>
+      </ol>
+      <div class="note w"><b>Apache روشن نمی‌شود؟ (Port 80 in use)</b>
+      معمولاً اسکایپ یا IIS پورت ۸۰ را گرفته. در XAMPP → <b>Config → httpd.conf</b> → مقدار <code>Listen 80</code> را به <code>Listen 8080</code> تغییر دهید، Apache را دوباره Start کنید و سایت را با <code>http://localhost:8080/mysite</code> باز کنید.</div>
+    </div>
+    <div class="card">
+      <h4><span class="ic">📐</span> نقشه‌ی مسیرها — این را حفظ کنید، نه چیز دیگر</h4>
+      <div class="term" style="margin-top:12px">
+<span class="o"># روی کامپیوتر شما (لوکال‌هاست)</span>
+C:\xampp\htdocs\mysite\index.html
+<span class="p">→</span> http://localhost/mysite
+
+<span class="o"># روی هاست واقعی</span>
+public_html/index.html
+<span class="p">→</span> https://yoursite.ir
+
+<span class="o"># قاعده‌ی طلایی</span>
+<span class="p">htdocs</span> <span class="o">(لوکال)</span> == <span class="p">public_html</span> <span class="o">(هاست)</span>
+      </div>
+      <p class="sm" style="margin-top:12px">در مک مسیر معمولاً <code>/Applications/XAMPP/htdocs/</code> است.</p>
+    </div>
+  </div>
+  <div class="notes">
+    ۲۰٪ کلاس در نصب گیر می‌کنند — <b>از قبل آرامشان کن</b>:
+    <span class="say">«اگه نصب طول کشید اصلاً نگران نباشین. تماشا کنین، بعداً با ویدیوی ضبط‌شده نصب می‌کنین. هیچ بخشی از کارگاه رو از دست نمی‌دین.»</span>
+    اگر خواستی سریع‌تر بروی: برای HTML/CSS خالص، <b>VS Code + Live Server</b> یا حتی CodePen کافی است — XAMPP فقط برای PHP و MySQL لازم می‌شود.
+  </div>
+</section>
+
+<!-- ===== 7 HTML in one slide, live ===== -->
+<section class="slide" data-sec="محیط کار" data-min="21" data-watermark="06">
+  <span class="tag">عملی</span>
+  <h2>HTML: ۸ تگی که ۹۰٪ کار را انجام می‌دهند</h2>
+  <p class="lead">لازم نیست HTML یاد بگیرید. فقط باید این ۸ تا را <b>بشناسید</b> تا وقتی AI کد داد، بفهمید به چه نگاه می‌کنید.</p>
+  <div class="split">
+    <div class="codebox">
+      <div class="hd"><span class="fn">index.html</span><button class="copy">کپی</button></div>
+      <pre><code></code></pre>
+    </div>
+    <div class="browser">
+      <div class="chrome"><span class="d"></span><span class="d"></span><span class="d"></span><span class="url">localhost/mysite</span></div>
+      <iframe sandbox="allow-scripts" loading="lazy"></iframe>
+    </div>
+    <script type="text/plain" class="src">
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <title>تمرین تگ‌ها</title>
+  <style>body{font-family:Tahoma;padding:14px;line-height:2;font-size:13px}</style>
+</head>
+<body>
+
+  <h1>این تیتر اصلی است (h1)</h1>
+  <h2>این تیتر فرعی است (h2)</h2>
+
+  <p>این یک پاراگراف متن است. داخلش می‌توان کلمه‌ای را
+     <strong>پررنگ</strong> یا <em>مورب</em> کرد.</p>
+
+  <a href="https://nic.ir">این یک لینک است (a)</a>
+
+  <br><br>
+  <img alt="تصویر نمونه" width="160" height="70"
+       src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='70'%3E%3Crect width='160' height='70' rx='8' fill='%230e4f6e'/%3E%3Ctext x='80' y='42' font-size='16' fill='%23fff' text-anchor='middle' font-family='Tahoma'%3EIMG%3C/text%3E%3C/svg%3E">
+
+  <ul>
+    <li>آیتم اول لیست (li)</li>
+    <li>آیتم دوم لیست</li>
+  </ul>
+
+  <div style="background:#eef5fa;padding:10px;border-radius:8px">
+    این یک div است — جعبه‌ای برای گروه‌بندی بقیه‌ی عناصر.
+  </div>
+
+  <button onclick="alert('سلام!')">این یک دکمه است</button>
+
+</body>
+</html>
+    </script>
+  </div>
+  <div class="note"><b>الگویی که همه‌جا تکرار می‌شود</b>
+  هر تگ سه بخش دارد: <code>&lt;p&gt;</code> باز شدن، محتوا، <code>&lt;/p&gt;</code> بسته شدن. همین. تمام HTML همین است.</div>
+  <div class="notes">
+    این اسلاید را <b>تعاملی</b> اجرا کن: در پیش‌نمایش روی دکمه کلیک کن تا alert بیاید — کلاس ذوق می‌کند.
+    <span class="say">«ببینین، این دکمه واقعیه. من روش کلیک می‌کنم... این همون چیزیه که تو سایت‌های واقعی هم اتفاق می‌افته.»</span>
+    اگر کسی پرسید «باید اینا رو حفظ کنم؟» → «نه. فقط باید بشناسین. حفظ کردن کار AI ـه، فهمیدن کار شما.»
+  </div>
+</section>
+
+<!-- ===== 8 CSS ===== -->
+<section class="slide" data-sec="محیط کار" data-min="25" data-watermark="07">
+  <span class="tag">عملی</span>
+  <h2>CSS: ۶ چیزی که کل ظاهر سایت را می‌سازد</h2>
+  <div class="split">
+    <div class="codebox">
+      <div class="hd"><span class="fn">style.css</span><button class="copy">کپی</button></div>
+      <pre><code></code></pre>
+    </div>
+    <div class="browser">
+      <div class="chrome"><span class="d"></span><span class="d"></span><span class="d"></span><span class="url">localhost/mysite</span></div>
+      <iframe sandbox="allow-scripts" loading="lazy"></iframe>
+    </div>
+    <script type="text/plain" class="src">
+<!DOCTYPE html>
+<html lang="fa" dir="rtl"><head><meta charset="utf-8">
+<style>
+/* 1) رنگ و فونت */
+body{ font-family:Tahoma; background:#f2f7fa; color:#14212b;
+      padding:14px; font-size:13px; line-height:2 }
+
+/* 2) فاصله: padding داخلی، margin بیرونی */
+.box{ background:#fff; padding:14px; margin-bottom:12px;
+      border:1px solid #dde7ee; border-radius:12px }
+
+/* 3) رنگ و سایه */
+.hero{ background:linear-gradient(120deg,#0e4f6e,#0a3549);
+       color:#fff; box-shadow:0 8px 20px rgba(14,79,110,.25) }
+
+/* 4) چیدمان کنار هم با flex */
+.row{ display:flex; gap:10px }
+.row > div{ flex:1; text-align:center }
+
+/* 5) تغییر حالت با hover */
+.btn{ background:#ffc857; color:#2f2000; padding:7px 18px;
+      border-radius:20px; display:inline-block; transition:.2s }
+.btn:hover{ transform:translateY(-3px); background:#ffb020 }
+
+/* 6) موبایل: زیر ۵۰۰ پیکسل ستون‌ها زیر هم */
+@media (max-width:500px){ .row{ flex-direction:column } }
+</style></head>
+<body>
+  <div class="box hero">
+    <b>این جعبه‌ی اصلی است</b><br>رنگ گرادیانی + سایه
+  </div>
+  <div class="row">
+    <div class="box">ستون ۱</div>
+    <div class="box">ستون ۲</div>
+    <div class="box">ستون ۳</div>
+  </div>
+  <span class="btn">موس را روی من ببر</span>
+</body></html>
+    </script>
+  </div>
+  <div class="note g"><b>چرا این مهم است؟</b> وقتی از AI می‌خواهید «فاصله‌ی بین بخش‌ها را بیشتر کن»، دارید درباره‌ی <code>margin</code> حرف می‌زنید. وقتی می‌گویید «کنار هم بچین»، منظورتان <code>flex</code> است. <b>دانستن این ۶ کلمه، پرامپت‌های شما را چند برابر دقیق‌تر می‌کند.</b></div>
+  <div class="notes">
+    حتماً موس را روی دکمه ببر تا انیمیشن hover را ببینند. لحظه‌ی «آها!» همین‌جاست.
+    <span class="say">«این شیش تا مفهوم، کل CSS ـه. بقیه‌ش جزئیاته که هوش مصنوعی برای شما می‌نویسه. ولی همین شیش تا کلمه رو اگه بلد باشین، می‌تونین دقیق بگین چی می‌خواین.»</span>
+  </div>
+</section>
+
+<!-- ===== 9 PLAYGROUND ===== -->
+<section class="slide" data-sec="محیط کار" data-min="29" data-watermark="08">
+  <span class="tag cy">نوبت شماست</span>
+  <h2>🎮 زمین بازی — همین‌جا کد بنویسید</h2>
+  <p class="lead">کد سمت راست را تغییر بدهید؛ نتیجه <b class="cy">همان لحظه</b> سمت چپ عوض می‌شود. چیزی خراب نمی‌شود — این بهترین راه یادگیری است.</p>
+  <div class="play">
+    <textarea id="pgCode" spellcheck="false"></textarea>
+    <div class="browser">
+      <div class="chrome"><span class="d"></span><span class="d"></span><span class="d"></span><span class="url">playground</span></div>
+      <iframe id="pgOut" sandbox="allow-scripts"></iframe>
+    </div>
+  </div>
+  <div style="display:flex;gap:9px;flex-wrap:wrap">
+    <button class="btn sm" id="pgReset">↺ بازگشت به حالت اول</button>
+    <button class="btn sm" id="pgDark">🌙 نمونه: تم تیره</button>
+    <button class="btn sm" id="pgCard">🃏 نمونه: کارت پروفایل</button>
+    <button class="btn gd sm" id="pgSave">💾 دانلود به‌عنوان فایل HTML</button>
+  </div>
+  <div class="notes">
+    <b>یک تمرین ۲ دقیقه‌ای بده و واقعاً صبر کن.</b> کلاس باید دستش را روی کیبورد ببرد:
+    <span class="say">«دو دقیقه وقت می‌دم. اسم داخل کد رو به اسم خودتون تغییر بدین و رنگ پس‌زمینه رو عوض کنین. هرکی انجام داد تو چت بنویسه "شد".»</span>
+    شمردن تعداد «شد»ها در چت، تعامل کلاس را چند برابر می‌کند. اگر وقت تنگ بود، این اسلاید اولین کاندید حذف است.
+  </div>
+</section>
+
+<!-- ===== 10 PROMPT ANATOMY ===== -->
+<section class="slide" data-sec="هوش مصنوعی" data-min="33" data-watermark="09">
+  <span class="tag cy">قدم ۳</span>
+  <h2>🧠 بد در برابر خوب — تفاوت را ببینید</h2>
+  <div class="grid g2">
+    <div class="card" style="border-color:#7a3845">
+      <h4><span class="ic r">✕</span> پرامپت ضعیف</h4>
+      <div class="codebox" style="margin-top:10px"><pre style="font-family:'Vazirmatn',Tahoma;direction:rtl;text-align:right;font-size:14px">یه سایت شخصی برام بساز</pre></div>
+      <p style="margin-top:10px">خروجی: یک صفحه‌ی انگلیسی چپ‌چین، با محتوای الکی، فونت نامناسب فارسی، و در موبایل به‌هم‌ریخته. بعد ۲۰ دقیقه وقت می‌گذارید تا درستش کنید.</p>
+    </div>
+    <div class="card" style="border-color:#2f6a4a">
+      <h4><span class="ic" style="background:rgba(74,222,128,.12);border-color:rgba(74,222,128,.3);color:var(--gr)">✓</span> پرامپت دقیق</h4>
+      <div class="codebox" style="margin-top:10px"><pre style="font-family:'Vazirmatn',Tahoma;direction:rtl;text-align:right;font-size:14px">تو یک طراح وب حرفه‌ای فارسی‌زبانی.
+یک صفحه رزومه‌ی تک‌صفحه‌ای بساز:
+بخش‌ها: هدر، معرفی، تحصیلات، پژوهش، تماس
+راست‌چین، فونت وزیرمتن، ریسپانسیو
+یک فایل، CSS داخلی، بدون کتابخانه
+فقط کد، بدون توضیح</pre></div>
+      <p style="margin-top:10px">خروجی: چیزی که <b>همان بار اول</b> قابل استفاده است.</p>
+    </div>
+  </div>
+  <h3>فرمول پرامپت خوب — پنج جزء</h3>
+  <div class="grid g4">
+    <div class="card"><h4><span class="ic">۱</span> نقش</h4><p class="sm">«تو یک طراح وب فارسی‌زبانی...»</p></div>
+    <div class="card"><h4><span class="ic">۲</span> هدف و جزئیات</h4><p class="sm">دقیقاً چه بخش‌هایی، چه رنگی، چه محتوایی</p></div>
+    <div class="card"><h4><span class="ic g">۳</span> قالب خروجی</h4><p class="sm">«یک فایل کامل، بدون توضیح اضافه»</p></div>
+    <div class="card"><h4><span class="ic g">۴</span> محدودیت</h4><p class="sm">«بدون کتابخانه، راست‌چین، ریسپانسیو»</p></div>
+  </div>
+  <div class="note w"><b>جزء پنجم که همه فراموش می‌کنند: زمینه</b>
+  بگویید کجا اجرا می‌شود. «این روی هاست اشتراکی با PHP 8.2 اجرا می‌شود» — همین یک جمله جلوی کلی خطای بعدی را می‌گیرد.</div>
+  <div class="notes">
+    <b>تضاد را زنده اجرا کن.</b> اول پرامپت بد را بفرست، خروجی ضعیف را نشان بده، بعد پرامپت خوب. این مؤثرترین دو دقیقه‌ی کل کارگاه است.
+    <span class="say">«بذارین یه چیزی نشونتون بدم. اول می‌نویسم "یه سایت برام بساز"... ببینین چی داد. حالا همون خواسته رو با جزئیات می‌نویسم... تفاوت رو ببینین. فرق این دو تا، ده دقیقه وقت گذاشتن روی نوشتن درخواسته.»</span>
+  </div>
+</section>
+
+<!-- ===== 11 MASTER PROMPT ===== -->
+<section class="slide" data-sec="هوش مصنوعی" data-min="37" data-watermark="10">
+  <span class="tag">دمو زنده ۱</span>
+  <h2>پرامپت اصلی — کپی کنید و اجرا کنید</h2>
+  <div class="codebox">
+    <div class="hd"><span class="fn">prompt-01-build.txt</span><button class="copy">کپی پرامپت</button></div>
+    <pre style="font-family:'Vazirmatn',Tahoma;direction:rtl;text-align:right;font-size:15px;line-height:2.1">تو یک طراح وب حرفه‌ای هستی که در ساخت سایت‌های فارسی و راست‌چین تخصص داری.
+
+یک صفحه وب تک‌صفحه‌ای شخصی برای من بساز:
+
+• نام: [نام و نام خانوادگی من]
+• عنوان: دانشجوی پزشکی دانشگاه [نام دانشگاه]
+• بخش‌ها به ترتیب: هدر با منوی چسبان، معرفی با عکس دایره‌ای،
+  سوابق تحصیلی، فعالیت‌های پژوهشی (۳ کارت)، مهارت‌ها، فرم تماس، فوتر
+
+الزامات فنی:
+• کل کد در یک فایل index.html با CSS داخلی
+• راست‌چین (dir="rtl")، charset UTF-8، فونت وزیرمتن از Google Fonts
+• رنگ اصلی آبی نفتی #0e4f6e و رنگ تأکیدی طلایی #ffc857
+• کاملاً ریسپانسیو؛ زیر ۷۶۸ پیکسل ستون‌ها زیر هم و منو همبرگری
+• انیمیشن ملایم هنگام اسکرول با IntersectionObserver
+• بدون هیچ کتابخانه یا فریم‌ورک خارجی
+• رنگ‌ها را با CSS Variables تعریف کن تا بعداً راحت عوض شوند
+
+زمینه اجرا: این فایل روی هاست اشتراکی با PHP 8.2 اجرا می‌شود.
+
+خروجی: فقط کد کامل و آماده اجرا، بدون توضیح اضافه.</pre>
+  </div>
+  <div class="grid g3">
+    <div class="card"><h4><span class="ic">۱</span> کد را کپی کنید</h4><p class="sm">از خروجی AI، کل کد را انتخاب و کپی کنید.</p></div>
+    <div class="card"><h4><span class="ic">۲</span> ذخیره کنید</h4><p class="sm">در Notepad پیست کنید → <b>Save As</b> → نام <code>index.html</code> → <b>Encoding: UTF-8</b> و <b>Save as type: All Files</b></p></div>
+    <div class="card"><h4><span class="ic">۳</span> باز کنید</h4><p class="sm"><code>http://localhost/mysite</code></p></div>
+  </div>
+  <div class="note d"><b>شایع‌ترین خطای کل کارگاه</b>
+  اگر در Notepad نوع فایل را <b>All Files</b> نکنید، فایل شما <code>index.html.txt</code> ذخیره می‌شود و باز نمی‌شود. و اگر Encoding را UTF-8 نگذارید، فارسی به‌صورت <span class="ltr">Ù†Ø§Ù…</span> نمایش داده می‌شود.</div>
+  <div class="notes">
+    این دمو را زنده اجرا کن و <b>در حین تولید کد سکوت نکن</b>:
+    <span class="say">«ببینین داره چی‌کار می‌کنه — اول ساختار صفحه رو می‌چینه، بعد میره سراغ استایل‌ها. این کاری بود که یه نفر باید چند ساعت روش وقت می‌ذاشت.»</span>
+    نکته‌ی Notepad را <b>حتماً</b> بگو. هر سال نصف کلاس همین‌جا گیر می‌کنند.
+  </div>
+</section>
+
+<!-- ===== 12 ITERATION ===== -->
+<section class="slide" data-sec="هوش مصنوعی" data-min="42" data-watermark="11">
+  <span class="tag">دمو زنده ۲</span>
+  <h2>🔁 اصلاح کردن — مهارتی که کار را تمام می‌کند</h2>
+  <p class="lead">خروجی اول هیچ‌وقت کامل نیست، و این کاملاً طبیعی است. مهارت واقعی این است که بدانید <b>چطور بخواهید تغییرش دهد</b>.</p>
+  <div class="grid g2">
+    <div class="card"><h4><span class="ic r">✕</span> این‌طور نگویید</h4>
+      <ul class="b sm" style="margin-top:6px"><li>«قشنگ‌ترش کن»</li><li>«خوب نشد»</li><li>«یه کاریش کن»</li><li>«این بخشش مشکل داره»</li></ul></div>
+    <div class="card"><h4><span class="ic">✓</span> این‌طور بگویید</h4>
+      <ul class="b sm" style="margin-top:6px"><li>«فاصله‌ی عمودی بین بخش‌ها را از ۴۰ به ۸۰ پیکسل ببر»</li><li>«رنگ دکمه‌ها را به <code>#ffc857</code> تغییر بده»</li><li>«هدر موقع اسکرول چسبان شود با پس‌زمینه‌ی بلور»</li><li>«در موبایل کارت‌های پژوهش زیر هم بیایند»</li></ul></div>
+  </div>
+  <div class="codebox">
+    <div class="hd"><span class="fn">prompt-02-refine.txt</span><button class="copy">کپی پرامپت</button></div>
+    <pre style="font-family:'Vazirmatn',Tahoma;direction:rtl;text-align:right;font-size:15px;line-height:2.1">همان کد قبلی را نگه دار و فقط این تغییرات را اعمال کن:
+
+۱. هدر هنگام اسکرول چسبان بماند، نیمه‌شفاف با افکت بلور
+۲. زیر بخش معرفی یک دکمه‌ی «دانلود رزومه» با رنگ طلایی اضافه کن
+۳. فاصله‌ی عمودی بین بخش‌ها را دو برابر کن
+۴. یک دکمه‌ی تغییر حالت روز/شب اضافه کن که انتخاب کاربر
+   در localStorage ذخیره شود
+۵. در موبایل منو به شکل همبرگری جمع شود
+
+کل فایل کامل و اصلاح‌شده را دوباره بده، نه فقط بخش تغییریافته.</pre>
+  </div>
+  <div class="note w"><b>مهم‌ترین جمله‌ی کل کارگاه</b>
+  همیشه بنویسید: <b class="gd">«کل فایل کامل را دوباره بده»</b><br>
+  وگرنه AI می‌نویسد «بقیه مثل قبل» و شما باید تکه‌ها را دستی بچسبانید — که منبع اصلی خطا برای تازه‌کارهاست.</div>
+  <div class="notes">
+    روی جمله‌ی «کل فایل کامل را دوباره بده» <b>مکث کن</b>. شاید مفیدترین جمله‌ی کل دو ساعت باشد.
+    <span class="say">«این جمله رو یادداشت کنین: کل فایل کامل رو دوباره بده. همین یه جمله، نود درصد دردسرهای بعدیتون رو حذف می‌کنه.»</span>
+    یک تغییر را زنده بگیر و مرورگر را رفرش کن تا حلقه‌ی «درخواست ← تغییر ← دیدن» کامل جا بیفتد.
+  </div>
+</section>
+
+<!-- ===== 13 DB INTRO ===== -->
+<section class="slide" data-sec="دیتابیس و SQL" data-min="47" data-watermark="12">
+  <span class="tag gd" style="color:var(--gd)">قدم ۴ · مهم‌ترین بخش فنی</span>
+  <h2>🗄 دیتابیس: جایی که سایت شما «یادش می‌ماند»</h2>
+  <div class="grid g23">
+    <div>
+      <p class="lead">یک صفحه‌ی HTML همیشه یک چیز ثابت نشان می‌دهد. دیتابیس آن را زنده می‌کند:
+      فرم تماس پیام‌ها را <b>ذخیره</b> می‌کند، لیست مقالات از دیتابیس <b>خوانده</b> می‌شود، و کاربر می‌تواند <b>جست‌وجو</b> کند.</p>
+      <h3>سه کلمه‌ای که باید بشناسید</h3>
+      <div class="grid g3" style="margin-top:6px">
+        <div class="card"><h4><span class="ic g">DB</span> دیتابیس</h4><p class="sm">کل فایل اکسل<br><code>mysite_db</code></p></div>
+        <div class="card"><h4><span class="ic g">TB</span> جدول</h4><p class="sm">یک شیت<br><code>messages</code></p></div>
+        <div class="card"><h4><span class="ic g">↔</span> سطر و ستون</h4><p class="sm">هر سطر یک رکورد<br>هر ستون یک ویژگی</p></div>
+      </div>
+      <div class="note"><b>SQL چیست؟</b> زبانی که با آن با دیتابیس حرف می‌زنید. فقط <b class="cy">۴ فعل</b> اصلی دارد که امروز هر چهار تا را کار می‌کنیم:
+      <br><span class="pill">SELECT = بخوان</span><span class="pill">INSERT = بنویس</span><span class="pill">UPDATE = تغییر بده</span><span class="pill">DELETE = پاک کن</span></div>
+    </div>
+    <div class="sql">
+      <div class="rh"><span>جدول <b class="ltr">messages</b> — این چیزی است که با هم می‌سازیم</span><span class="ltr">8 rows</span></div>
+      <div style="overflow:auto"><table class="res">
+        <tr><th>id</th><th>name</th><th>subject</th><th>is_read</th><th>created_at</th></tr>
+        <tr><td>1</td><td class="fa">مریم احمدی</td><td class="fa">سؤال درباره نوبت</td><td>1</td><td>2026-06-01</td></tr>
+        <tr><td>2</td><td class="fa">علی رضایی</td><td class="fa">همکاری پژوهشی</td><td>0</td><td>2026-06-03</td></tr>
+        <tr><td>3</td><td class="fa">زهرا موسوی</td><td class="fa">سؤال درباره مقاله</td><td>1</td><td>2026-06-05</td></tr>
+        <tr><td>4</td><td class="fa">امیر کاظمی</td><td class="fa">درخواست مشاوره</td><td>0</td><td>2026-06-07</td></tr>
+        <tr><td>5</td><td class="fa">نگار شریفی</td><td class="fa">همکاری پژوهشی</td><td>0</td><td>2026-06-09</td></tr>
+        <tr><td>…</td><td class="fa">…</td><td class="fa">…</td><td>…</td><td>…</td></tr>
+      </table></div>
+    </div>
+  </div>
+  <div class="notes">
+    این اسلاید «چرا»ی بخش دیتابیس است. اگر «چرا» جا بیفتد، بقیه‌ی بخش راحت پیش می‌رود.
+    <span class="say">«فرق یه صفحه‌ی وب با یه سایت واقعی همینه: صفحه فقط نشون می‌ده، سایت یادش می‌مونه. هر چیزی که تو اینترنت استفاده می‌کنین — از اینستاگرام تا سامانه‌ی نوبت‌دهی — پشتش یه جدول شبیه همین چیزیه که می‌بینین.»</span>
+  </div>
+</section>
+
+<!-- ===== 14 CREATE ===== -->
+<section class="slide" data-sec="دیتابیس و SQL" data-min="51" data-watermark="13">
+  <span class="tag cy">SQL عملی ۱</span>
+  <h2>ساخت دیتابیس و جدول — قدم به قدم</h2>
+  <p class="lead">این را در <code>http://localhost/phpmyadmin</code> → تب <b>SQL</b> پیست کنید و <b>Go</b> بزنید.</p>
+  <div class="codebox">
+    <div class="hd"><span class="fn">01-create.sql</span><button class="copy">کپی</button></div>
+    <pre><span class="cm">-- ۱) ساخت دیتابیس با پشتیبانی کامل از فارسی و ایموجی</span>
+<span class="kw">CREATE DATABASE IF NOT EXISTS</span> mysite_db
+  <span class="kw">DEFAULT CHARACTER SET</span> utf8mb4
+  <span class="kw">COLLATE</span> utf8mb4_persian_ci;
+
+<span class="kw">USE</span> mysite_db;
+
+<span class="cm">-- ۲) ساخت جدول پیام‌های فرم تماس</span>
+<span class="kw">CREATE TABLE IF NOT EXISTS</span> messages (
+  id         <span class="fn2">INT</span> <span class="kw">AUTO_INCREMENT PRIMARY KEY</span>,   <span class="cm">-- شماره یکتا، خودکار</span>
+  name       <span class="fn2">VARCHAR</span>(100) <span class="kw">NOT NULL</span>,            <span class="cm">-- متن کوتاه، اجباری</span>
+  email      <span class="fn2">VARCHAR</span>(150) <span class="kw">NOT NULL</span>,
+  subject    <span class="fn2">VARCHAR</span>(200) <span class="kw">NOT NULL</span>,
+  message    <span class="fn2">TEXT</span>         <span class="kw">NOT NULL</span>,            <span class="cm">-- متن بلند</span>
+  is_read    <span class="fn2">TINYINT</span>(1)   <span class="kw">DEFAULT</span> <span class="nm">0</span>,           <span class="cm">-- ۰ خوانده‌نشده، ۱ خوانده‌شده</span>
+  created_at <span class="fn2">TIMESTAMP</span>    <span class="kw">DEFAULT</span> <span class="fn2">CURRENT_TIMESTAMP</span> <span class="cm">-- زمان خودکار</span>
+) <span class="kw">ENGINE</span>=InnoDB <span class="kw">DEFAULT CHARSET</span>=utf8mb4 <span class="kw">COLLATE</span>=utf8mb4_persian_ci;</pre>
+  </div>
+  <div class="grid g2">
+    <div class="card"><h4><span class="ic g">⚠</span> چرا <span class="ltr">utf8mb4_persian_ci</span>؟</h4>
+      <p>اگر این را نگذارید، فارسی در دیتابیس به‌صورت <span class="ltr">????</span> یا <span class="ltr">Ù†Ø§Ù…</span> ذخیره می‌شود. این شایع‌ترین خطای دیتابیس فارسی است و بعداً سخت رفع می‌شود. <b>از همان اول درست بگذارید.</b></p></div>
+    <div class="card"><h4><span class="ic">🔑</span> <span class="ltr">AUTO_INCREMENT PRIMARY KEY</span> یعنی چه؟</h4>
+      <p>یعنی هر رکورد جدید خودکار یک شماره‌ی یکتا می‌گیرد (۱، ۲، ۳...). شما هیچ‌وقت خودتان <code>id</code> نمی‌نویسید — دیتابیس این کار را می‌کند.</p></div>
+  </div>
+  <details><summary>جدول انواع داده — کدام را کِی استفاده کنم؟</summary><div class="in">
+    <table class="t sm">
+      <tr><th>نوع</th><th>برای چه</th><th>مثال</th></tr>
+      <tr><td><b class="ltr">INT</b></td><td>عدد صحیح</td><td>شماره، تعداد بازدید، سن</td></tr>
+      <tr><td><b class="ltr">VARCHAR(n)</b></td><td>متن کوتاه تا n کاراکتر</td><td>نام، ایمیل، عنوان</td></tr>
+      <tr><td><b class="ltr">TEXT</b></td><td>متن بلند بدون محدودیت عملی</td><td>متن پیام، بدنه‌ی مقاله</td></tr>
+      <tr><td><b class="ltr">TINYINT(1)</b></td><td>بله/خیر (۰ یا ۱)</td><td>خوانده‌شده، فعال، منتشرشده</td></tr>
+      <tr><td><b class="ltr">DATE</b> / <b class="ltr">DATETIME</b></td><td>تاریخ و زمان</td><td>تاریخ تولد، زمان انتشار</td></tr>
+      <tr><td><b class="ltr">DECIMAL(10,2)</b></td><td>عدد اعشاری دقیق (پول)</td><td>قیمت، مبلغ</td></tr>
+    </table>
+    <p class="sm"><b>قاعده‌ی ساده:</b> اگر روی آن محاسبه می‌کنید <span class="ltr">INT/DECIMAL</span>، اگر متن کوتاه است <span class="ltr">VARCHAR</span>، اگر متن بلند است <span class="ltr">TEXT</span>.</p>
+  </div></details>
+  <div class="notes">
+    <b>این را واقعاً در phpMyAdmin اجرا کن.</b> دیدن جدول ساخته‌شده در ستون سمت چپ، لحظه‌ی «شد!» این بخش است.
+    <span class="say">«حالا نگاه کنین سمت چپ... جدول messages اومد. این یعنی دیتابیس شما آماده‌ست. از این لحظه سایت شما می‌تونه چیزی رو یادش نگه داره.»</span>
+    اگر کسی پرسید «باید این کد رو حفظ کنم؟» → «نه، از AI بخواین بنویسه. ولی باید بفهمین داره چی می‌سازه، که اگه اشتباه ساخت متوجه بشین.»
+  </div>
+</section>
+
+<!-- ===== 15 INSERT ===== -->
+<section class="slide" data-sec="دیتابیس و SQL" data-min="55" data-watermark="14">
+  <span class="tag cy">SQL عملی ۲</span>
+  <h2><span class="ltr">INSERT</span> — نوشتن داده در جدول</h2>
+  <div class="split">
+    <div class="codebox">
+      <div class="hd"><span class="fn">02-insert.sql</span><button class="copy">کپی</button></div>
+      <pre><span class="cm">-- یک رکورد</span>
+<span class="kw">INSERT INTO</span> messages (name, email, subject, message)
+<span class="kw">VALUES</span> (<span class="st">'مریم احمدی'</span>, <span class="st">'maryam@example.com'</span>,
+        <span class="st">'سؤال درباره نوبت'</span>, <span class="st">'سلام، وقت بخیر...'</span>);
+
+<span class="cm">-- چند رکورد با یک دستور (سریع‌تر)</span>
+<span class="kw">INSERT INTO</span> messages (name, email, subject, message) <span class="kw">VALUES</span>
+(<span class="st">'علی رضایی'</span>,   <span class="st">'ali@example.com'</span>,   <span class="st">'همکاری پژوهشی'</span>,    <span class="st">'پیشنهاد همکاری...'</span>),
+(<span class="st">'زهرا موسوی'</span>,  <span class="st">'zahra@example.com'</span>, <span class="st">'سؤال درباره مقاله'</span>, <span class="st">'در مورد مقاله...'</span>),
+(<span class="st">'امیر کاظمی'</span>,  <span class="st">'amir@example.com'</span>,  <span class="st">'درخواست مشاوره'</span>,   <span class="st">'امکان مشاوره...'</span>),
+(<span class="st">'نگار شریفی'</span>,  <span class="st">'negar@example.com'</span>, <span class="st">'همکاری پژوهشی'</span>,    <span class="st">'طرح پژوهشی...'</span>);
+
+<span class="cm">-- بررسی اینکه ثبت شد</span>
+<span class="kw">SELECT</span> id, name, subject <span class="kw">FROM</span> messages;</pre>
+    </div>
+    <div class="sql" style="margin:0">
+      <div class="rh"><span>نتیجه بعد از اجرا</span><span class="ltr">5 rows inserted</span></div>
+      <div style="overflow:auto"><table class="res">
+        <tr><th>id</th><th>name</th><th>subject</th></tr>
+        <tr><td>1</td><td class="fa">مریم احمدی</td><td class="fa">سؤال درباره نوبت</td></tr>
+        <tr><td>2</td><td class="fa">علی رضایی</td><td class="fa">همکاری پژوهشی</td></tr>
+        <tr><td>3</td><td class="fa">زهرا موسوی</td><td class="fa">سؤال درباره مقاله</td></tr>
+        <tr><td>4</td><td class="fa">امیر کاظمی</td><td class="fa">درخواست مشاوره</td></tr>
+        <tr><td>5</td><td class="fa">نگار شریفی</td><td class="fa">همکاری پژوهشی</td></tr>
+      </table></div>
+      <div class="rh" style="border-top:1px solid var(--line);border-bottom:0"><span class="dim sm">توجه: <code>id</code> و <code>created_at</code> را ننوشتیم — دیتابیس خودش پر کرد.</span></div>
+    </div>
+  </div>
+  <div class="note w"><b>سه نکته‌ای که خطا می‌سازند</b>
+  ۱) مقادیر متنی <b>حتماً</b> داخل تک‌کوتیشن <code>'...'</code> · ۲) ترتیب <span class="ltr">VALUES</span> باید دقیقاً با ترتیب ستون‌ها یکی باشد · ۳) ستون‌های <span class="ltr">NOT NULL</span> را نمی‌شود خالی گذاشت.</div>
+  <div class="notes">
+    اجرا کن و بعد در phpMyAdmin روی تب <b>Browse</b> برو تا داده‌ها را ببینند. این «دیدن داده‌ی خودم در دیتابیس» خیلی مؤثر است.
+    <span class="say">«این پنج تا رکورد رو ما دستی نوشتیم. ولی چند دقیقه دیگه، فرم تماس سایت همین کار رو خودکار انجام می‌ده — یعنی هر کسی که فرم رو پر کنه، یه سطر جدید اینجا اضافه می‌شه.»</span>
+  </div>
+</section>
+
+<!-- ===== 16 SELECT PLAYGROUND ===== -->
+<section class="slide" data-sec="دیتابیس و SQL" data-min="59" data-watermark="15">
+  <span class="tag cy">SQL عملی ۳ · تعاملی</span>
+  <h2><span class="ltr">SELECT</span> — خواندن داده‌ها</h2>
+  <p class="lead">روی هر دکمه بزنید تا کوئری و نتیجه‌اش را ببینید. این همان چیزی است که در phpMyAdmin هم می‌بینید.</p>
+  <div class="qbtns" id="qbtns"></div>
+  <div class="sql">
+    <div class="q" id="qText"></div>
+    <div class="rh"><span id="qDesc"></span><span id="qRows" class="ltr"></span></div>
+    <div style="overflow:auto;max-height:290px"><table class="res" id="qRes"></table></div>
+  </div>
+  <div class="grid g3">
+    <div class="card"><h4><span class="ic w">WHERE</span></h4><p class="sm">فیلتر کردن سطرها. «فقط آن‌هایی که...»</p></div>
+    <div class="card"><h4><span class="ic w">ORDER BY</span></h4><p class="sm">مرتب‌سازی. <span class="ltr">ASC</span> صعودی، <span class="ltr">DESC</span> نزولی.</p></div>
+    <div class="card"><h4><span class="ic w">LIMIT</span></h4><p class="sm">فقط n تای اول. برای صفحه‌بندی.</p></div>
+  </div>
+  <div class="note"><b>الگوی همیشگی SELECT</b>
+  <span class="ltr" style="display:block;font-family:var(--mono);margin-top:4px">SELECT <span class="dim">چه ستون‌هایی</span> FROM <span class="dim">کدام جدول</span> WHERE <span class="dim">چه شرطی</span> ORDER BY <span class="dim">مرتب بر چه</span> LIMIT <span class="dim">چند تا</span></span>
+  هر بخش اختیاری است جز دو تای اول. همین یک خط، کل SELECT است.</div>
+  <div class="notes">
+    <b>این اسلاید را با کلاس تعاملی کن.</b> قبل از زدن هر دکمه، از آن‌ها بپرس نتیجه چه خواهد بود:
+    <span class="say">«قبل از اینکه بزنم، حدس بزنین: اگه بگم پیام‌های خوانده‌نشده رو نشون بده، چند تا سطر برمی‌گرده؟ تو چت بنویسین.»</span>
+    این حدس‌زدن قبل از دیدن نتیجه، یادگیری SQL را چند برابر می‌کند. مخصوصاً روی <span class="ltr">GROUP BY</span> که سخت‌ترین مفهوم این اسلاید است مکث کن.
+    <div class="sm">نتایج این بخش از یک دیتاست نمونه‌ی درون‌صفحه محاسبه می‌شود تا بدون نیاز به سرور قابل نمایش باشد؛ خروجی دقیقاً همان چیزی است که MySQL برمی‌گرداند.</div>
+  </div>
+</section>
+
+<!-- ===== 17 UPDATE / DELETE ===== -->
+<section class="slide" data-sec="دیتابیس و SQL" data-min="64" data-watermark="16">
+  <span class="tag rd">SQL عملی ۴ · خطرناک</span>
+  <h2><span class="ltr">UPDATE</span> و <span class="ltr">DELETE</span> — و یک اشتباه که گران تمام می‌شود</h2>
+  <div class="grid g2">
+    <div class="codebox">
+      <div class="hd"><span class="fn">03-update.sql</span><button class="copy">کپی</button></div>
+      <pre><span class="cm">-- پیام شماره ۲ را «خوانده‌شده» علامت بزن</span>
+<span class="kw">UPDATE</span> messages
+<span class="kw">SET</span> is_read = <span class="nm">1</span>
+<span class="kw">WHERE</span> id = <span class="nm">2</span>;
+
+<span class="cm">-- همه‌ی پیام‌های یک موضوع را خوانده‌شده کن</span>
+<span class="kw">UPDATE</span> messages
+<span class="kw">SET</span> is_read = <span class="nm">1</span>
+<span class="kw">WHERE</span> subject = <span class="st">'همکاری پژوهشی'</span>;
+
+<span class="cm">-- حذف یک پیام مشخص</span>
+<span class="kw">DELETE FROM</span> messages
+<span class="kw">WHERE</span> id = <span class="nm">7</span>;</pre>
+    </div>
+    <div class="codebox" style="border-color:#7a3845">
+      <div class="hd" style="background:#2a0f16"><span class="fn" style="color:var(--rd)">☠ هرگز این را اجرا نکنید</span></div>
+      <pre><span class="cm">-- بدون WHERE: همه‌ی سطرهای جدول عوض می‌شود</span>
+<span class="kw">UPDATE</span> messages <span class="kw">SET</span> is_read = <span class="nm">1</span>;
+
+<span class="cm">-- بدون WHERE: کل جدول خالی می‌شود</span>
+<span class="kw">DELETE FROM</span> messages;
+
+<span class="cm">-- و این، کل جدول را نابود می‌کند</span>
+<span class="kw">DROP TABLE</span> messages;
+
+<span class="cm">-- هیچ دکمه‌ی Undo ای وجود ندارد.</span></pre>
+    </div>
+  </div>
+  <div class="note d"><b>عادتی که باید از امروز بسازید</b>
+  قبل از هر <span class="ltr">UPDATE</span> یا <span class="ltr">DELETE</span>، اول همان دستور را با <span class="ltr">SELECT</span> بزنید تا ببینید <b>دقیقاً روی چند سطر اثر می‌گذارد</b>:
+  <div class="codebox" style="margin-top:9px"><pre><span class="cm">-- اول این:</span>
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> messages <span class="kw">WHERE</span> subject = <span class="st">'همکاری پژوهشی'</span>;
+<span class="cm">-- نتیجه را دیدید و درست بود؟ حالا:</span>
+<span class="kw">UPDATE</span> messages <span class="kw">SET</span> is_read = <span class="nm">1</span> <span class="kw">WHERE</span> subject = <span class="st">'همکاری پژوهشی'</span>;</pre></div></div>
+  <div class="note g"><b>و همیشه بکاپ</b> قبل از هر تغییر مهم، در phpMyAdmin تب <b>Export</b> → <b>Go</b>. یک فایل <code>.sql</code> دانلود می‌شود که کل دیتابیس شماست. ۱۰ ثانیه وقت می‌برد و روزی نجاتتان می‌دهد.</div>
+  <div class="notes">
+    این اسلاید را با <b>یک داستان</b> بگو — ترس مفید می‌سازد و یادشان می‌ماند:
+    <span class="say">«یه قانون هست بین برنامه‌نویس‌ها: هرکی یه بار بدون WHERE دستور DELETE زده، تا آخر عمر یادش می‌مونه. بذارین شما جزو اون آدم‌ها نباشین.»</span>
+    عادت «اول SELECT بعد UPDATE» را حتماً جا بینداز — این یک عادت حرفه‌ای واقعی است.
+  </div>
+</section>
+
+<!-- ===== 18 JOIN ===== -->
+<section class="slide" data-sec="دیتابیس و SQL" data-min="68" data-watermark="17">
+  <span class="tag cy">SQL عملی ۵</span>
+  <h2><span class="ltr">JOIN</span> — وقتی دو جدول به هم وصل می‌شوند</h2>
+  <p class="lead">فرض کنید می‌خواهید لیست مقالاتتان را با دسته‌بندی نشان دهید. نام دسته را در هر مقاله تکرار نمی‌کنیم — <b>به جدول دسته‌ها وصلش می‌کنیم</b>.</p>
+  <div class="grid g2">
+    <div class="sql" style="margin:0">
+      <div class="rh"><span>جدول <b class="ltr">categories</b></span></div>
+      <table class="res">
+        <tr><th>id</th><th>name</th></tr>
+        <tr><td>1</td><td class="fa">قلب و عروق</td></tr>
+        <tr><td>2</td><td class="fa">هوش مصنوعی در پزشکی</td></tr>
+        <tr><td>3</td><td class="fa">آموزش پزشکی</td></tr>
+      </table>
+    </div>
+    <div class="sql" style="margin:0">
+      <div class="rh"><span>جدول <b class="ltr">articles</b></span></div>
+      <table class="res">
+        <tr><th>id</th><th>title</th><th>category_id</th><th>views</th></tr>
+        <tr><td>1</td><td class="fa">تشخیص زودهنگام...</td><td>1</td><td>320</td></tr>
+        <tr><td>2</td><td class="fa">کاربرد یادگیری ماشین...</td><td>2</td><td>780</td></tr>
+        <tr><td>3</td><td class="fa">روش‌های نوین تدریس...</td><td>3</td><td>145</td></tr>
+        <tr><td>4</td><td class="fa">شبکه عصبی در تصویربرداری</td><td>2</td><td>510</td></tr>
+      </table>
+    </div>
+  </div>
+  <div class="note"><b>کلید ارتباط</b> ستون <code>category_id</code> در جدول مقالات، به ستون <code>id</code> در جدول دسته‌ها اشاره می‌کند. به این می‌گویند <b>کلید خارجی</b> (Foreign Key).</div>
+  <div class="split">
+    <div class="codebox">
+      <div class="hd"><span class="fn">04-join.sql</span><button class="copy">کپی</button></div>
+      <pre><span class="kw">SELECT</span>
+    a.title       <span class="kw">AS</span> <span class="st">'عنوان'</span>,
+    c.name        <span class="kw">AS</span> <span class="st">'دسته'</span>,
+    a.views       <span class="kw">AS</span> <span class="st">'بازدید'</span>
+<span class="kw">FROM</span> articles a
+<span class="kw">JOIN</span> categories c <span class="kw">ON</span> a.category_id = c.id
+<span class="kw">ORDER BY</span> a.views <span class="kw">DESC</span>;</pre>
+    </div>
+    <div class="sql" style="margin:0">
+      <div class="rh"><span>نتیجه</span><span class="ltr">4 rows</span></div>
+      <table class="res">
+        <tr><th>عنوان</th><th>دسته</th><th>بازدید</th></tr>
+        <tr><td class="fa">کاربرد یادگیری ماشین...</td><td class="fa">هوش مصنوعی در پزشکی</td><td>780</td></tr>
+        <tr><td class="fa">شبکه عصبی در تصویربرداری</td><td class="fa">هوش مصنوعی در پزشکی</td><td>510</td></tr>
+        <tr><td class="fa">تشخیص زودهنگام...</td><td class="fa">قلب و عروق</td><td>320</td></tr>
+        <tr><td class="fa">روش‌های نوین تدریس...</td><td class="fa">آموزش پزشکی</td><td>145</td></tr>
+      </table>
+    </div>
+  </div>
+  <div class="note g"><b>چرا اینطوری بهتر است؟</b> اگر روزی اسم یک دسته را عوض کنید، فقط <b>یک سطر</b> در جدول دسته‌ها تغییر می‌کند و همه‌ی مقالات خودکار به‌روز می‌شوند. این کل فلسفه‌ی دیتابیس رابطه‌ای است.</div>
+  <div class="notes">
+    JOIN سخت‌ترین مفهوم این بخش است — <b>با انگشت روی صفحه نشان بده</b> که <code>category_id = 2</code> به کدام سطر جدول دسته‌ها وصل می‌شود.
+    <span class="say">«ببینین، این مقاله دسته‌ش شماره ۲ ـه. حالا می‌ریم تو جدول دسته‌ها، شماره ۲ می‌شه "هوش مصنوعی در پزشکی". JOIN دقیقاً همین کارو می‌کنه، فقط خودکار و برای همه‌ی سطرها.»</span>
+    <b>اگر عقب هستی، این اسلاید قابل حذف است</b> — بگو در فایل ارائه هست.
+  </div>
+</section>
+
+<!-- ===== 19 PHP CONNECT + WRITE ===== -->
+<section class="slide" data-sec="دیتابیس و SQL" data-min="72" data-watermark="18">
+  <span class="tag cy">قدم ۵ · اتصال</span>
+  <h2>🔌 PHP + دیتابیس — فرم تماسی که واقعاً کار می‌کند</h2>
+  <p class="lead">سه فایل، و تمام. هر سه در بسته‌ی دانلودی آماده‌اند (دکمه 📦 بالای صفحه).</p>
+  <div class="grid g2">
+    <div class="codebox">
+      <div class="hd"><span class="fn">config.php</span><button class="copy">کپی</button></div>
+      <pre><span class="cm">&lt;?php</span>
+<span class="cm">// فقط این ۴ خط را روی هاست عوض می‌کنید</span>
+<span class="kw">define</span>(<span class="st">'DB_HOST'</span>, <span class="st">'localhost'</span>);
+<span class="kw">define</span>(<span class="st">'DB_NAME'</span>, <span class="st">'mysite_db'</span>);
+<span class="kw">define</span>(<span class="st">'DB_USER'</span>, <span class="st">'root'</span>);   <span class="cm">// لوکال: root</span>
+<span class="kw">define</span>(<span class="st">'DB_PASS'</span>, <span class="st">''</span>);       <span class="cm">// لوکال: خالی</span>
+
+<span class="kw">function</span> <span class="fn2">db</span>() {
+    <span class="kw">static</span> <span class="at">$pdo</span> = <span class="kw">null</span>;
+    <span class="kw">if</span> (<span class="at">$pdo</span> === <span class="kw">null</span>) {
+        <span class="at">$dsn</span> = <span class="st">'mysql:host='</span>.DB_HOST
+              .<span class="st">';dbname='</span>.DB_NAME
+              .<span class="st">';charset=utf8mb4'</span>;
+        <span class="at">$pdo</span> = <span class="kw">new</span> <span class="fn2">PDO</span>(<span class="at">$dsn</span>, DB_USER, DB_PASS, [
+            PDO::ATTR_ERRMODE =&gt; PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_DEFAULT_FETCH_MODE =&gt; PDO::FETCH_ASSOC,
+            PDO::ATTR_EMULATE_PREPARES =&gt; <span class="kw">false</span>,
+        ]);
+    }
+    <span class="kw">return</span> <span class="at">$pdo</span>;
+}</pre>
+    </div>
+    <div class="codebox">
+      <div class="hd"><span class="fn">contact.php</span><button class="copy">کپی</button></div>
+      <pre><span class="cm">&lt;?php</span>
+<span class="kw">require</span> __DIR__ . <span class="st">'/config.php'</span>;
+
+<span class="cm">// ۱) گرفتن ورودی‌های فرم</span>
+<span class="at">$name</span>    = <span class="fn2">trim</span>(<span class="at">$_POST</span>[<span class="st">'name'</span>]    ?? <span class="st">''</span>);
+<span class="at">$email</span>   = <span class="fn2">trim</span>(<span class="at">$_POST</span>[<span class="st">'email'</span>]   ?? <span class="st">''</span>);
+<span class="at">$subject</span> = <span class="fn2">trim</span>(<span class="at">$_POST</span>[<span class="st">'subject'</span>] ?? <span class="st">''</span>);
+<span class="at">$message</span> = <span class="fn2">trim</span>(<span class="at">$_POST</span>[<span class="st">'message'</span>] ?? <span class="st">''</span>);
+
+<span class="cm">// ۲) اعتبارسنجی</span>
+<span class="at">$errors</span> = [];
+<span class="kw">if</span> (<span class="fn2">mb_strlen</span>(<span class="at">$name</span>) &lt; <span class="nm">3</span>)
+    <span class="at">$errors</span>[] = <span class="st">'نام را کامل وارد کنید.'</span>;
+<span class="kw">if</span> (!<span class="fn2">filter_var</span>(<span class="at">$email</span>, FILTER_VALIDATE_EMAIL))
+    <span class="at">$errors</span>[] = <span class="st">'ایمیل معتبر نیست.'</span>;
+<span class="kw">if</span> (<span class="fn2">mb_strlen</span>(<span class="at">$message</span>) &lt; <span class="nm">10</span>)
+    <span class="at">$errors</span>[] = <span class="st">'متن پیام خیلی کوتاه است.'</span>;
+
+<span class="cm">// ۳) ذخیره در دیتابیس (امن)</span>
+<span class="kw">if</span> (!<span class="at">$errors</span>) {
+    <span class="at">$sql</span> = <span class="st">'INSERT INTO messages
+            (name, email, subject, message)
+            VALUES (?, ?, ?, ?)'</span>;
+    <span class="fn2">db</span>()-&gt;<span class="fn2">prepare</span>(<span class="at">$sql</span>)-&gt;<span class="fn2">execute</span>(
+        [<span class="at">$name</span>, <span class="at">$email</span>, <span class="at">$subject</span>, <span class="at">$message</span>]
+    );
+    <span class="kw">echo</span> <span class="st">'پیام شما ثبت شد ✅'</span>;
+}</pre>
+    </div>
+  </div>
+  <div class="note g"><b>چرا <span class="ltr">prepare</span> و علامت‌های <span class="ltr">?</span>؟</b>
+  چون داده‌ی کاربر <b>هیچ‌وقت</b> مستقیم داخل متن SQL نمی‌رود. دیتابیس اول ساختار دستور را می‌گیرد، بعد داده را جداگانه. نتیجه: داده هرچه باشد، به‌عنوان <b>داده</b> رفتار می‌شود نه <b>دستور</b>. اسلاید بعد نشان می‌دهد اگر این کار را نکنید چه می‌شود.</div>
+  <div class="notes">
+    <b>خط به خط نخوان.</b> سه بخش شماره‌گذاری‌شده را نشان بده: گرفتن ورودی، اعتبارسنجی، ذخیره.
+    <span class="say">«شما قرار نیست این کد رو بنویسین — آماده‌ست و دانلودش می‌کنین. فقط باید بتونین سه تا بخشش رو تشخیص بدین: ورودی می‌گیره، چک می‌کنه، ذخیره می‌کنه. همین.»</span>
+    تأکید کن که روی هاست فقط <b>چهار خط</b> اول <code>config.php</code> عوض می‌شود — این ترس «کد رو باید تغییر بدم» را از بین می‌برد.
+  </div>
+</section>
+
+<!-- ===== 20 PHP READ ===== -->
+<section class="slide" data-sec="دیتابیس و SQL" data-min="76" data-watermark="19">
+  <span class="tag">خروجی واقعی</span>
+  <h2>نمایش داده‌های دیتابیس در صفحه</h2>
+  <p class="lead">حالا برعکس: داده را از دیتابیس <b>می‌خوانیم</b> و در صفحه نشان می‌دهیم. این همان کاری است که هر سایت خبری، فروشگاهی یا وبلاگی می‌کند.</p>
+  <div class="split">
+    <div class="codebox">
+      <div class="hd"><span class="fn">inbox.php</span><button class="copy">کپی</button></div>
+      <pre><span class="cm">&lt;?php</span>
+<span class="kw">require</span> __DIR__ . <span class="st">'/config.php'</span>;
+
+<span class="cm">// خواندن ۱۰ پیام آخر</span>
+<span class="at">$rows</span> = <span class="fn2">db</span>()-&gt;<span class="fn2">query</span>(
+    <span class="st">'SELECT name, subject, is_read, created_at
+      FROM messages
+      ORDER BY created_at DESC
+      LIMIT 10'</span>
+)-&gt;<span class="fn2">fetchAll</span>();
+<span class="cm">?&gt;</span>
+
+&lt;<span class="tg">table</span>&gt;
+  &lt;<span class="tg">tr</span>&gt;&lt;<span class="tg">th</span>&gt;فرستنده&lt;/<span class="tg">th</span>&gt;&lt;<span class="tg">th</span>&gt;موضوع&lt;/<span class="tg">th</span>&gt;
+      &lt;<span class="tg">th</span>&gt;وضعیت&lt;/<span class="tg">th</span>&gt;&lt;/<span class="tg">tr</span>&gt;
+
+<span class="cm">&lt;?php foreach (</span><span class="at">$rows</span> <span class="cm">as </span><span class="at">$r</span><span class="cm">): ?&gt;</span>
+  &lt;<span class="tg">tr</span>&gt;
+    &lt;<span class="tg">td</span>&gt;<span class="cm">&lt;?= </span><span class="fn2">htmlspecialchars</span>(<span class="at">$r</span>[<span class="st">'name'</span>])<span class="cm"> ?&gt;</span>&lt;/<span class="tg">td</span>&gt;
+    &lt;<span class="tg">td</span>&gt;<span class="cm">&lt;?= </span><span class="fn2">htmlspecialchars</span>(<span class="at">$r</span>[<span class="st">'subject'</span>])<span class="cm"> ?&gt;</span>&lt;/<span class="tg">td</span>&gt;
+    &lt;<span class="tg">td</span>&gt;<span class="cm">&lt;?= </span><span class="at">$r</span>[<span class="st">'is_read'</span>] ? <span class="st">'خوانده‌شده'</span>
+                      : <span class="st">'جدید'</span><span class="cm"> ?&gt;</span>&lt;/<span class="tg">td</span>&gt;
+  &lt;/<span class="tg">tr</span>&gt;
+<span class="cm">&lt;?php endforeach; ?&gt;</span>
+&lt;/<span class="tg">table</span>&gt;</pre>
+    </div>
+    <div class="browser">
+      <div class="chrome"><span class="d"></span><span class="d"></span><span class="d"></span><span class="url">localhost/mysite/inbox.php</span></div>
+      <iframe sandbox="allow-scripts" loading="lazy"></iframe>
+    </div>
+    <script type="text/plain" class="src">
+<!DOCTYPE html>
+<html lang="fa" dir="rtl"><head><meta charset="utf-8"><style>
+body{font-family:Tahoma;padding:14px;background:#f6f9fc;color:#14212b;font-size:12.5px}
+h3{margin:0 0 12px;color:#0e4f6e;font-size:15px}
+table{width:100%;border-collapse:collapse;background:#fff;border-radius:10px;overflow:hidden;
+      box-shadow:0 4px 14px rgba(14,79,110,.08)}
+th{background:#0e4f6e;color:#fff;padding:9px;text-align:right;font-size:12px}
+td{padding:9px;border-bottom:1px solid #eef3f7}
+.new{background:#ffc857;color:#2f2000;padding:1px 9px;border-radius:12px;font-size:11px}
+.old{color:#8aa2b3;font-size:11px}
+</style></head><body>
+<h3>📥 صندوق پیام‌ها</h3>
+<table>
+  <tr><th>فرستنده</th><th>موضوع</th><th>وضعیت</th></tr>
+  <tr><td>رضا کریمی</td><td>همکاری پژوهشی</td><td><span class="new">جدید</span></td></tr>
+  <tr><td>سارا یزدانی</td><td>تشکر</td><td><span class="new">جدید</span></td></tr>
+  <tr><td>حسین نوری</td><td>سؤال درباره نوبت</td><td><span class="old">خوانده‌شده</span></td></tr>
+  <tr><td>نگار شریفی</td><td>همکاری پژوهشی</td><td><span class="new">جدید</span></td></tr>
+  <tr><td>امیر کاظمی</td><td>درخواست مشاوره</td><td><span class="new">جدید</span></td></tr>
+  <tr><td>زهرا موسوی</td><td>سؤال درباره مقاله</td><td><span class="old">خوانده‌شده</span></td></tr>
+</table>
+</body></html>
+    </script>
+  </div>
+  <div class="note w"><b>الگویی که همه‌جا تکرار می‌شود</b>
+  یک <span class="ltr">SELECT</span> بزن → نتیجه را در یک آرایه بگیر → با <span class="ltr">foreach</span> روی آن بچرخ و برای هر سطر یک قطعه HTML بساز.
+  <b>هر لیست، جدول، گالری یا کارتی که در هر سایتی دیده‌اید، دقیقاً همین است.</b></div>
+  <div class="note d"><b class="ltr">htmlspecialchars</b> را حذف نکنید
+  اگر کسی در فرم تماس به‌جای نام، کد جاوااسکریپت بفرستد، بدون این تابع آن کد در صفحه‌ی شما <b>اجرا می‌شود</b>. به این حمله می‌گویند XSS. این تابع، کد را به متن بی‌خطر تبدیل می‌کند.</div>
+  <div class="notes">
+    <b>پل ذهنی مهم:</b> اینجا بگو که همین الگو پشت هر سایتی است که می‌شناسند.
+    <span class="say">«این الگو رو یادتون باشه، چون همه‌چیزه. لیست محصولات دیجی‌کالا، فید اینستاگرام، لیست نوبت‌های یه کلینیک — همه‌ش همینه: یه SELECT، یه حلقه، یه قالب HTML. فقط بزرگ‌تر.»</span>
+  </div>
+</section>
+
+<!-- ===== 21 SQL INJECTION ===== -->
+<section class="slide" data-sec="دیتابیس و SQL" data-min="80" data-watermark="20">
+  <span class="tag rd">امنیت · مهم</span>
+  <h2>💉 <span class="ltr">SQL Injection</span> — چرا روی <span class="ltr">prepare</span> اصرار کردیم</h2>
+  <p class="lead">فرض کنید یک صفحه‌ی ورود دارید و کد را این‌طور نوشته‌اید (کاری که AI هم اگر نخواهید، ممکن است بکند):</p>
+  <div class="grid g2">
+    <div class="codebox" style="border-color:#7a3845">
+      <div class="hd" style="background:#2a0f16"><span class="fn" style="color:var(--rd)">✕ کد آسیب‌پذیر</span></div>
+      <pre><span class="at">$user</span> = <span class="at">$_POST</span>[<span class="st">'user'</span>];
+<span class="at">$pass</span> = <span class="at">$_POST</span>[<span class="st">'pass'</span>];
+
+<span class="cm">// داده‌ی کاربر مستقیم چسبیده به دستور 👎</span>
+<span class="at">$sql</span> = <span class="st">"SELECT * FROM users
+        WHERE user = '</span><span class="at">$user</span><span class="st">'
+          AND pass = '</span><span class="at">$pass</span><span class="st">'"</span>;
+
+<span class="at">$row</span> = <span class="fn2">db</span>()-&gt;<span class="fn2">query</span>(<span class="at">$sql</span>)-&gt;<span class="fn2">fetch</span>();
+<span class="kw">if</span> (<span class="at">$row</span>) { <span class="cm">/* ورود موفق */</span> }</pre>
+    </div>
+    <div class="codebox" style="border-color:#2f6a4a">
+      <div class="hd" style="background:#0d2418"><span class="fn" style="color:var(--gr)">✓ کد امن</span></div>
+      <pre><span class="at">$user</span> = <span class="at">$_POST</span>[<span class="st">'user'</span>];
+<span class="at">$pass</span> = <span class="at">$_POST</span>[<span class="st">'pass'</span>];
+
+<span class="cm">// ساختار جداست، داده جدا 👍</span>
+<span class="at">$sql</span>  = <span class="st">'SELECT * FROM users
+         WHERE user = ? AND pass = ?'</span>;
+<span class="at">$stmt</span> = <span class="fn2">db</span>()-&gt;<span class="fn2">prepare</span>(<span class="at">$sql</span>);
+<span class="at">$stmt</span>-&gt;<span class="fn2">execute</span>([<span class="at">$user</span>, <span class="at">$pass</span>]);
+<span class="at">$row</span> = <span class="at">$stmt</span>-&gt;<span class="fn2">fetch</span>();</pre>
+    </div>
+  </div>
+  <h3>حالا ببینید مهاجم چه می‌نویسد</h3>
+  <div class="sql">
+    <div class="rh"><span>کاربر در فیلد رمز عبور این را تایپ می‌کند</span></div>
+    <div class="q" style="color:var(--rd)">' OR '1'='1</div>
+    <div class="rh"><span>دستوری که در کد آسیب‌پذیر ساخته و اجرا می‌شود</span></div>
+    <div class="q">SELECT * FROM users WHERE user = 'admin' AND pass = '<span style="color:var(--rd)">' OR '1'='1</span>'</div>
+    <div class="rh"><span>نتیجه</span><span style="color:var(--rd)">دسترسی کامل بدون دانستن رمز</span></div>
+    <div class="q" style="color:var(--gd)">شرط <span class="ltr">'1'='1'</span> همیشه درست است → همه‌ی کاربران برمی‌گردند → اولین نفر وارد می‌شود.</div>
+  </div>
+  <div class="note g"><b>در کد امن چه می‌شود؟</b>
+  همان متن <code class="ltr">' OR '1'='1</code> فقط به‌عنوان <b>یک رمز عبور اشتباه</b> در نظر گرفته می‌شود و ورود رد می‌شود. چون دیتابیس از قبل می‌داند کجای دستور «ساختار» است و کجا «داده».</div>
+  <div class="note w"><b>پس در پرامپت‌هایتان همیشه بنویسید</b>
+  «حتماً از PDO با Prepared Statement استفاده کن، ورودی‌ها را با <span class="ltr">filter_var</span> اعتبارسنجی کن و خروجی را با <span class="ltr">htmlspecialchars</span> پاک‌سازی کن.»<br>
+  همین یک جمله، تفاوت بین سایت امن و سایت هک‌شدنی است.</div>
+  <div class="notes">
+    این اسلاید تو را از «مدرس AI» به <b>مدرس مسئول</b> تبدیل می‌کند. آرام و با تأکید اجرا کن.
+    <span class="say">«من قرار نیست فقط از هوش مصنوعی تعریف کنم. باید اینم بدونین: اگه امنیت رو ازش نخواین، لزوماً بهتون نمی‌ده. و اون موقع یه سایت دارین که هر کسی می‌تونه واردش بشه.»</span>
+    برای مخاطب پزشکی یک جمله‌ی مهم اضافه کن: «اگه روزی سایتی بسازین که اطلاعات بیمار توشه، این دیگه فقط یه مسئله‌ی فنی نیست — مسئله‌ی اخلاقی و قانونیه.»
+  </div>
+</section>
+
+<!-- ===== 22 DEPLOY FILES ===== -->
+<section class="slide" data-sec="انتشار" data-min="85" data-watermark="21">
+  <span class="tag cy">قدم ۶</span>
+  <h2>🚀 انتقال به هاست — چک‌لیست عملی</h2>
+  <div class="grid g2">
+    <div>
+      <h3>الف) فایل‌ها</h3>
+      <ol class="st">
+        <li>فایل‌های سایت را <b>zip</b> کنید — خودِ فایل‌ها را انتخاب کنید، نه پوشه‌ی بیرونی را.</li>
+        <li>cPanel → <b>File Manager</b> → وارد <b class="cy">public_html</b> شوید.</li>
+        <li><b>Upload</b> → فایل zip را بکشید و رها کنید.</li>
+        <li>روی فایل zip راست‌کلیک → <b>Extract</b> → سپس فایل zip را حذف کنید.</li>
+        <li>مطمئن شوید <code>index.html</code> <b>مستقیماً</b> داخل <code>public_html</code> است.</li>
+      </ol>
+      <div class="note d"><b>اشتباهی که همه بار اول می‌کنند</b>
+      <div class="term" style="margin:8px 0 0">
+<span class="o">✕ غلط</span>
+public_html/mysite/index.html
+<span class="o">→ باز می‌شود در: yoursite.ir/mysite</span>
+
+<span class="p">✓ درست</span>
+public_html/index.html
+<span class="o">→ باز می‌شود در: yoursite.ir</span>
+      </div></div>
+    </div>
+    <div>
+      <h3>ب) دیتابیس</h3>
+      <ol class="st">
+        <li><b>در لوکال:</b> phpMyAdmin → دیتابیس → تب <b>Export</b> → <b>Go</b> (یک فایل <code>.sql</code> دانلود می‌شود).</li>
+        <li><b>در cPanel:</b> بخش <b>MySQL Databases</b> → یک دیتابیس بسازید → یک کاربر بسازید → کاربر را با دسترسی <b>All Privileges</b> به دیتابیس وصل کنید.</li>
+        <li><b>در cPanel:</b> phpMyAdmin → دیتابیس جدید → تب <b>Import</b> → فایل <code>.sql</code> را آپلود کنید.</li>
+        <li>در <code>config.php</code> چهار مقدار را عوض کنید:</li>
+      </ol>
+      <div class="codebox"><pre><span class="cm">// روی هاست، نام دیتابیس و کاربر معمولاً</span>
+<span class="cm">// با پیشوند نام اکانت شما ساخته می‌شود</span>
+<span class="kw">define</span>(<span class="st">'DB_NAME'</span>, <span class="st">'username_mysite'</span>);
+<span class="kw">define</span>(<span class="st">'DB_USER'</span>, <span class="st">'username_admin'</span>);
+<span class="kw">define</span>(<span class="st">'DB_PASS'</span>, <span class="st">'رمزی که ساختید'</span>);</pre></div>
+      <h3>ج) SSL</h3>
+      <p class="sm">cPanel → <b>SSL/TLS Status</b> → دامنه را انتخاب → <b>Run AutoSSL</b> → سپس <b>Force HTTPS Redirect</b> را روشن کنید.</p>
+    </div>
+  </div>
+  <div class="note w"><b>۹۹٪ خطاهای «دیتابیس وصل نمی‌شود»</b> از همین چهار خط <code>config.php</code> است. روی لوکال کاربر <code>root</code> با رمز خالی بود؛ روی هاست حتماً فرق دارد.</div>
+  <div class="notes">
+    اگر دسترسی زنده به cPanel داری همین‌جا نشان بده. اگر نه، صادقانه بگو ضبط‌شده/اسکرین‌شات است.
+    عمداً اشتباه پوشه را مرتکب شو و بعد درستش کن — یادگیری از اشتباه دیده‌شده چند برابر است.
+    <span class="say">«بذارین من عمداً همون اشتباهی رو بکنم که همه بار اول می‌کنن...»</span>
+  </div>
+</section>
+
+<!-- ===== 23 DEBUG TABLE ===== -->
+<section class="slide" data-sec="انتشار" data-min="90" data-watermark="22">
+  <span class="tag">عیب‌یابی</span>
+  <h2>🩺 جدول نجات — خطا دیدید، اینجا را نگاه کنید</h2>
+  <table class="t">
+    <tr><th>چه می‌بینید</th><th>یعنی چه</th><th>چه کار کنید</th></tr>
+    <tr><td><b>صفحه سفید کامل</b></td><td>خطای PHP که نمایش داده نمی‌شود</td><td>موقتاً بالای فایل بگذارید: <code class="ltr">error_reporting(E_ALL); ini_set('display_errors',1);</code></td></tr>
+    <tr><td><b class="ltr">404 Not Found</b></td><td>فایل پیدا نشد</td><td><code>index.html</code> باید مستقیماً در <code>public_html</code> باشد، با حروف کوچک</td></tr>
+    <tr><td><b class="ltr">403 Forbidden</b></td><td>اجازه دسترسی نیست</td><td>پوشه‌ها را ۷۵۵ و فایل‌ها را ۶۴۴ کنید (راست‌کلیک ← Change Permissions)</td></tr>
+    <tr><td><b class="ltr">500 Internal Server Error</b></td><td>خطای PHP یا فایل <code>.htaccess</code></td><td>در cPanel بخش <b>Errors</b> را ببینید؛ متن خطا را به AI بدهید</td></tr>
+    <tr><td><b class="ltr">SQLSTATE[HY000] [1045]</b></td><td>نام کاربری یا رمز دیتابیس غلط است</td><td>چهار خط <code>config.php</code> را با اطلاعات cPanel مطابقت دهید</td></tr>
+    <tr><td><b class="ltr">SQLSTATE[42S02]</b></td><td>جدول وجود ندارد</td><td>فایل <code>.sql</code> را در دیتابیسِ درست import کنید</td></tr>
+    <tr><td><b>فارسی به‌هم‌ریخته</b></td><td>مشکل انکودینگ</td><td>فایل را UTF-8 ذخیره کنید · در دیتابیس <code class="ltr">utf8mb4_persian_ci</code> · در PHP <code class="ltr">charset=utf8mb4</code></td></tr>
+    <tr><td><b>تغییرات را نمی‌بینم</b></td><td>کش مرورگر</td><td><code class="ltr">Ctrl+Shift+R</code> یا باز کردن در حالت ناشناس</td></tr>
+  </table>
+  <div class="note g"><b>و روش همیشگی، برای هر خطایی</b>
+  متن دقیق خطا را کپی کنید → به AI بدهید → بگویید محیطتان چیست (هاست اشتراکی، cPanel، PHP نسخه ...) → کد کامل اصلاح‌شده بخواهید. قالب آماده‌اش در بسته‌ی دانلودی هست.</div>
+  <div class="notes">
+    این را به‌عنوان «این اسلاید را ذخیره کنید» معرفی کن.
+    <span class="say">«از این جدول اسکرین‌شات بگیرین یا تو فایل ارائه بوکمارکش کنین. نود درصد مشکلاتی که تو دو ماه آینده می‌بینین، همین هشت تاست.»</span>
+    اگر وقت داری، عمداً یک خطا بساز (مثلاً رمز دیتابیس را خراب کن) و با AI رفعش کن — قوی‌ترین لحظه‌ی آموزشی کارگاه.
+  </div>
+</section>
+
+<!-- ===== 24 FREE PATH ===== -->
+<section class="slide" data-sec="ادامه مسیر" data-min="95" data-watermark="23">
+  <span class="tag">بدون هزینه</span>
+  <h2>🆓 اگر امروز هاست ندارید</h2>
+  <div class="grid g3">
+    <div class="card"><h4><span class="ic">GH</span> GitHub Pages</h4><p>در <a href="https://github.com" target="_blank" rel="noopener">github.com</a> حساب بسازید → مخزن جدید → فایل‌ها را آپلود → Settings → Pages → فعال کنید.</p><p class="sm" style="margin-top:8px">آدرس: <code class="ltr">username.github.io</code></p></div>
+    <div class="card"><h4><span class="ic">NL</span> Netlify</h4><p>در <a href="https://netlify.com" target="_blank" rel="noopener">netlify.com</a> ثبت‌نام کنید و پوشه‌ی سایت را مستقیماً drag & drop کنید. در ۱۰ ثانیه آنلاین است.</p></div>
+    <div class="card"><h4><span class="ic">VC</span> Vercel</h4><p>مشابه Netlify، در <a href="https://vercel.com" target="_blank" rel="noopener">vercel.com</a>. سریع، رایگان، با https خودکار.</p></div>
+  </div>
+  <div class="note w"><b>محدودیتی که باید بدانید</b>
+  این سه سرویس <b>PHP و MySQL اجرا نمی‌کنند</b>. یعنی صفحات HTML/CSS/JS شما عالی کار می‌کند، ولی فرم تماسی که امروز ساختیم روی آن‌ها کار نخواهد کرد.</div>
+  <div class="grid g2">
+    <div class="card tint"><h4><span class="ic">✓</span> راه‌حل فرم بدون هاست</h4><p>از سرویس‌هایی مثل <b>Formspree</b> یا <b>Google Forms</b> استفاده کنید: فرم در سایت شما می‌ماند، ولی داده به سرویس بیرونی می‌رود و به ایمیلتان می‌آید.</p></div>
+    <div class="card tintg"><h4><span class="ic g">↗</span> مسیر پیشنهادی</h4><p>امروز رایگان منتشر کنید تا سایتتان <b>وجود داشته باشد</b>. هر وقت خواستید فرم و دیتابیس واقعی داشته باشید، هاست بگیرید و همان فایل‌ها را منتقل کنید.</p></div>
+  </div>
+  <div class="notes">
+    این اسلاید برای دانشجوی بی‌بودجه طلاست و باعث می‌شود <b>هیچ‌کس با دست خالی از کلاس بیرون نرود</b>.
+    <span class="say">«اگه امروز پول هاست ندارین اصلاً مشکلی نیست. با این روش، تا امشب سایتتون آنلاینه و لینکش رو می‌تونین بذارین تو رزومه‌تون.»</span>
+  </div>
+</section>
+
+<!-- ===== 25 30 DAYS + RESOURCES ===== -->
+<section class="slide" data-sec="ادامه مسیر" data-min="99" data-watermark="24">
+  <span class="tag">بعد از امروز</span>
+  <h2>📅 مسیر ۳۰ روزه و جعبه‌ابزار</h2>
+  <div class="grid g4">
+    <div class="card"><h4><span class="ic">W1</span> هفته ۱</h4><p class="sm">سایت امروز را با محتوای واقعی خودتان کامل کنید و <b>منتشرش کنید</b> — حتی ناقص.</p></div>
+    <div class="card"><h4><span class="ic">W2</span> هفته ۲</h4><p class="sm">یک صفحه‌ی دوم (مقالات یا پروژه‌ها) بسازید و از دیتابیس بخوانیدش.</p></div>
+    <div class="card"><h4><span class="ic">W3</span> هفته ۳</h4><p class="sm">فرم تماس را روی هاست فعال کنید و اولین پیام واقعی را بگیرید.</p></div>
+    <div class="card"><h4><span class="ic">W4</span> هفته ۴</h4><p class="sm">سئو، سرعت و موبایل را بهینه کنید. لینک را در رزومه و لینکدین بگذارید.</p></div>
+  </div>
+  <div class="grid g4" style="margin-top:16px">
+    <div class="card"><h4>🤖 هوش مصنوعی</h4><p class="sm"><a href="https://claude.ai" target="_blank" rel="noopener">Claude</a> · <a href="https://chatgpt.com" target="_blank" rel="noopener">ChatGPT</a> · <a href="https://gemini.google.com" target="_blank" rel="noopener">Gemini</a></p></div>
+    <div class="card"><h4>🛠 ابزار</h4><p class="sm"><a href="https://code.visualstudio.com" target="_blank" rel="noopener">VS Code</a> · <a href="https://www.apachefriends.org" target="_blank" rel="noopener">XAMPP</a> · <a href="https://codepen.io" target="_blank" rel="noopener">CodePen</a></p></div>
+    <div class="card"><h4>📚 یادگیری</h4><p class="sm"><a href="https://developer.mozilla.org/fa/" target="_blank" rel="noopener">MDN</a> · <a href="https://www.w3schools.com/sql/" target="_blank" rel="noopener">W3Schools SQL</a> · <a href="https://sqlbolt.com" target="_blank" rel="noopener">SQLBolt</a></p></div>
+    <div class="card"><h4>🎨 محتوا</h4><p class="sm"><a href="https://fonts.google.com/?subset=arabic" target="_blank" rel="noopener">Google Fonts</a> · <a href="https://unsplash.com" target="_blank" rel="noopener">Unsplash</a> · <a href="https://coolors.co" target="_blank" rel="noopener">Coolors</a></p></div>
+  </div>
+  <div class="note g"><b>یک توصیه‌ی جدی</b>
+  سایتِ ناقصِ منتشرشده، هزار برابر ارزشمندتر از سایتِ کاملِ منتشرنشده است. <b>همین امشب</b>، قبل از اینکه انگیزه سرد شود، یک نسخه‌ی خیلی ساده را بالا بیاورید.</div>
+  <div class="notes">
+    <span class="say">«یه خواهش دارم: امشب، همین امشب، حتی یه صفحه‌ی خیلی ساده رو منتشر کنین. چون اگه به فردا بیفته، به هفته‌ی بعد می‌افته، و بعد اصلاً نمی‌شه.»</span>
+    اینجا بگو که کل فایل ارائه + بسته‌ی کدها برایشان ارسال می‌شود، تا به‌جای یادداشت‌برداری گوش بدهند.
+  </div>
+</section>
+
+<!-- ===== 26 END ===== -->
+<section class="slide" data-sec="ادامه مسیر" data-min="104" data-watermark="25">
+  <div class="cover">
+    <span class="tag cy">پایان</span>
+    <h1>حالا نوبت شماست</h1>
+    <p class="lead" style="margin:0 auto">هر سؤالی دارید بپرسید — من هستم.</p>
+    <div class="grid g4" style="margin-top:24px;text-align:right">
+      <div class="card"><h4><span class="ic">✓</span> امروز ساختیم</h4><p class="sm">یک سایت راست‌چین ریسپانسیو با AI</p></div>
+      <div class="card"><h4><span class="ic">✓</span> امروز یاد گرفتیم</h4><p class="sm">دیتابیس، SQL، و چهار فعل اصلی‌اش</p></div>
+      <div class="card"><h4><span class="ic">✓</span> امروز امن کردیم</h4><p class="sm">با Prepared Statement و پاک‌سازی ورودی</p></div>
+      <div class="card"><h4><span class="ic">✓</span> امروز منتشر کردیم</h4><p class="sm">روی هاست واقعی با دامنه و https</p></div>
+    </div>
+    <div class="meta" style="margin-top:22px">
+      <div><b>بسته‌ی کدها</b> دکمه 📦 بالای همین صفحه</div>
+      <div><b>ضبط جلسه</b> لینکش ارسال می‌شود</div>
+      <div><b>گواهی</b> بعد از کارگاه صادر می‌شود</div>
+    </div>
+    <p class="lead" style="margin:30px auto 0;font-size:21px;color:var(--gd)">
+      «بهترین زمان برای ساختن سایتت دیروز بود.<br>دومین بهترین زمان، همین امشب است.»</p>
+    <p class="dim sm" style="margin-top:20px">سبحان عفتی · کارگاه طراحی سایت با هوش مصنوعی · شهریور ۱۴۰۵</p>
+  </div>
+  <div class="notes">
+    پرسش و پاسخ را با یک سؤال از خودت شروع کن، چون معمولاً اول کسی حرف نمی‌زند:
+    <span class="say">«تا سؤالاتتون رو تایپ می‌کنین، به یه سؤالی که همیشه ازم می‌پرسن جواب می‌دم: "سایتی که با AI ساخته شده، سایت واقعیه؟" جوابم اینه: کدی که رو سرور اجرا می‌شه و کار می‌کنه، واقعیه. مهم نیست کی نوشتتش — مهم اینه که شما می‌فهمین داره چی‌کار می‌کنه.»</span>
+    فراموش نکن: <b>راه ارتباطی</b>، <b>لینک نظرسنجی/گواهی</b> در چت، و تشکر از حاضرین.
+  </div>
+</section>
+
+</main>
+
+<div class="nav">
+  <button class="btn" id="prev">◀ قبلی</button>
+  <span class="pos"><b id="cur">۱</b> / <span id="tot">۱</span></span>
+  <button class="btn" id="next">بعدی ▶</button>
+  <span class="sc" id="scName"></span>
+</div>
+
+<!-- ===== TOC ===== -->
+<div class="drw" id="drw"><div class="pn">
+  <button class="btn x" id="drwX" style="float:left">✕</button>
+  <h3 style="margin-top:0">فهرست</h3>
+  <ul class="toc" id="toc"></ul>
+  <hr style="border:0;border-top:1px solid var(--line);margin:18px 0">
+  <button class="btn" id="bPrint" style="width:100%;justify-content:center">🖨 چاپ / خروجی PDF</button>
+</div></div>
+
+<!-- ===== FILES ===== -->
+<div class="ov" id="ovFiles"><div class="sheet">
+  <button class="btn x" id="filesX">✕ بستن</button>
+  <span class="tag cy">بسته‌ی کدها</span>
+  <h2>📦 فایل‌های آماده</h2>
+  <p class="lead">پروژه‌ی کامل و کارکننده. همه‌چیز را یک‌جا بگیرید، یا هر فایل را جدا.</p>
+  <div style="display:flex;gap:9px;flex-wrap:wrap;margin:16px 0">
+    <button class="btn gd" id="dlZip">⬇ دانلود همه (فایل zip)</button>
+    <span class="dim sm" style="align-self:center">— یا از لیست زیر، تکی</span>
+  </div>
+  <ul class="filelist" id="fileList"></ul>
+  <div class="note g"><b>نحوه استفاده</b>
+  فایل zip را باز کنید → کل محتوایش را در <code>C:\xampp\htdocs\mysite</code> بریزید → XAMPP را روشن کنید →
+  در phpMyAdmin فایل <code>database.sql</code> را import کنید → مرورگر: <code>http://localhost/mysite</code></div>
+</div></div>
+
+<!-- ===== PLAN ===== -->
+<div class="ov" id="ovPlan"><div class="sheet">
+  <button class="btn x" id="planX">✕ بستن</button>
+  <span class="tag">فقط برای مدرس</span>
+  <h2>📋 پلن اجرای کارگاه</h2>
+
+  <h3>۱) چک‌لیست ۳۰ دقیقه قبل از شروع</h3>
+  <ul class="cl" id="cl">
+    <li><input type="checkbox" id="k1"><label for="k1">اسکای‌روم تست شد: میکروفن، صدا، <b>اشتراک صفحه</b>، و <b>ضبط</b> روشن است</label></li>
+    <li><input type="checkbox" id="k2"><label for="k2">XAMPP روشن؛ <code>localhost</code> و <code>localhost/phpmyadmin</code> هر دو بالا می‌آیند</label></li>
+    <li><input type="checkbox" id="k3"><label for="k3">دیتابیس <code>mysite_db</code> از قبل ساخته شده و جدول <code>messages</code> دارد</label></li>
+    <li><input type="checkbox" id="k4"><label for="k4">پوشه‌ی <code>htdocs/mysite</code> آماده است و فایل‌های بسته داخلش هست</label></li>
+    <li><input type="checkbox" id="k5"><label for="k5">تب ابزار AI باز، لاگین، با یک گفت‌وگوی <b>خالی</b> آماده</label></li>
+    <li><input type="checkbox" id="k6"><label for="k6">تب cPanel باز و لاگین (یا اسکرین‌شات‌های جایگزین آماده)</label></li>
+    <li><input type="checkbox" id="k7"><label for="k7">فونت مرورگر بزرگ شد (<code class="ltr">Ctrl +</code> تا ۱۲۵٪) تا کد در ویدیو خوانا باشد</label></li>
+    <li><input type="checkbox" id="k8"><label for="k8">نوتیفیکیشن‌ها، تلگرام و ایمیل <b>خاموش</b> است</label></li>
+    <li><input type="checkbox" id="k9"><label for="k9">لینک نظرسنجی/گواهی آماده است تا در چت بگذارم</label></li>
+    <li><input type="checkbox" id="k10"><label for="k10">لیوان آب کنار دست 💧</label></li>
+  </ul>
+
+  <h3>۲) زمان‌بندی (۱۲۰ دقیقه)</h3>
+  <table class="t">
+    <tr><th>دقیقه</th><th>بخش</th><th>هدف</th></tr>
+    <tr><td><b>۰ – ۹</b></td><td>خوش‌آمد، نمایش خروجی نهایی، نقشه راه</td><td>انگیزه و تنظیم انتظار</td></tr>
+    <tr><td><b>۹ – ۱۷</b></td><td>زیرساخت: چرخه‌ی درخواست، چه بخریم</td><td>تصمیم‌گیری، نه حفظیات</td></tr>
+    <tr><td><b>۱۷ – ۳۳</b></td><td>XAMPP، HTML و CSS با پیش‌نمایش زنده، زمین بازی</td><td>دست به کیبورد شدن کلاس</td></tr>
+    <tr><td><b>۳۳ – ۴۷</b></td><td>هوش مصنوعی: پرامپت دقیق، ساخت، اصلاح</td><td>مهارت اصلی</td></tr>
+    <tr><td><b>۴۷ – ۸۵</b></td><td><b>دیتابیس و SQL:</b> CREATE، INSERT، SELECT، UPDATE، JOIN، PHP، امنیت</td><td>عمیق‌ترین بخش کارگاه</td></tr>
+    <tr><td><b>۸۵ – ۹۵</b></td><td>انتشار روی هاست، انتقال دیتابیس، SSL، جدول خطاها</td><td>رسیدن به خروجی واقعی</td></tr>
+    <tr><td><b>۹۵ – ۱۲۰</b></td><td>مسیر رایگان، برنامه ۳۰ روزه، پرسش و پاسخ</td><td>تداوم بعد از کارگاه</td></tr>
+  </table>
+  <div class="note w"><b>قانون طلایی زمان</b>
+  اگر دقیقه ۵۰ شد و هنوز وارد بخش دیتابیس نشده‌ای: <b>زمین بازی (اسلاید ۹) و JOIN (اسلاید ۱۸) را حذف کن.</b>
+  این دو اولین کاندیدهای حذف‌اند. هرگز بخش امنیت (SQL Injection) را حذف نکن.</div>
+
+  <h3>۳) جمله‌ی شروع (کلمه به کلمه)</h3>
+  <div class="note"><span class="say" style="border-color:var(--cy)">«سلام به همگی، خیلی خوش اومدین. من سبحان عفتی هستم، دانشجوی پزشکی شهید صدوقی یزد.<br><br>
+  یه سؤال قبل از شروع: چند نفرتون تا حالا فکر کردین "کاش یه سایت داشتم" ولی چون فکر می‌کردین باید برنامه‌نویسی بلد باشین بی‌خیال شدین؟ تو چت بنویسین.<br><br>
+  خب... تو دو ساعت آینده اون فکر رو کاملاً می‌ذاریم کنار. و یه خبر خوب: تمام کدهایی که امروز می‌بینین آماده‌ست، پس لازم نیست چیزی رو تند تایپ کنین یا عکس بگیرین.»</span></div>
+
+  <h3>۴) نقشه‌ی اضطراری</h3>
+  <table class="t">
+    <tr><th>اگر این شد</th><th>این کار را بکن</th></tr>
+    <tr><td>اینترنت قطع شد یا AI جواب نداد</td><td>دکمه 📦 → بسته‌ی کدها را باز کن و بگو «این خروجی همون پرامپته که از قبل گرفتم». کلاس متوقف نمی‌شود.</td></tr>
+    <tr><td>XAMPP کسی بالا نیامد</td><td>بگو تماشا کند؛ با ویدیوی ضبط‌شده نصب می‌کند. اسلایدهای HTML/CSS پیش‌نمایش زنده دارند و بدون XAMPP هم قابل پیگیری‌اند.</td></tr>
+    <tr><td>عقب افتادی</td><td>زمین بازی و JOIN را حذف کن. اگر باز هم عقبی، بخش نمایش داده‌ها (اسلاید ۲۰) را فقط توضیح بده.</td></tr>
+    <tr><td>جلو افتادی</td><td>در زمین بازی یک تمرین گروهی بده، یا یک پرامپت اضافه (دارک مود / سئو) را زنده اجرا کن.</td></tr>
+    <tr><td>سؤالی پرسیدند که جوابش را نمی‌دانی</td><td>«الان مطمئن نیستم، بعد از کلاس چک می‌کنم و جواب دقیق می‌دم.» — این اعتبارت را بالا می‌برد، نه پایین.</td></tr>
+    <tr><td>یکی مدام سؤال خیلی تخصصی می‌پرسد</td><td>«سؤال خوبیه ولی از سطح این کارگاه بالاتره — بعد از کلاس جداگانه در خدمتم.»</td></tr>
+    <tr><td>دمو زنده خراب شد</td><td>پنهانش نکن: «این دقیقاً همون چیزیه که برای شما هم پیش میاد» و جلوی کلاس با AI رفعش کن. بهترین لحظه‌ی آموزشی است.</td></tr>
+    <tr><td>کلاس ساکت است</td><td>سؤال بسته بپرس: «کی تونست صفحه‌ی phpMyAdmin رو ببینه؟ فقط بنویسین بله یا خیر.»</td></tr>
+  </table>
+
+  <h3>۵) هفت اصل ارائه‌ی خوب</h3>
+  <ul class="b sm">
+    <li><b>نشان بده، بعد توضیح بده.</b> اول خروجی را ببینند، بعد بفهمند چطور ساخته شد.</li>
+    <li><b>هر ۷ تا ۱۰ دقیقه یک تعامل.</b> حتی یک «بله/خیر» در چت کافی است.</li>
+    <li><b>آهسته‌تر از چیزی که فکر می‌کنی حرف بزن.</b> در ارائه‌ی آنلاین همه تندتر از حد لازم حرف می‌زنند.</li>
+    <li><b>موقع تایپ کردن، حرف بزن.</b> سکوت طولانی یعنی از دست دادن مخاطب.</li>
+    <li><b>عدد بده.</b> «سالی ۳۰ هزار تومان» مؤثرتر از «ارزان است» است.</li>
+    <li><b>هر بخش را با یک جمله جمع کن</b> قبل از رفتن به بخش بعد.</li>
+    <li><b>محدودیت‌ها را هم بگو.</b> مدرسی که فقط تعریف می‌کند، فروشنده به‌نظر می‌رسد.</li>
+  </ul>
+
+  <h3>۶) بعد از کارگاه</h3>
+  <ul class="b g sm">
+    <li>لینک ضبط + همین فایل ارائه + بسته‌ی کدها را بفرست</li>
+    <li>نظرسنجی کوتاه ۳ سؤالی بفرست — برای کارگاه بعدی طلاست</li>
+    <li>اطلاعات لازم برای صدور گواهی را جمع کن</li>
+    <li>یک گروه بساز تا هرکس سایتش را ساخت نشان بدهد — این تداوم می‌سازد</li>
+  </ul>
+</div></div>
+
+<!-- ================= FILE PAYLOADS ================= -->
+<textarea hidden class="payload" data-file="index.html" data-desc="صفحه اصلی سایت — راست‌چین و ریسپانسیو">
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>سبحان عفتی | دانشجوی پزشکی</title>
+<meta name="description" content="صفحه شخصی، سوابق پژوهشی و راه‌های ارتباطی">
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700;900&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header id="top">
+  <nav class="container">
+    <a class="logo" href="#top">سبحان عفتی</a>
+    <button class="burger" aria-label="منو">☰</button>
+    <ul class="menu">
+      <li><a href="#about">درباره من</a></li>
+      <li><a href="#edu">تحصیلات</a></li>
+      <li><a href="#research">پژوهش</a></li>
+      <li><a href="#contact">تماس</a></li>
+    </ul>
+  </nav>
+</header>
+
+<section class="hero">
+  <div class="container hero-in">
+    <div>
+      <p class="eyebrow">خوش آمدید</p>
+      <h1>سلام، من <span>سبحان عفتی</span> هستم</h1>
+      <p class="lead">دانشجوی پزشکی دانشگاه علوم پزشکی شهید صدوقی یزد،
+         علاقه‌مند به هوش مصنوعی در سلامت.</p>
+      <a class="btn" href="#contact">در ارتباط باشیم</a>
+      <a class="btn ghost" href="#research">پژوهش‌های من</a>
+    </div>
+    <div class="avatar">👨‍⚕️</div>
+  </div>
+</section>
+
+<main>
+  <section id="about" class="container sec">
+    <h2>درباره من</h2>
+    <p>اینجا در دو یا سه جمله خودتان را معرفی کنید: چه می‌خوانید،
+       به چه علاقه دارید و دنبال چه فرصت‌هایی هستید.</p>
+  </section>
+
+  <section id="edu" class="container sec">
+    <h2>سوابق تحصیلی</h2>
+    <div class="timeline">
+      <div class="item"><b>دکترای حرفه‌ای پزشکی</b><span>دانشگاه علوم پزشکی شهید صدوقی یزد · ۱۴۰۲ تا کنون</span></div>
+      <div class="item"><b>دیپلم علوم تجربی</b><span>۱۴۰۱</span></div>
+    </div>
+  </section>
+
+  <section id="research" class="container sec">
+    <h2>فعالیت‌های پژوهشی</h2>
+    <div class="cards">
+      <article class="card"><h3>عنوان مقاله یا پروژه</h3><p>توضیح کوتاه درباره پروژه و نقش شما در آن.</p></article>
+      <article class="card"><h3>عنوان دوم</h3><p>توضیح کوتاه درباره پروژه و نقش شما در آن.</p></article>
+      <article class="card"><h3>عنوان سوم</h3><p>توضیح کوتاه درباره پروژه و نقش شما در آن.</p></article>
+    </div>
+  </section>
+
+  <section id="contact" class="container sec">
+    <h2>تماس با من</h2>
+    <form class="form" action="contact.php" method="post">
+      <div class="row">
+        <input type="text"  name="name"    placeholder="نام و نام خانوادگی" required>
+        <input type="email" name="email"   placeholder="ایمیل" required>
+      </div>
+      <input type="text" name="subject" placeholder="موضوع" required>
+      &lt;textarea name="message" rows="5" placeholder="متن پیام شما..." required>&lt;/textarea>
+      <button type="submit" class="btn">ارسال پیام</button>
+    </form>
+    <p class="hint">پیام‌های ثبت‌شده را می‌توانید در <a href="inbox.php">inbox.php</a> ببینید.</p>
+  </section>
+</main>
+
+<footer>
+  <div class="container">
+    <p>تمام حقوق محفوظ است — ۱۴۰۵</p>
+    <p class="muted">ساخته‌شده در کارگاه طراحی سایت با هوش مصنوعی</p>
+  </div>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>
+</textarea>
+
+<textarea hidden class="payload" data-file="style.css" data-desc="استایل‌ها — رنگ‌ها را از بالای فایل عوض کنید">
+/* ---- متغیرهای رنگ: فقط این‌ها را عوض کنید تا کل سایت عوض شود ---- */
+:root{
+  --bg:#f6f9fc; --surface:#fff; --text:#12232e; --muted:#5b7181;
+  --brand:#0e4f6e; --accent:#ffc857; --line:#dfe8ef; --radius:16px;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:'Vazirmatn',Tahoma,sans-serif;background:var(--bg);
+     color:var(--text);line-height:2}
+.container{max-width:1080px;margin:0 auto;padding:0 20px}
+a{color:var(--brand);text-decoration:none}
+h1,h2,h3{line-height:1.5}
+
+/* هدر چسبان */
+header{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.88);
+       backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+header nav{display:flex;align-items:center;justify-content:space-between;height:66px}
+.logo{font-weight:900;font-size:19px;color:var(--brand)}
+.menu{display:flex;gap:22px;list-style:none;margin:0;padding:0}
+.menu a{color:var(--muted);font-size:15px}
+.menu a:hover{color:var(--brand)}
+.burger{display:none;background:none;border:0;font-size:24px;cursor:pointer;color:var(--brand)}
+
+/* بخش معرفی */
+.hero{background:linear-gradient(160deg,#0e4f6e,#0a3549);color:#fff;padding:70px 0}
+.hero-in{display:flex;align-items:center;gap:40px;justify-content:space-between}
+.eyebrow{color:var(--accent);font-weight:700;margin:0}
+.hero h1{font-size:clamp(28px,5vw,44px);margin:8px 0 14px;font-weight:900}
+.hero h1 span{color:var(--accent)}
+.lead{color:#cfe2ee;max-width:52ch;font-size:18px}
+.avatar{width:170px;height:170px;flex:none;border-radius:50%;
+        background:rgba(255,255,255,.12);display:grid;place-items:center;
+        font-size:72px;border:3px solid var(--accent)}
+
+.btn{display:inline-block;background:var(--accent);color:#2f2000;font-weight:700;
+     padding:11px 26px;border-radius:30px;margin:18px 0 0 10px;border:0;
+     cursor:pointer;font-family:inherit;font-size:16px}
+.btn.ghost{background:transparent;color:#fff;border:1px solid rgba(255,255,255,.45)}
+.btn:hover{opacity:.9}
+
+/* بخش‌ها */
+.sec{padding:56px 20px}
+.sec h2{font-size:28px;margin:0 0 18px;position:relative;padding-bottom:10px}
+.sec h2::after{content:'';position:absolute;bottom:0;right:0;width:56px;height:4px;
+               background:var(--accent);border-radius:4px}
+
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+      padding:22px;transition:.2s}
+.card:hover{transform:translateY(-4px);box-shadow:0 12px 30px rgba(14,79,110,.12)}
+.card h3{margin:0 0 8px;color:var(--brand);font-size:18px}
+.card p{margin:0;color:var(--muted);font-size:15px}
+
+.timeline .item{background:var(--surface);border:1px solid var(--line);
+                border-inline-start:4px solid var(--accent);border-radius:var(--radius);
+                padding:16px 20px;margin-bottom:12px}
+.timeline .item b{display:block}
+.timeline .item span{color:var(--muted);font-size:14px}
+
+/* فرم */
+.form{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+      padding:24px;max-width:660px}
+.form .row{display:flex;gap:12px}
+.form input,.form textarea{width:100%;font-family:inherit;font-size:15px;padding:12px 14px;
+      margin-bottom:12px;border:1px solid var(--line);border-radius:10px;
+      background:#fbfdff;color:var(--text)}
+.form input:focus,.form textarea:focus{outline:2px solid var(--brand);border-color:transparent}
+.hint{color:var(--muted);font-size:14px}
+
+footer{background:#0a3549;color:#cfe2ee;padding:28px 0;text-align:center;margin-top:30px}
+footer p{margin:4px 0;font-size:15px}
+.muted{color:#7fa3b8;font-size:13px}
+
+/* انیمیشن ورود هنگام اسکرول */
+.reveal{opacity:0;transform:translateY(22px);transition:.6s ease}
+.reveal.show{opacity:1;transform:none}
+
+/* ---------- موبایل ---------- */
+@media (max-width:820px){
+  .menu{display:none;position:absolute;top:66px;right:0;left:0;background:#fff;
+        flex-direction:column;gap:0;padding:10px 20px;border-bottom:1px solid var(--line)}
+  .menu.open{display:flex}
+  .burger{display:block}
+  .hero-in{flex-direction:column-reverse;text-align:center}
+  .avatar{width:130px;height:130px;font-size:56px}
+  .cards{grid-template-columns:1fr}
+  .form .row{flex-direction:column;gap:0}
+}
+</textarea>
+
+<textarea hidden class="payload" data-file="script.js" data-desc="منوی موبایل، اسکرول نرم، انیمیشن ورود">
+// منوی همبرگری در موبایل
+document.querySelector('.burger').addEventListener('click', function () {
+  document.querySelector('.menu').classList.toggle('open');
+});
+
+// بستن منو بعد از کلیک روی لینک
+document.querySelectorAll('.menu a').forEach(function (a) {
+  a.addEventListener('click', function () {
+    document.querySelector('.menu').classList.remove('open');
+  });
+});
+
+// اسکرول نرم
+document.querySelectorAll('a[href^="#"]').forEach(function (a) {
+  a.addEventListener('click', function (e) {
+    var el = document.querySelector(a.getAttribute('href'));
+    if (!el) { return; }
+    e.preventDefault();
+    el.scrollIntoView({ behavior: 'smooth' });
+  });
+});
+
+// انیمیشن نمایان‌شدن هنگام اسکرول
+document.querySelectorAll('.sec').forEach(function (s) { s.classList.add('reveal'); });
+var io = new IntersectionObserver(function (entries) {
+  entries.forEach(function (en) {
+    if (en.isIntersecting) { en.target.classList.add('show'); }
+  });
+}, { threshold: 0.12 });
+document.querySelectorAll('.reveal').forEach(function (el) { io.observe(el); });
+</textarea>
+
+<textarea hidden class="payload" data-file="config.php" data-desc="اتصال به دیتابیس — روی هاست فقط ۴ خط اول را عوض کنید">
+<?php
+/**
+ * تنظیمات اتصال به دیتابیس
+ * -------------------------------------------------
+ * روی لوکال‌هاست (XAMPP) مقادیر پیش‌فرض زیر کار می‌کند.
+ * بعد از انتقال به هاست، این چهار مقدار را با اطلاعاتی که در
+ * cPanel -> MySQL Databases ساختید جایگزین کنید.
+ */
+
+define('DB_HOST', 'localhost');
+define('DB_NAME', 'mysite_db');   // نام دیتابیس
+define('DB_USER', 'root');        // روی هاست: نام کاربر دیتابیس
+define('DB_PASS', '');            // روی هاست: رمز کاربر دیتابیس
+
+function db() {
+    static $pdo = null;
+    if ($pdo === null) {
+        $dsn = 'mysql:host=' . DB_HOST . ';dbname=' . DB_NAME . ';charset=utf8mb4';
+        $pdo = new PDO($dsn, DB_USER, DB_PASS, [
+            PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+            PDO::ATTR_EMULATE_PREPARES   => false,
+        ]);
+    }
+    return $pdo;
+}
+</textarea>
+
+<textarea hidden class="payload" data-file="contact.php" data-desc="دریافت فرم و ذخیره امن در دیتابیس (PDO + Prepared Statement)">
+<?php
+/**
+ * دریافت و ذخیره‌ی پیام فرم تماس
+ * -------------------------------------------------
+ * نکات امنیتی رعایت‌شده:
+ *  ۱) PDO + Prepared Statement  -> جلوگیری از SQL Injection
+ *  ۲) اعتبارسنجی ورودی‌ها با filter_var
+ *  ۳) پاک‌سازی خروجی با htmlspecialchars -> جلوگیری از XSS
+ *  ۴) اطلاعات اتصال در فایل جداگانه config.php
+ */
+
+require __DIR__ . '/config.php';
+
+$errors  = [];
+$success = false;
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
+    $name    = trim($_POST['name']    ?? '');
+    $email   = trim($_POST['email']   ?? '');
+    $subject = trim($_POST['subject'] ?? '');
+    $message = trim($_POST['message'] ?? '');
+
+    if (mb_strlen($name) < 3) {
+        $errors[] = 'لطفاً نام خود را کامل وارد کنید.';
+    }
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $errors[] = 'آدرس ایمیل معتبر نیست.';
+    }
+    if ($subject === '') {
+        $errors[] = 'موضوع پیام را وارد کنید.';
+    }
+    if (mb_strlen($message) < 10) {
+        $errors[] = 'متن پیام باید حداقل ۱۰ کاراکتر باشد.';
+    }
+
+    if (!$errors) {
+        try {
+            $sql  = 'INSERT INTO messages (name, email, subject, message)
+                     VALUES (?, ?, ?, ?)';
+            $stmt = db()->prepare($sql);          // Prepared Statement
+            $stmt->execute([$name, $email, $subject, $message]);
+            $success = true;
+        } catch (PDOException $e) {
+            error_log('DB error: ' . $e->getMessage());
+            $errors[] = 'خطایی در ثبت پیام رخ داد. لطفاً بعداً دوباره تلاش کنید.';
+        }
+    }
+}
+?>
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>نتیجه ارسال پیام</title>
+  <style>
+    body{font-family:Tahoma,sans-serif;background:#f6f9fc;color:#12232e;
+         display:grid;place-items:center;height:100vh;margin:0;line-height:2}
+    .box{background:#fff;border:1px solid #dfe8ef;border-radius:16px;padding:34px 40px;
+         max-width:520px;text-align:center;box-shadow:0 12px 30px rgba(14,79,110,.08)}
+    .ok{color:#0f9d58;font-size:52px}
+    .err{color:#d93025;font-size:52px}
+    ul{text-align:right;color:#d93025;padding-inline-start:20px}
+    a{display:inline-block;margin-top:18px;background:#ffc857;color:#2f2000;
+      padding:10px 26px;border-radius:30px;text-decoration:none;font-weight:700}
+  </style>
+</head>
+<body>
+  <div class="box">
+  <?php if ($success): ?>
+    <div class="ok">✓</div>
+    <h2>پیام شما با موفقیت ثبت شد</h2>
+    <p>ممنون از تماس شما، در اولین فرصت پاسخ می‌دهم.</p>
+  <?php elseif ($errors): ?>
+    <div class="err">!</div>
+    <h2>پیام ارسال نشد</h2>
+    <ul>
+      <?php foreach ($errors as $e): ?>
+        <li><?= htmlspecialchars($e, ENT_QUOTES, 'UTF-8') ?></li>
+      <?php endforeach; ?>
+    </ul>
+  <?php else: ?>
+    <h2>این صفحه مستقیماً قابل مشاهده نیست</h2>
+    <p>لطفاً از طریق فرم تماس سایت اقدام کنید.</p>
+  <?php endif; ?>
+    <a href="index.html#contact">بازگشت به سایت</a>
+  </div>
+</body>
+</html>
+</textarea>
+
+<textarea hidden class="payload" data-file="inbox.php" data-desc="نمایش پیام‌های ذخیره‌شده — الگوی SELECT سپس حلقه">
+<?php
+/**
+ * صندوق پیام‌ها — خواندن داده از دیتابیس و نمایش آن
+ * الگوی اصلی: یک SELECT بزن، با foreach روی نتیجه بچرخ.
+ */
+require __DIR__ . '/config.php';
+
+$rows = db()->query(
+    'SELECT id, name, email, subject, is_read, created_at
+     FROM messages
+     ORDER BY created_at DESC
+     LIMIT 20'
+)->fetchAll();
+
+$unread = db()->query('SELECT COUNT(*) AS c FROM messages WHERE is_read = 0')
+              ->fetch()['c'];
+?>
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>صندوق پیام‌ها</title>
+<style>
+  body{font-family:Tahoma,sans-serif;background:#f6f9fc;color:#12232e;padding:24px;line-height:2}
+  h1{color:#0e4f6e;font-size:22px;margin:0 0 6px}
+  .sub{color:#5b7181;font-size:14px;margin:0 0 18px}
+  table{width:100%;border-collapse:collapse;background:#fff;border-radius:12px;
+        overflow:hidden;box-shadow:0 6px 20px rgba(14,79,110,.08)}
+  th{background:#0e4f6e;color:#fff;padding:11px;text-align:right;font-size:14px}
+  td{padding:11px;border-bottom:1px solid #eef3f7;font-size:14px}
+  .new{background:#ffc857;color:#2f2000;padding:2px 10px;border-radius:12px;font-size:12px}
+  .old{color:#8aa2b3;font-size:12px}
+  .empty{background:#fff;border-radius:12px;padding:30px;text-align:center;color:#5b7181}
+</style>
+</head>
+<body>
+  <h1>صندوق پیام‌ها</h1>
+  <p class="sub"><?= (int)$unread ?> پیام خوانده‌نشده</p>
+
+  <?php if (!$rows): ?>
+    <div class="empty">هنوز پیامی ثبت نشده است.</div>
+  <?php else: ?>
+    <table>
+      <tr><th>فرستنده</th><th>ایمیل</th><th>موضوع</th><th>تاریخ</th><th>وضعیت</th></tr>
+      <?php foreach ($rows as $r): ?>
+      <tr>
+        <td><?= htmlspecialchars($r['name']) ?></td>
+        <td><?= htmlspecialchars($r['email']) ?></td>
+        <td><?= htmlspecialchars($r['subject']) ?></td>
+        <td><?= htmlspecialchars($r['created_at']) ?></td>
+        <td><?= $r['is_read'] ? '<span class="old">خوانده‌شده</span>'
+                              : '<span class="new">جدید</span>' ?></td>
+      </tr>
+      <?php endforeach; ?>
+    </table>
+  <?php endif; ?>
+</body>
+</html>
+</textarea>
+
+<textarea hidden class="payload" data-file="database.sql" data-desc="ساخت دیتابیس و جدول‌ها + داده نمونه — در phpMyAdmin ایمپورت کنید">
+-- ============================================================
+--  کارگاه طراحی سایت با هوش مصنوعی
+--  در phpMyAdmin: تب Import -> این فایل -> Go
+--  یا: تب SQL -> کل محتوا را پیست کنید -> Go
+-- ============================================================
+
+CREATE DATABASE IF NOT EXISTS mysite_db
+  DEFAULT CHARACTER SET utf8mb4
+  COLLATE utf8mb4_persian_ci;
+
+USE mysite_db;
+
+-- ---------- جدول پیام‌های فرم تماس ----------
+CREATE TABLE IF NOT EXISTS messages (
+  id         INT AUTO_INCREMENT PRIMARY KEY,
+  name       VARCHAR(100) NOT NULL,
+  email      VARCHAR(150) NOT NULL,
+  subject    VARCHAR(200) NOT NULL,
+  message    TEXT         NOT NULL,
+  is_read    TINYINT(1)   DEFAULT 0,
+  created_at TIMESTAMP    DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_persian_ci;
+
+-- ---------- داده نمونه برای تمرین SELECT ----------
+INSERT INTO messages (name, email, subject, message, is_read) VALUES
+('مریم احمدی',  'maryam@example.com',  'سؤال درباره نوبت',   'سلام، وقت بخیر. می‌خواستم بپرسم...', 1),
+('علی رضایی',   'ali@example.com',     'همکاری پژوهشی',      'پیشنهاد همکاری در یک طرح...',       0),
+('زهرا موسوی',  'zahra@example.com',   'سؤال درباره مقاله',  'در مورد مقاله‌ی اخیرتان...',        1),
+('امیر کاظمی',  'amir@example.com',    'درخواست مشاوره',     'امکان مشاوره در زمینه...',          0),
+('نگار شریفی',  'negar@example.com',   'همکاری پژوهشی',      'طرح پژوهشی مشترک...',               0),
+('حسین نوری',   'hossein@example.com', 'سؤال درباره نوبت',   'برای گرفتن نوبت چه کنم؟',           1),
+('سارا یزدانی', 'sara@example.com',    'تشکر',               'بابت راهنمایی‌تان ممنونم.',         0),
+('رضا کریمی',   'reza@example.com',    'همکاری پژوهشی',      'علاقه‌مند به همکاری هستم.',          0);
+
+-- ---------- جدول‌های نمونه برای تمرین JOIN ----------
+CREATE TABLE IF NOT EXISTS categories (
+  id   INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(120) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_persian_ci;
+
+CREATE TABLE IF NOT EXISTS articles (
+  id           INT AUTO_INCREMENT PRIMARY KEY,
+  title        VARCHAR(220) NOT NULL,
+  category_id  INT          NOT NULL,
+  views        INT          DEFAULT 0,
+  published_at DATE,
+  FOREIGN KEY (category_id) REFERENCES categories(id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_persian_ci;
+
+INSERT INTO categories (name) VALUES
+('قلب و عروق'), ('هوش مصنوعی در پزشکی'), ('آموزش پزشکی');
+
+INSERT INTO articles (title, category_id, views, published_at) VALUES
+('تشخیص زودهنگام بیماری‌های قلبی',        1, 320, '2026-02-11'),
+('کاربرد یادگیری ماشین در تشخیص',         2, 780, '2026-03-04'),
+('روش‌های نوین تدریس در آموزش پزشکی',      3, 145, '2026-04-19'),
+('شبکه عصبی در تصویربرداری پزشکی',        2, 510, '2026-05-22');
+
+-- ============================================================
+--  تمرین: این کوئری‌ها را یکی‌یکی اجرا کنید
+-- ============================================================
+-- SELECT * FROM messages;
+-- SELECT name, subject FROM messages WHERE is_read = 0;
+-- SELECT * FROM messages ORDER BY created_at DESC LIMIT 3;
+-- SELECT COUNT(*) AS total FROM messages WHERE is_read = 0;
+-- SELECT subject, COUNT(*) AS tedad FROM messages GROUP BY subject ORDER BY tedad DESC;
+-- SELECT * FROM messages WHERE name LIKE 'ز%';
+-- UPDATE messages SET is_read = 1 WHERE id = 2;
+-- SELECT a.title, c.name, a.views FROM articles a
+--   JOIN categories c ON a.category_id = c.id ORDER BY a.views DESC;
+</textarea>
+
+<textarea hidden class="payload" data-file="prompts.txt" data-desc="همه‌ی پرامپت‌های کارگاه، آماده کپی">
+================================================================
+  جعبه‌ابزار پرامپت — کارگاه طراحی سایت با هوش مصنوعی
+  جاهای داخل [...] را با اطلاعات خودتان جایگزین کنید.
+================================================================
+
+--- ۰) فرمول پرامپت خوب ---------------------------------------
+نقش + هدف و جزئیات + قالب خروجی + محدودیت + زمینه اجرا
+
+--- ۱) ساخت صفحه اصلی -----------------------------------------
+تو یک طراح وب حرفه‌ای هستی که در ساخت سایت‌های فارسی و راست‌چین تخصص داری.
+
+یک صفحه وب تک‌صفحه‌ای شخصی برای من بساز:
+
+- نام: [نام و نام خانوادگی من]
+- عنوان: دانشجوی پزشکی دانشگاه [نام دانشگاه]
+- بخش‌ها به ترتیب: هدر با منوی چسبان، معرفی با عکس دایره‌ای، سوابق تحصیلی،
+  فعالیت‌های پژوهشی (۳ کارت)، مهارت‌ها، فرم تماس، فوتر
+
+الزامات فنی:
+- کل کد در یک فایل index.html با CSS داخلی
+- راست‌چین (dir="rtl")، charset UTF-8، فونت وزیرمتن از Google Fonts
+- رنگ اصلی آبی نفتی #0e4f6e و رنگ تأکیدی طلایی #ffc857
+- کاملاً ریسپانسیو؛ زیر ۷۶۸ پیکسل ستون‌ها زیر هم و منو همبرگری
+- انیمیشن ملایم هنگام اسکرول با IntersectionObserver
+- بدون هیچ کتابخانه یا فریم‌ورک خارجی
+- رنگ‌ها را با CSS Variables تعریف کن تا بعداً راحت عوض شوند
+
+زمینه اجرا: این فایل روی هاست اشتراکی با PHP 8.2 اجرا می‌شود.
+خروجی: فقط کد کامل و آماده اجرا، بدون توضیح اضافه.
+
+--- ۲) اصلاح و تغییر ------------------------------------------
+همان کد قبلی را نگه دار و فقط این تغییرات را اعمال کن:
+۱. هدر هنگام اسکرول چسبان بماند، نیمه‌شفاف با افکت بلور
+۲. زیر بخش معرفی یک دکمه‌ی «دانلود رزومه» با رنگ طلایی اضافه کن
+۳. فاصله‌ی عمودی بین بخش‌ها را دو برابر کن
+۴. یک دکمه‌ی تغییر حالت روز/شب اضافه کن که انتخاب کاربر در localStorage ذخیره شود
+۵. در موبایل منو به شکل همبرگری جمع شود
+
+کل فایل کامل و اصلاح‌شده را دوباره بده، نه فقط بخش تغییریافته.
+
+  *** مهم‌ترین جمله: «کل فایل کامل را دوباره بده» ***
+
+--- ۳) ریسپانسیو کردن -----------------------------------------
+این کد در موبایل به‌هم می‌ریزد. کل فایل را طوری بازنویسی کن که:
+- در عرض‌های زیر ۷۶۸ پیکسل ستون‌ها زیر هم بیایند
+- اندازه‌ی فونت‌ها با clamp متناسب کوچک شود
+- منو به دکمه‌ی همبرگری تبدیل شود
+- هیچ اسکرول افقی ایجاد نشود
+کل فایل کامل را بده.
+
+--- ۴) تغییر کامل ظاهر بدون دست زدن به محتوا ------------------
+محتوا و ساختار HTML را دقیقاً حفظ کن و فقط CSS را بازنویسی کن تا سایت
+ظاهری مینیمال، روشن و آکادمیک پیدا کند: پس‌زمینه سفید، متن خاکستری تیره،
+رنگ تأکیدی سرمه‌ای، گوشه‌های کمی گرد، سایه‌های خیلی ملایم.
+کل فایل کامل را بده.
+
+--- ۵) دیتابیس: ساخت جدول ------------------------------------
+برای یک سایت شخصی فارسی، دستور SQL ساخت جدول [نام جدول] را بنویس با
+ستون‌های [ستون‌ها]. حتماً:
+- از utf8mb4 و utf8mb4_persian_ci استفاده کن
+- یک ستون id از نوع INT AUTO_INCREMENT PRIMARY KEY داشته باش
+- یک ستون created_at با DEFAULT CURRENT_TIMESTAMP داشته باش
+- جلوی هر ستون با کامنت فارسی توضیح بده چرا این نوع را انتخاب کردی
+
+--- ۶) دیتابیس: نوشتن کوئری ----------------------------------
+جدول messages را با این ستون‌ها دارم: id, name, email, subject, message,
+is_read, created_at
+
+کوئری‌های زیر را بنویس و کنار هرکدام با یک جمله توضیح بده چه می‌کند:
+۱. ۱۰ پیام آخر
+۲. فقط پیام‌های خوانده‌نشده
+۳. تعداد پیام‌ها به تفکیک موضوع، از زیاد به کم
+۴. علامت‌زدن یک پیام مشخص به‌عنوان خوانده‌شده
+۵. جست‌وجو در نام و موضوع بر اساس یک عبارت
+
+--- ۷) فرم تماس امن با PHP و MySQL ---------------------------
+یک فرم تماس کامل و امن برایم بساز شامل:
+۱. بخش HTML فرم (نام، ایمیل، موضوع، پیام) هماهنگ با سایت راست‌چین من
+۲. فایل contact.php که اطلاعات را در MySQL ذخیره کند
+۳. دستور SQL ساخت جدول
+
+الزامات امنیتی (مهم):
+- حتماً PDO با Prepared Statement تا جلوی SQL Injection گرفته شود
+- اعتبارسنجی ورودی با filter_var و پاک‌سازی خروجی با htmlspecialchars
+- اطلاعات اتصال در فایل جداگانه config.php
+- پیام موفقیت یا خطا به شکل فارسی و کاربرپسند
+
+هر فایل را جداگانه و کامل بده و بنویس هرکدام با چه نامی ذخیره شود.
+
+--- ۸) قالب گزارش خطا (مهم‌ترین پرامپت) ----------------------
+این کد را تو برایم نوشتی ولی کار نمی‌کند.
+
+۱) کدی که اجرا کردم:
+[کد کامل را اینجا پیست کنید]
+
+۲) خطایی که می‌بینم (عین متن):
+[متن دقیق خطا را اینجا پیست کنید]
+
+۳) چه انتظاری داشتم:
+[مثلاً: انتظار داشتم پیام در دیتابیس ذخیره شود]
+
+۴) چه اتفاقی واقعاً افتاد:
+[مثلاً: صفحه سفید شد و چیزی ذخیره نشد]
+
+محیط من: XAMPP روی ویندوز، PHP نسخه ۸.۲، MySQL
+لطفاً اول بگو دقیقاً مشکل از کجاست و چرا، بعد کل فایل اصلاح‌شده را بده.
+
+--- ۹) بهینه‌سازی برای گوگل ----------------------------------
+این صفحه را از نظر سئو بهینه کن: title و meta description فارسی مناسب،
+تگ‌های Open Graph، ساختار درست هدینگ‌ها (فقط یک h1)، متن alt برای تصاویر،
+و اسکیمای Person به صورت JSON-LD. کل فایل کامل را بده.
+</textarea>
+
+<textarea hidden class="payload" data-file="README.txt" data-desc="راهنمای راه‌اندازی پروژه در ۴ قدم">
+================================================================
+  پروژه‌ی کارگاه «طراحی سایت با هوش مصنوعی»
+================================================================
+
+فایل‌ها
+-------
+index.html    صفحه‌ی اصلی سایت (راست‌چین، ریسپانسیو)
+style.css     استایل‌ها — رنگ‌ها را از بخش :root بالای فایل عوض کنید
+script.js     منوی موبایل، اسکرول نرم، انیمیشن ورود
+config.php    اطلاعات اتصال به دیتابیس (۴ خط اول را روی هاست عوض کنید)
+contact.php   دریافت فرم تماس و ذخیره‌ی امن در دیتابیس
+inbox.php     نمایش پیام‌های ذخیره‌شده
+database.sql  ساخت دیتابیس و جدول‌ها + داده‌ی نمونه برای تمرین SQL
+prompts.txt   همه‌ی پرامپت‌های کارگاه
+
+راه‌اندازی روی لوکال‌هاست (۴ قدم)
+----------------------------------
+۱. این فایل‌ها را در مسیر زیر کپی کنید:
+   C:\xampp\htdocs\mysite
+
+۲. XAMPP را باز کنید و Apache و MySQL را Start کنید.
+
+۳. به آدرس http://localhost/phpmyadmin بروید،
+   تب Import را بزنید، فایل database.sql را انتخاب و Go کنید.
+
+۴. سایت را باز کنید:  http://localhost/mysite
+   صندوق پیام‌ها:      http://localhost/mysite/inbox.php
+
+انتقال به هاست
+--------------
+۱. همه‌ی فایل‌ها را در پوشه‌ی public_html آپلود و extract کنید.
+   (توجه: index.html باید مستقیماً داخل public_html باشد، نه در زیرپوشه)
+۲. در cPanel یک دیتابیس و یک کاربر بسازید و کاربر را با
+   دسترسی All Privileges به دیتابیس وصل کنید.
+۳. در phpMyAdmin هاست، فایل database.sql را import کنید.
+   (خط‌های CREATE DATABASE و USE را حذف کنید، چون دیتابیس را cPanel ساخته)
+۴. در config.php مقادیر DB_NAME و DB_USER و DB_PASS را عوض کنید.
+۵. در cPanel بخش SSL/TLS Status، گزینه Run AutoSSL را بزنید
+   و سپس Force HTTPS Redirect را روشن کنید.
+
+اگر به مشکل خوردید
+------------------
+متن دقیق خطا را کپی کنید و همراه با قالب شماره ۸ در prompts.txt
+به هوش مصنوعی بدهید. تقریباً همیشه جواب می‌گیرید.
+</textarea>
+
+<script>
+(function(){
+'use strict';
+var fa = function(n){ return String(n).replace(/\d/g, function(d){ return '۰۱۲۳۴۵۶۷۸۹'[d]; }); };
+var $  = function(s,r){ return (r||document).querySelector(s); };
+var $$ = function(s,r){ return Array.prototype.slice.call((r||document).querySelectorAll(s)); };
+
+/* ============ SPLIT: code + live preview from one source ============ */
+$$('.split').forEach(function(sp){
+  var src = sp.querySelector('script.src');
+  if (!src) return;
+  var raw  = src.textContent.replace(/^\n/,'').replace(/\s+$/,'');
+  var code = sp.querySelector('pre code');
+  var fr   = sp.querySelector('iframe');
+  if (code) code.textContent = raw;
+  if (fr)   fr.setAttribute('srcdoc', raw);
+});
+
+/* ============ SLIDES ============ */
+var slides = $$('.slide'), total = slides.length, i = 0;
+$('#tot').textContent = fa(total);
+
+/* rail (one button per section) */
+var secs = [], seen = {};
+slides.forEach(function(s, idx){
+  var n = s.getAttribute('data-sec');
+  if (!(n in seen)){ seen[n] = secs.length; secs.push({ name:n, first:idx }); }
+  s.setAttribute('data-secidx', seen[n]);
+});
+var rail = $('#rail');
+rail.innerHTML = '<span class="lbl">مسیر کارگاه</span>';
+secs.forEach(function(s, k){
+  var b = document.createElement('button');
+  b.textContent = fa(k + 1);
+  b.title = s.name;
+  b.addEventListener('click', function(){ go(s.first); });
+  rail.appendChild(b);
+});
+var railBtns = $$('button', rail);
+
+/* toc */
+var toc = $('#toc'), last = null;
+slides.forEach(function(s, idx){
+  var sec = s.getAttribute('data-sec');
+  if (sec !== last){
+    var h = document.createElement('li');
+    h.className = 's';
+    h.innerHTML = '<span>' + sec + '</span><em>دقیقه ' + fa(s.getAttribute('data-min')) + '</em>';
+    toc.appendChild(h); last = sec;
+  }
+  var t = (s.querySelector('h1,h2') || {}).textContent || ('اسلاید ' + (idx + 1));
+  var li = document.createElement('li'), a = document.createElement('a');
+  a.href = '#s' + (idx + 1);
+  a.innerHTML = '<i>' + fa(idx + 1) + '</i><span></span>';
+  a.querySelector('span').textContent = t.replace(/\s+/g, ' ').trim();
+  a.addEventListener('click', function(e){ e.preventDefault(); go(idx); $('#drw').classList.remove('open'); });
+  li.appendChild(a); toc.appendChild(li);
+});
+var tocLinks = $$('a', toc);
+
+function go(n){
+  n = Math.max(0, Math.min(total - 1, n));
+  slides[i].classList.remove('active');
+  i = n;
+  slides[i].classList.add('active');
+  $('#cur').textContent = fa(i + 1);
+  $('#prog i').style.width = (i / (total - 1) * 100) + '%';
+  $('#scName').textContent = slides[i].getAttribute('data-sec');
+  var si = +slides[i].getAttribute('data-secidx');
+  railBtns.forEach(function(b, k){ b.classList.toggle('cur', k === si); });
+  tocLinks.forEach(function(a, k){ a.classList.toggle('cur', k === i); });
+  if (history.replaceState) history.replaceState(null, '', '#s' + (i + 1));
+  try { localStorage.setItem('w2_slide', i); } catch(e){}
+  window.scrollTo(0, 0);
+  pace();
+}
+window.addEventListener('hashchange', function(){
+  var m = location.hash.match(/^#s(\d+)$/);
+  if (m){ var n = parseInt(m[1], 10) - 1; if (n !== i) go(n); }
+});
+$('#next').addEventListener('click', function(){ go(i + 1); });
+$('#prev').addEventListener('click', function(){ go(i - 1); });
+
+/* ============ KEYBOARD ============ */
+document.addEventListener('keydown', function(e){
+  if (/^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)) return;
+  var k = e.key;
+  if (k === 'ArrowLeft' || k === 'PageDown' || k === ' ') { e.preventDefault(); go(i + 1); }
+  else if (k === 'ArrowRight' || k === 'PageUp') { e.preventDefault(); go(i - 1); }
+  else if (k === 'Home') go(0);
+  else if (k === 'End') go(total - 1);
+  else if (/^[nNز]$/.test(k)) toggleNotes();
+  else if (/^[mMئ]$/.test(k)) $('#drw').classList.toggle('open');
+  else if (/^[gGل]$/.test(k)) $('#ovPlan').classList.toggle('open');
+  else if (/^[dDی]$/.test(k)) $('#ovFiles').classList.toggle('open');
+  else if (/^[tTن]$/.test(k)) timer();
+  else if (/^[fFب]$/.test(k)) full();
+  else if (k === 'Escape'){ $('#drw').classList.remove('open');
+    $('#ovPlan').classList.remove('open'); $('#ovFiles').classList.remove('open'); }
+});
+var x0 = null;
+document.addEventListener('touchstart', function(e){ x0 = e.changedTouches[0].clientX; }, {passive:true});
+document.addEventListener('touchend', function(e){
+  if (x0 === null) return;
+  var dx = e.changedTouches[0].clientX - x0;
+  if (Math.abs(dx) > 70) { go(dx < 0 ? i - 1 : i + 1); }
+  x0 = null;
+}, {passive:true});
+
+function toggleNotes(){
+  var on = document.body.classList.toggle('sn');
+  $('#bNotes').classList.toggle('on', on);
+  try { localStorage.setItem('w2_notes', on ? '1' : '0'); } catch(e){}
+}
+function full(){
+  if (!document.fullscreenElement){ if (document.documentElement.requestFullscreen) document.documentElement.requestFullscreen(); }
+  else if (document.exitFullscreen) document.exitFullscreen();
+}
+$('#bNotes').addEventListener('click', toggleNotes);
+$('#bToc').addEventListener('click', function(){ $('#drw').classList.toggle('open'); });
+$('#drwX').addEventListener('click', function(){ $('#drw').classList.remove('open'); });
+$('#bPlan').addEventListener('click', function(){ $('#ovPlan').classList.toggle('open'); });
+$('#planX').addEventListener('click', function(){ $('#ovPlan').classList.remove('open'); });
+$('#bFiles').addEventListener('click', function(){ $('#ovFiles').classList.toggle('open'); });
+$('#filesX').addEventListener('click', function(){ $('#ovFiles').classList.remove('open'); });
+$('#bPrint').addEventListener('click', function(){ $('#drw').classList.remove('open'); setTimeout(function(){ window.print(); }, 250); });
+[['#drw','pn'],['#ovPlan','sheet'],['#ovFiles','sheet']].forEach(function(p){
+  var el = $(p[0]);
+  el.addEventListener('click', function(e){ if (e.target === el) el.classList.remove('open'); });
+});
+
+/* ============ TIMER + PACE ============ */
+var t0 = null, tick = null;
+function fmt(ms){ var s = Math.floor(ms/1000); return fa(('0'+Math.floor(s/60)).slice(-2)) + ':' + fa(('0'+(s%60)).slice(-2)); }
+function pace(){
+  var p = $('#pace');
+  if (t0 === null){ p.className = ''; p.id = 'pace'; p.textContent = 'تایمر خاموش'; return; }
+  var d = (Date.now() - t0) / 60000 - (+slides[i].getAttribute('data-min'));
+  p.className = '';
+  if (d < -3)      { p.classList.add('ok');   p.textContent = 'جلوتر از برنامه (' + fa(Math.round(-d)) + ' دقیقه)'; }
+  else if (d <= 4) { p.classList.add('ok');   p.textContent = 'طبق برنامه ✓'; }
+  else if (d <= 10){ p.classList.add('warn'); p.textContent = fa(Math.round(d)) + ' دقیقه عقب'; }
+  else             { p.classList.add('bad');  p.textContent = fa(Math.round(d)) + ' دقیقه عقب — فشرده کن'; }
+}
+function timer(){
+  var c = $('#clock');
+  if (t0 !== null){ t0 = null; clearInterval(tick); tick = null; c.classList.remove('on'); pace(); }
+  else {
+    t0 = Date.now(); c.classList.add('on'); c.textContent = fmt(0); pace();
+    tick = setInterval(function(){ c.textContent = fmt(Date.now() - t0); pace(); }, 1000);
+  }
+}
+$('#clock').addEventListener('click', timer);
+
+/* ============ COPY ============ */
+function copyText(txt, btn){
+  var done = function(){
+    var old = btn.textContent;
+    btn.textContent = '✓ کپی شد'; btn.classList.add('done');
+    setTimeout(function(){ btn.textContent = old; btn.classList.remove('done'); }, 1500);
+  };
+  if (navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(txt).then(done, function(){ fb(txt, done); });
+  } else fb(txt, done);
+}
+function fb(txt, cb){
+  var ta = document.createElement('textarea');
+  ta.value = txt; ta.style.position = 'fixed'; ta.style.opacity = '0';
+  document.body.appendChild(ta); ta.select();
+  try { document.execCommand('copy'); cb(); } catch(e){}
+  document.body.removeChild(ta);
+}
+$$('.codebox .copy').forEach(function(b){
+  b.addEventListener('click', function(){
+    var pre = b.closest('.codebox').querySelector('pre');
+    if (pre) copyText(pre.innerText, b);
+  });
+});
+
+/* ============ PLAYGROUND ============ */
+var PG = {
+  start: '<!DOCTYPE html>\n<html lang="fa" dir="rtl">\n<head>\n  <meta charset="utf-8">\n  <style>\n    body{ font-family:Tahoma; background:#eef4f8; padding:20px; line-height:2 }\n    .card{ background:#fff; border-radius:14px; padding:20px;\n           box-shadow:0 6px 20px rgba(14,79,110,.12) }\n    h1{ color:#0e4f6e; margin:0 0 8px; font-size:20px }\n    .btn{ background:#ffc857; color:#2f2000; padding:8px 20px;\n          border-radius:20px; display:inline-block; margin-top:10px }\n  </style>\n</head>\n<body>\n\n  <div class="card">\n    <h1>سلام، من [اسم شما] هستم</h1>\n    <p>این متن را عوض کنید و نتیجه را همین‌جا ببینید.</p>\n    <span class="btn">تماس با من</span>\n  </div>\n\n</body>\n</html>',
+  dark:  '<!DOCTYPE html>\n<html lang="fa" dir="rtl">\n<head>\n  <meta charset="utf-8">\n  <style>\n    body{ font-family:Tahoma; background:#0f172a; color:#e2e8f0;\n          padding:20px; line-height:2 }\n    .card{ background:#1e293b; border:1px solid #334155;\n           border-radius:14px; padding:20px }\n    h1{ color:#38bdf8; margin:0 0 8px; font-size:20px }\n    .btn{ background:#38bdf8; color:#04222a; padding:8px 20px;\n          border-radius:20px; display:inline-block; margin-top:10px }\n  </style>\n</head>\n<body>\n  <div class="card">\n    <h1>حالت شب</h1>\n    <p>فقط رنگ‌ها عوض شد — ساختار همان است.</p>\n    <span class="btn">دکمه</span>\n  </div>\n</body>\n</html>',
+  card:  '<!DOCTYPE html>\n<html lang="fa" dir="rtl">\n<head>\n  <meta charset="utf-8">\n  <style>\n    body{ font-family:Tahoma; background:#f1f5f9; display:grid;\n          place-items:center; height:100vh; margin:0 }\n    .p{ background:#fff; border-radius:18px; padding:26px; text-align:center;\n        box-shadow:0 12px 34px rgba(2,32,56,.14); width:250px }\n    .av{ width:82px; height:82px; border-radius:50%; margin:0 auto 12px;\n         background:linear-gradient(140deg,#0e4f6e,#38bdf8); display:grid;\n         place-items:center; font-size:38px }\n    h2{ margin:0; font-size:17px; color:#0f2b3d }\n    p{ margin:4px 0 12px; color:#64748b; font-size:13px }\n    .t{ background:#e0f2fe; color:#0369a1; border-radius:20px;\n        padding:3px 12px; font-size:12px; display:inline-block; margin:2px }\n  </style>\n</head>\n<body>\n  <div class="p">\n    <div class="av">👩‍⚕️</div>\n    <h2>دکتر نمونه</h2>\n    <p>دانشجوی پزشکی</p>\n    <span class="t">پژوهش</span><span class="t">هوش مصنوعی</span>\n  </div>\n</body>\n</html>'
+};
+var pgCode = $('#pgCode'), pgOut = $('#pgOut');
+function pgRender(){ pgOut.setAttribute('srcdoc', pgCode.value); }
+function pgSet(v){ pgCode.value = v; pgRender(); try{ localStorage.setItem('w2_pg', v); }catch(e){} }
+var saved = null; try { saved = localStorage.getItem('w2_pg'); } catch(e){}
+pgSet(saved || PG.start);
+var pgT;
+pgCode.addEventListener('input', function(){
+  clearTimeout(pgT);
+  pgT = setTimeout(function(){ pgRender(); try{ localStorage.setItem('w2_pg', pgCode.value); }catch(e){} }, 400);
+});
+$('#pgReset').addEventListener('click', function(){ pgSet(PG.start); });
+$('#pgDark').addEventListener('click', function(){ pgSet(PG.dark); });
+$('#pgCard').addEventListener('click', function(){ pgSet(PG.card); });
+$('#pgSave').addEventListener('click', function(){ dl('my-page.html', pgCode.value, 'text/html'); });
+
+/* ============ SQL PLAYGROUND ============ */
+var MSG = [
+  {id:1, name:'مریم احمدی',  email:'maryam@example.com',  subject:'سؤال درباره نوبت',  is_read:1, created_at:'2026-06-01 09:14'},
+  {id:2, name:'علی رضایی',   email:'ali@example.com',     subject:'همکاری پژوهشی',     is_read:0, created_at:'2026-06-03 11:02'},
+  {id:3, name:'زهرا موسوی',  email:'zahra@example.com',   subject:'سؤال درباره مقاله', is_read:1, created_at:'2026-06-05 16:40'},
+  {id:4, name:'امیر کاظمی',  email:'amir@example.com',    subject:'درخواست مشاوره',    is_read:0, created_at:'2026-06-07 08:25'},
+  {id:5, name:'نگار شریفی',  email:'negar@example.com',   subject:'همکاری پژوهشی',     is_read:0, created_at:'2026-06-09 13:55'},
+  {id:6, name:'حسین نوری',   email:'hossein@example.com', subject:'سؤال درباره نوبت',  is_read:1, created_at:'2026-06-11 10:07'},
+  {id:7, name:'سارا یزدانی', email:'sara@example.com',    subject:'تشکر',              is_read:0, created_at:'2026-06-12 18:30'},
+  {id:8, name:'رضا کریمی',   email:'reza@example.com',    subject:'همکاری پژوهشی',     is_read:0, created_at:'2026-06-14 07:48'}
+];
+function pick(rows, cols){
+  return rows.map(function(r){ var o = {}; cols.forEach(function(c){ o[c] = r[c]; }); return o; });
+}
+var QUERIES = [
+  { lbl:'همه چیز',        desc:'بدون شرط: تمام سطرها و تمام ستون‌ها',
+    sql:'SELECT * FROM messages;',
+    run:function(){ return pick(MSG, ['id','name','subject','is_read','created_at']); } },
+  { lbl:'فقط چند ستون',   desc:'به‌جای * فقط ستون‌های لازم را بخواهید — سریع‌تر و تمیزتر',
+    sql:'SELECT name, subject FROM messages;',
+    run:function(){ return pick(MSG, ['name','subject']); } },
+  { lbl:'خوانده‌نشده‌ها',  desc:'WHERE سطرها را فیلتر می‌کند',
+    sql:'SELECT id, name, subject\nFROM messages\nWHERE is_read = 0;',
+    run:function(){ return pick(MSG.filter(function(r){ return r.is_read === 0; }), ['id','name','subject']); } },
+  { lbl:'یک موضوع خاص',   desc:'مقایسه‌ی متنی — مقدار داخل تک‌کوتیشن',
+    sql:"SELECT name, email, created_at\nFROM messages\nWHERE subject = 'همکاری پژوهشی';",
+    run:function(){ return pick(MSG.filter(function(r){ return r.subject === 'همکاری پژوهشی'; }), ['name','email','created_at']); } },
+  { lbl:'۳ پیام آخر',     desc:'ORDER BY مرتب می‌کند، DESC نزولی، LIMIT تعداد را محدود می‌کند',
+    sql:'SELECT name, subject, created_at\nFROM messages\nORDER BY created_at DESC\nLIMIT 3;',
+    run:function(){
+      var s = MSG.slice().sort(function(a,b){ return a.created_at < b.created_at ? 1 : -1; });
+      return pick(s.slice(0,3), ['name','subject','created_at']); } },
+  { lbl:'شمارش',          desc:'COUNT یک عدد برمی‌گرداند، AS به آن نام می‌دهد',
+    sql:'SELECT COUNT(*) AS unread\nFROM messages\nWHERE is_read = 0;',
+    run:function(){ return [{ unread: MSG.filter(function(r){ return r.is_read === 0; }).length }]; } },
+  { lbl:'گروه‌بندی',       desc:'GROUP BY سطرهای هم‌مقدار را در یک گروه جمع می‌کند و روی هر گروه می‌شمارد',
+    sql:'SELECT subject, COUNT(*) AS tedad\nFROM messages\nGROUP BY subject\nORDER BY tedad DESC;',
+    run:function(){
+      var m = {};
+      MSG.forEach(function(r){ m[r.subject] = (m[r.subject] || 0) + 1; });
+      return Object.keys(m).map(function(k){ return { subject:k, tedad:m[k] }; })
+                   .sort(function(a,b){ return b.tedad - a.tedad; }); } },
+  { lbl:'جست‌وجو',        desc:"LIKE جست‌وجوی الگویی است؛ % یعنی «هرچیزی». اینجا: نام‌هایی که با «ز» شروع می‌شوند",
+    sql:"SELECT id, name, email\nFROM messages\nWHERE name LIKE 'ز%';",
+    run:function(){ return pick(MSG.filter(function(r){ return r.name.indexOf('ز') === 0; }), ['id','name','email']); } }
+];
+var qb = $('#qbtns');
+QUERIES.forEach(function(q, k){
+  var b = document.createElement('button');
+  b.className = 'qbtn'; b.textContent = q.lbl;
+  b.addEventListener('click', function(){ runQ(k); });
+  qb.appendChild(b);
+});
+function runQ(k){
+  var q = QUERIES[k], rows = q.run();
+  $$('.qbtn', qb).forEach(function(b, n){ b.classList.toggle('cur', n === k); });
+  $('#qText').textContent = q.sql;
+  $('#qDesc').textContent = q.desc;
+  $('#qRows').textContent = rows.length + (rows.length === 1 ? ' row' : ' rows');
+  var t = $('#qRes');
+  if (!rows.length){ t.innerHTML = '<tr><td>نتیجه‌ای برنگشت</td></tr>'; return; }
+  var cols = Object.keys(rows[0]), html = '<tr>';
+  cols.forEach(function(c){ html += '<th>' + c + '</th>'; });
+  html += '</tr>';
+  rows.forEach(function(r){
+    html += '<tr>';
+    cols.forEach(function(c){
+      var v = String(r[c]);
+      var faCol = /[؀-ۿ]/.test(v);
+      html += '<td class="' + (faCol ? 'fa' : '') + '">' + v.replace(/</g,'&lt;') + '</td>';
+    });
+    html += '</tr>';
+  });
+  t.innerHTML = html;
+}
+runQ(0);
+
+/* ============ FILES: list, download, zip ============ */
+var FILES = $$('.payload').map(function(t){
+  return { name:t.getAttribute('data-file'), desc:t.getAttribute('data-desc'),
+           body:t.value.replace(/^\n/,'') };
+});
+var fl = $('#fileList');
+FILES.forEach(function(f){
+  var li = document.createElement('li');
+  li.innerHTML = '<span class="nm2"></span><span class="ds"></span>';
+  li.querySelector('.nm2').textContent = f.name;
+  li.querySelector('.ds').textContent  = f.desc;
+  var c = document.createElement('button'); c.className = 'copy'; c.textContent = 'کپی';
+  c.addEventListener('click', function(){ copyText(f.body, c); });
+  var d = document.createElement('button'); d.className = 'btn sm'; d.textContent = '⬇ دانلود';
+  d.addEventListener('click', function(){ dl(f.name, f.body, 'text/plain'); });
+  li.appendChild(c); li.appendChild(d);
+  fl.appendChild(li);
+});
+function dl(name, text, type){
+  var url = URL.createObjectURL(new Blob([text], { type: (type||'text/plain') + ';charset=utf-8' }));
+  var a = document.createElement('a');
+  a.href = url; a.download = name; document.body.appendChild(a); a.click();
+  document.body.removeChild(a); setTimeout(function(){ URL.revokeObjectURL(url); }, 4000);
+}
+
+/* --- minimal ZIP writer (stored, no compression) --- */
+var CRC = (function(){
+  var t = new Uint32Array(256);
+  for (var n = 0; n < 256; n++){
+    var c = n;
+    for (var k = 0; k < 8; k++) c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1);
+    t[n] = c >>> 0;
+  }
+  return t;
+})();
+function crc32(b){
+  var c = 0xFFFFFFFF;
+  for (var n = 0; n < b.length; n++) c = CRC[(c ^ b[n]) & 0xFF] ^ (c >>> 8);
+  return (c ^ 0xFFFFFFFF) >>> 0;
+}
+function zip(files){
+  var enc = new TextEncoder(), parts = [], cds = [], off = 0, d = new Date();
+  var dTime = ((d.getHours() << 11) | (d.getMinutes() << 5) | (d.getSeconds() >> 1)) & 0xFFFF;
+  var dDate = (((d.getFullYear() - 1980) << 9) | ((d.getMonth() + 1) << 5) | d.getDate()) & 0xFFFF;
+  files.forEach(function(f){
+    var nm = enc.encode(f.name), data = enc.encode(f.body), crc = crc32(data);
+    var lh = new Uint8Array(30 + nm.length), v = new DataView(lh.buffer);
+    v.setUint32(0, 0x04034b50, true); v.setUint16(4, 20, true); v.setUint16(6, 0x0800, true);
+    v.setUint16(8, 0, true); v.setUint16(10, dTime, true); v.setUint16(12, dDate, true);
+    v.setUint32(14, crc, true); v.setUint32(18, data.length, true); v.setUint32(22, data.length, true);
+    v.setUint16(26, nm.length, true); v.setUint16(28, 0, true);
+    lh.set(nm, 30);
+    parts.push(lh, data);
+    var cd = new Uint8Array(46 + nm.length), c = new DataView(cd.buffer);
+    c.setUint32(0, 0x02014b50, true); c.setUint16(4, 20, true); c.setUint16(6, 20, true);
+    c.setUint16(8, 0x0800, true); c.setUint16(10, 0, true);
+    c.setUint16(12, dTime, true); c.setUint16(14, dDate, true);
+    c.setUint32(16, crc, true); c.setUint32(20, data.length, true); c.setUint32(24, data.length, true);
+    c.setUint16(28, nm.length, true); c.setUint16(30, 0, true); c.setUint16(32, 0, true);
+    c.setUint16(34, 0, true); c.setUint16(36, 0, true); c.setUint32(38, 0, true);
+    c.setUint32(42, off, true);
+    cd.set(nm, 46);
+    cds.push(cd);
+    off += lh.length + data.length;
+  });
+  var cdSize = cds.reduce(function(a, b){ return a + b.length; }, 0);
+  var eo = new Uint8Array(22), e = new DataView(eo.buffer);
+  e.setUint32(0, 0x06054b50, true); e.setUint16(4, 0, true); e.setUint16(6, 0, true);
+  e.setUint16(8, files.length, true); e.setUint16(10, files.length, true);
+  e.setUint32(12, cdSize, true); e.setUint32(16, off, true); e.setUint16(20, 0, true);
+  return new Blob(parts.concat(cds, [eo]), { type:'application/zip' });
+}
+$('#dlZip').addEventListener('click', function(){
+  var url = URL.createObjectURL(zip(FILES));
+  var a = document.createElement('a');
+  a.href = url; a.download = 'workshop-site-files.zip';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  setTimeout(function(){ URL.revokeObjectURL(url); }, 6000);
+});
+
+/* ============ CHECKLIST PERSISTENCE ============ */
+$$('#cl input').forEach(function(cb){
+  try { cb.checked = localStorage.getItem('w2_' + cb.id) === '1'; } catch(e){}
+  cb.addEventListener('change', function(){
+    try { localStorage.setItem('w2_' + cb.id, cb.checked ? '1' : '0'); } catch(e){}
+  });
+});
+
+/* ============ RESTORE ============ */
+try { if (localStorage.getItem('w2_notes') === '1') toggleNotes(); } catch(e){}
+var h = (location.hash.match(/^#s(\d+)$/) || [])[1];
+var start = h ? (parseInt(h, 10) - 1) : 0;
+if (!h){ try { var v = localStorage.getItem('w2_slide'); if (v !== null) start = parseInt(v, 10) || 0; } catch(e){} }
+go(start);
+})();
+</script>
+</body>
+</html>
