@@ -1,0 +1,1358 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>کارگاه طراحی سایت با هوش مصنوعی</title>
+<meta name="description" content="دک ارائه و راهنمای کامل مدرس برای کارگاه دوساعته طراحی سایت با هوش مصنوعی">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚀</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#05141f; --bg2:#08203200; --panel:#0b2536; --panel2:#0e2e42;
+  --line:#17455f; --line2:#1e5a7a;
+  --teal:#2fd4d4; --teal-dim:#1c8f96; --gold:#f5c45e; --gold-dim:#a8802c;
+  --txt:#e8f4fa; --txt-dim:#9fbccd; --white:#fff;
+  --ok:#3ddc97; --warn:#ffb454; --danger:#ff6b6b;
+  --radius:18px; --radius-sm:12px;
+  --shadow:0 18px 50px rgba(0,0,0,.45);
+  --maxw:1080px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;height:100%}
+body{
+  font-family:'Vazirmatn',Tahoma,system-ui,sans-serif;
+  background:
+    radial-gradient(1200px 700px at 85% -10%, #10405c 0%, transparent 60%),
+    radial-gradient(900px 600px at 5% 105%, #0d3a4d 0%, transparent 55%),
+    var(--bg);
+  background-attachment:fixed;
+  color:var(--txt); line-height:1.95; font-size:17px;
+  -webkit-font-smoothing:antialiased;
+}
+a{color:var(--teal)}
+code{direction:ltr;unicode-bidi:isolate;display:inline-block;background:rgba(47,212,212,.1);
+  border:1px solid var(--line);border-radius:6px;padding:0 6px;font-size:.92em;font-family:Consolas,monospace}
+b,strong{color:var(--white);font-weight:700}
+
+/* ---------- TOP BAR ---------- */
+.topbar{
+  position:fixed; inset-inline:0; top:0; height:58px; z-index:60;
+  display:flex; align-items:center; gap:10px; padding:0 14px;
+  background:rgba(5,20,31,.86); backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--line);
+}
+.brand{display:flex;align-items:center;gap:9px;font-weight:700;white-space:nowrap}
+.brand .dot{width:11px;height:11px;border-radius:50%;background:var(--teal);box-shadow:0 0 14px var(--teal)}
+.brand span.sub{color:var(--txt-dim);font-weight:400;font-size:13px}
+.spacer{flex:1}
+.btn{
+  background:var(--panel); border:1px solid var(--line); color:var(--txt);
+  border-radius:11px; padding:7px 13px; font-family:inherit; font-size:14px;
+  cursor:pointer; display:inline-flex; align-items:center; gap:7px; transition:.16s;
+  white-space:nowrap;
+}
+.btn:hover{border-color:var(--teal);color:var(--white);transform:translateY(-1px)}
+.btn.on{background:var(--teal);color:#042028;border-color:var(--teal);font-weight:700}
+.btn.gold{background:linear-gradient(180deg,var(--gold),#e0a93b);color:#2a1c00;border-color:var(--gold);font-weight:700}
+.btn.ghost{background:transparent}
+.btn kbd{font-family:inherit;font-size:11px;opacity:.6;border:1px solid currentColor;border-radius:5px;padding:0 4px}
+#timerBox{font-variant-numeric:tabular-nums;font-weight:700;min-width:82px;justify-content:center}
+#paceTag{font-size:12px;padding:4px 9px;border-radius:20px;border:1px solid var(--line);color:var(--txt-dim)}
+#paceTag.ahead{color:var(--ok);border-color:var(--ok)}
+#paceTag.behind{color:var(--warn);border-color:var(--warn)}
+#paceTag.late{color:var(--danger);border-color:var(--danger)}
+.progress{position:fixed;top:58px;inset-inline:0;height:3px;background:#0a2434;z-index:60}
+.progress>i{display:block;height:100%;background:linear-gradient(90deg,var(--teal),var(--gold));transition:width .3s}
+
+/* ---------- SLIDE AREA ---------- */
+.stage{padding:96px 20px 130px;min-height:100vh}
+.slide{display:none;max-width:var(--maxw);margin:0 auto;animation:in .35s ease both}
+.slide.active{display:block}
+@keyframes in{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.eyebrow{
+  display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:700;
+  color:var(--gold); background:rgba(245,196,94,.09); border:1px solid rgba(245,196,94,.32);
+  padding:5px 14px;border-radius:30px;margin-bottom:14px;
+}
+h1{font-size:clamp(30px,5vw,50px);line-height:1.45;margin:.1em 0 .35em;font-weight:900;color:var(--white)}
+h2{font-size:clamp(24px,3.6vw,36px);line-height:1.5;margin:.1em 0 .5em;font-weight:900;color:var(--white)}
+h3{font-size:20px;margin:1.3em 0 .5em;color:var(--teal);font-weight:700}
+.lead{font-size:19px;color:var(--txt-dim);max-width:62ch}
+.hl{color:var(--teal);font-weight:700}
+.hl-g{color:var(--gold);font-weight:700}
+
+/* ---------- CARDS / GRID ---------- */
+.card{
+  background:linear-gradient(180deg,var(--panel),#092131);
+  border:1px solid var(--line); border-radius:var(--radius);
+  padding:20px 22px; box-shadow:var(--shadow);
+}
+.card + .card{margin-top:14px}
+.grid{display:grid;gap:14px;margin-top:8px}
+.g2{grid-template-columns:repeat(2,1fr)}
+.g3{grid-template-columns:repeat(3,1fr)}
+.g4{grid-template-columns:repeat(4,1fr)}
+@media(max-width:860px){.g2,.g3,.g4{grid-template-columns:1fr}}
+.card h4{margin:0 0 6px;font-size:18px;color:var(--white);display:flex;align-items:center;gap:9px}
+.card p{margin:0;color:var(--txt-dim);font-size:15.5px}
+.ico{
+  width:38px;height:38px;flex:none;border-radius:11px;display:grid;place-items:center;font-size:19px;
+  background:rgba(47,212,212,.12);border:1px solid rgba(47,212,212,.3);
+}
+.ico.g{background:rgba(245,196,94,.12);border-color:rgba(245,196,94,.3)}
+
+ul.bullets{list-style:none;padding:0;margin:14px 0}
+ul.bullets li{position:relative;padding-inline-start:30px;margin-bottom:11px;font-size:17px}
+ul.bullets li::before{
+  content:'';position:absolute;inset-inline-start:6px;top:14px;width:9px;height:9px;border-radius:50%;
+  background:var(--teal);box-shadow:0 0 10px rgba(47,212,212,.7);
+}
+ul.bullets.gold li::before{background:var(--gold);box-shadow:0 0 10px rgba(245,196,94,.7)}
+ol.steps{counter-reset:s;list-style:none;padding:0;margin:14px 0}
+ol.steps li{counter-increment:s;position:relative;padding-inline-start:46px;margin-bottom:14px}
+ol.steps li::before{
+  content:counter(s);position:absolute;inset-inline-start:0;top:4px;width:30px;height:30px;border-radius:9px;
+  background:var(--teal);color:#042028;font-weight:900;display:grid;place-items:center;font-size:15px;
+}
+
+/* ---------- TIMELINE / FLOW ---------- */
+.flow{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
+.flow .step{
+  flex:1 1 170px;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px;
+  position:relative;text-align:center;
+}
+.flow .step .n{
+  width:30px;height:30px;margin:0 auto 8px;border-radius:50%;background:var(--gold);color:#2a1c00;
+  font-weight:900;display:grid;place-items:center;
+}
+.flow .step b{display:block;font-size:15px;margin-bottom:3px}
+.flow .step small{color:var(--txt-dim);font-size:13px;line-height:1.7;display:block}
+
+/* ---------- CODE ---------- */
+.codewrap{position:relative;margin:14px 0}
+pre{
+  background:#04121c;border:1px solid var(--line);border-radius:var(--radius-sm);
+  padding:16px 18px;overflow:auto;direction:ltr;text-align:left;
+  font-family:'SFMono-Regular',Consolas,'Courier New',monospace;font-size:14px;line-height:1.75;
+  color:#cfe9f5;margin:0;
+}
+pre .c{color:#5d87a1}      /* comment */
+pre .t{color:#7fd6ff}      /* tag */
+pre .s{color:#ffd48a}      /* string */
+pre .k{color:#ff9ecb}      /* keyword */
+.copy{
+  position:absolute;top:8px;inset-inline-end:8px;z-index:2;
+  background:var(--panel2);border:1px solid var(--line2);color:var(--txt);
+  border-radius:9px;padding:4px 11px;font-family:inherit;font-size:12.5px;cursor:pointer;
+}
+.copy:hover{background:var(--teal);color:#042028}
+.copy.done{background:var(--ok);color:#03301f;border-color:var(--ok)}
+
+/* ---------- PROMPT CARD ---------- */
+.prompt{
+  background:linear-gradient(180deg,#0f3246,#0a2333);
+  border:1px solid var(--gold-dim);border-radius:var(--radius);padding:18px 20px;position:relative;margin:16px 0;
+}
+.prompt::before{
+  content:'✦ پرامپت آماده';position:absolute;top:-13px;inset-inline-start:20px;
+  background:var(--gold);color:#2a1c00;font-size:12.5px;font-weight:700;padding:2px 12px;border-radius:20px;
+}
+.prompt .body{
+  background:#04121c;border:1px solid var(--line);border-radius:var(--radius-sm);
+  padding:15px 16px;margin-top:10px;white-space:pre-wrap;font-size:15px;color:#d5ecf7;line-height:2;
+}
+
+/* ---------- CALLOUTS ---------- */
+.note{
+  border-inline-start:4px solid var(--teal);background:rgba(47,212,212,.07);
+  padding:13px 17px;border-radius:0 var(--radius-sm) var(--radius-sm) 0;margin:14px 0;font-size:16px;
+}
+.note.warn{border-color:var(--warn);background:rgba(255,180,84,.08)}
+.note.bad{border-color:var(--danger);background:rgba(255,107,107,.08)}
+.note.ok{border-color:var(--ok);background:rgba(61,220,151,.08)}
+.note b{display:block;margin-bottom:3px}
+
+/* ---------- DETAILS / ACCORDION ---------- */
+details{
+  background:var(--panel);border:1px solid var(--line);border-radius:var(--radius-sm);
+  margin:11px 0;overflow:hidden;
+}
+details[open]{border-color:var(--teal-dim)}
+summary{
+  cursor:pointer;padding:12px 17px;font-weight:700;color:var(--teal);list-style:none;
+  display:flex;align-items:center;gap:9px;user-select:none;font-size:16px;
+}
+summary::-webkit-details-marker{display:none}
+summary::before{content:'＋';font-weight:900;color:var(--gold);width:19px;display:inline-block}
+details[open] summary::before{content:'－'}
+summary:hover{background:rgba(47,212,212,.06)}
+details .in{padding:2px 17px 16px;border-top:1px solid var(--line);color:var(--txt-dim)}
+details .in p:first-child{margin-top:12px}
+
+/* ---------- TABLE ---------- */
+table{width:100%;border-collapse:collapse;margin:14px 0;font-size:15.5px;overflow:hidden;border-radius:var(--radius-sm)}
+th,td{padding:11px 14px;border:1px solid var(--line);text-align:right;vertical-align:top}
+th{background:var(--panel2);color:var(--white);font-weight:700}
+td{background:rgba(11,37,54,.55);color:var(--txt-dim)}
+td b{color:var(--white)}
+tr:hover td{background:rgba(47,212,212,.06)}
+
+/* ---------- SPEAKER NOTES ---------- */
+.notes{display:none}
+body.shownotes .notes{
+  display:block;margin-top:20px;background:rgba(245,196,94,.07);
+  border:1px dashed var(--gold-dim);border-radius:var(--radius-sm);padding:15px 18px;font-size:16px;color:#f3e2c0;
+}
+body.shownotes .notes::before{
+  content:'🎙 چی بگم';display:block;font-weight:900;color:var(--gold);margin-bottom:7px;font-size:14px;letter-spacing:.3px;
+}
+.notes .say{color:#fff;font-style:normal;border-inline-start:3px solid var(--gold);padding-inline-start:11px;display:block;margin:9px 0}
+
+/* ---------- BOTTOM NAV ---------- */
+.nav{
+  position:fixed;bottom:0;inset-inline:0;height:64px;z-index:60;
+  display:flex;align-items:center;justify-content:center;gap:12px;padding:0 16px;
+  background:rgba(5,20,31,.9);backdrop-filter:blur(14px);border-top:1px solid var(--line);
+}
+.nav .pos{font-size:14px;color:var(--txt-dim);font-variant-numeric:tabular-nums;min-width:92px;text-align:center}
+.nav .sect{font-size:13px;color:var(--teal);max-width:270px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+@media(max-width:700px){.nav .sect{display:none}}
+@media(max-width:820px){
+  .brand span.sub{display:none}
+  #paceTag{display:none}
+  .topbar{gap:7px;padding:0 9px}
+  .btn{padding:7px 10px;font-size:13px}
+  .brand{font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+}
+@media(max-width:520px){ .brand{display:none} }
+
+/* ---------- TOC DRAWER ---------- */
+.drawer{
+  position:fixed;inset:0;z-index:80;background:rgba(2,10,16,.75);backdrop-filter:blur(5px);
+  display:none;
+}
+.drawer.open{display:block}
+.drawer .panel{
+  position:absolute;inset-block:0;inset-inline-end:0;width:min(440px,92vw);
+  background:#071c2a;border-inline-start:1px solid var(--line);padding:20px;overflow:auto;
+  animation:slide .25s ease both;
+}
+@keyframes slide{from{transform:translateX(-30px);opacity:0}to{transform:none;opacity:1}}
+.drawer h3{margin-top:0}
+.toc{list-style:none;padding:0;margin:0}
+.toc .sec{
+  margin:16px 0 6px;font-size:12.5px;font-weight:700;color:var(--gold);letter-spacing:.4px;
+  display:flex;justify-content:space-between;align-items:center;
+}
+.toc .sec em{font-style:normal;color:var(--txt-dim);font-weight:400}
+.toc li.item{padding:0}
+.toc li.item a{
+  display:flex;gap:10px;align-items:center;padding:7px 11px;border-radius:9px;color:var(--txt);
+  text-decoration:none;font-size:15px;
+}
+.toc li.item a:hover{background:rgba(47,212,212,.1)}
+.toc li.item a.cur{background:var(--teal);color:#042028;font-weight:700}
+.toc li.item a i{font-style:normal;opacity:.5;font-size:12px;min-width:20px}
+
+/* ---------- MODAL (guide) ---------- */
+.modal{position:fixed;inset:0;z-index:90;background:rgba(2,10,16,.85);backdrop-filter:blur(6px);display:none;overflow:auto;padding:30px 16px}
+.modal.open{display:block}
+.modal .sheet{max-width:920px;margin:0 auto;background:#071c2a;border:1px solid var(--line);border-radius:var(--radius);padding:26px 28px;box-shadow:var(--shadow)}
+.modal .x{position:sticky;top:0;float:inline-end;margin:-10px -10px 0 0}
+
+/* ---------- COVER ---------- */
+.cover{text-align:center;padding-top:14px}
+.cover .meta{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:26px}
+.cover .meta div{
+  background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:11px 18px;font-size:15px;
+}
+.cover .meta b{display:block;color:var(--gold);font-size:13px;font-weight:700}
+.logo-row{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:8px;opacity:.85;font-size:13.5px;color:var(--txt-dim)}
+.kbdhelp{margin-top:34px;font-size:14px;color:var(--txt-dim)}
+.kbdhelp kbd{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:2px 8px;margin:0 2px;font-family:inherit}
+
+.pill{display:inline-block;background:rgba(47,212,212,.12);border:1px solid var(--line2);border-radius:20px;padding:3px 12px;font-size:13.5px;margin:3px 3px 3px 0;color:var(--teal)}
+.pill.g{background:rgba(245,196,94,.1);border-color:var(--gold-dim);color:var(--gold)}
+.pill.r{background:rgba(255,107,107,.1);border-color:#7a3838;color:#ff9b9b}
+.ltr{direction:ltr;unicode-bidi:isolate}
+
+.checklist{list-style:none;padding:0;margin:12px 0}
+.checklist li{padding:9px 0;border-bottom:1px dashed var(--line);display:flex;gap:11px;align-items:flex-start}
+.checklist li:last-child{border:0}
+.checklist input{margin-top:9px;accent-color:var(--teal);width:17px;height:17px;flex:none}
+.checklist label{cursor:pointer;flex:1}
+
+.big-num{font-size:44px;font-weight:900;color:var(--gold);line-height:1.2}
+.center{text-align:center}
+.muted{color:var(--txt-dim)}
+.sm{font-size:14.5px}
+
+/* ---------- PRINT ---------- */
+@media print{
+  .topbar,.nav,.progress,.drawer,.modal,.copy{display:none!important}
+  body{background:#fff;color:#111}
+  .stage{padding:0}
+  .slide{display:block!important;page-break-after:always;max-width:none;border-bottom:1px solid #ccc;padding-bottom:20px}
+  .card,.prompt,details,pre{background:#f6f8fa!important;color:#111!important;border-color:#ccd!important;box-shadow:none}
+  h1,h2,.card h4{color:#0a2333!important}
+  .notes{display:block!important}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand"><span class="dot"></span> کارگاه طراحی سایت با هوش مصنوعی <span class="sub">— راهنمای مدرس</span></div>
+  <div class="spacer"></div>
+  <span id="paceTag">تایمر خاموش</span>
+  <button class="btn" id="timerBox" title="شروع/توقف تایمر (T)">۰۰:۰۰</button>
+  <button class="btn" id="btnNotes" title="یادداشت مدرس (N)">🎙 نُت</button>
+  <button class="btn gold" id="btnGuide" title="راهنمای کامل اجرا (G)">📋 پلن اجرا</button>
+  <button class="btn" id="btnToc" title="فهرست (M)">☰</button>
+</div>
+<div class="progress"><i id="bar" style="width:0"></i></div>
+
+<main class="stage" id="stage">
+
+<!-- ============ 0. COVER ============ -->
+<section class="slide active" data-sec="شروع" data-min="0">
+  <div class="cover">
+    <div class="logo-row">کمیته تحقیقات و فناوری دانشجویی واحد پردیس بین‌الملل · با همکاری کمیته توسعه آموزش دانشگاه علوم پزشکی شهید صدوقی یزد</div>
+    <span class="eyebrow">کارگاه آنلاین · بدون نیاز به دانش برنامه‌نویسی</span>
+    <h1>طراحی سایت<br>با هوش مصنوعی</h1>
+    <p class="lead" style="margin:0 auto">از صفر تا یک سایت واقعی روی دامنه‌ی خودت — در ۲ ساعت</p>
+    <div class="meta">
+      <div><b>مدرس</b> سبحان عفتی</div>
+      <div><b>زمان</b> پنجشنبه ۲۶ شهریور ۱۴۰۵ · ۱۰ تا ۱۲</div>
+      <div><b>بستر</b> اسکای‌روم + ضبط جلسه</div>
+      <div><b>گواهی</b> معتبر، پس از کارگاه</div>
+    </div>
+    <p class="kbdhelp">
+      حرکت بین اسلایدها: <kbd>←</kbd> <kbd>→</kbd> یا <kbd>Space</kbd> ·
+      یادداشت مدرس: <kbd>N</kbd> · فهرست: <kbd>M</kbd> · پلن اجرا: <kbd>G</kbd> · تایمر: <kbd>T</kbd> · تمام‌صفحه: <kbd>F</kbd>
+    </p>
+  </div>
+  <div class="notes">
+    <span class="say">«سلام به همگی، خوش اومدین. من سبحان عفتی هستم، دانشجوی پزشکی شهید صدوقی یزد. قراره تو دو ساعت آینده کاری کنیم که خیلی‌ها فکر می‌کنن ماه‌ها طول می‌کشه: ساختن یه سایت واقعی، بدون اینکه حتی یک خط کد بلد باشین.»</span>
+    ۳۰ ثانیه اول را صرف <b>انرژی دادن</b> کن، نه معرفی طولانی. قبل از شروع محتوا، یک سؤال در چت بپرس تا کلاس گرم شود:
+    <span class="say">«قبل از هر چیز، تو چت بنویسین: اسمتون + رشته‌تون + اگه سایت بسازین، اولین چیزی که توش می‌ذارین چیه؟»</span>
+    در حالی که جواب می‌دهند، اشتراک صفحه و صدا را چک کن.
+  </div>
+</section>
+
+<!-- ============ 1. PROMISE ============ -->
+<section class="slide" data-sec="شروع" data-min="4">
+  <span class="eyebrow">قرار ما</span>
+  <h2>ساعت ۱۲، شما این‌ها را دارید</h2>
+  <div class="grid g2">
+    <div class="card"><h4><span class="ico">🌐</span> یک سایت زنده</h4><p>یک سایت شخصی/رزومه‌ای که روی اینترنت بالا آمده و هرکسی با آدرسش می‌تواند ببیندش.</p></div>
+    <div class="card"><h4><span class="ico">🧠</span> مهارت پرامپت‌نویسی</h4><p>می‌دانید چطور از هوش مصنوعی کد بگیرید، اصلاحش کنید و خطایش را رفع کنید.</p></div>
+    <div class="card"><h4><span class="ico g">🗺</span> نقشه راه</h4><p>می‌دانید دامنه، هاست، SSL، دیتابیس چه هستند و کجای پازل قرار می‌گیرند.</p></div>
+    <div class="card"><h4><span class="ico g">🔁</span> قابلیت تکرار</h4><p>فردا برای پروژه، مطب، استارتاپ یا کلینیک خودتان دوباره همین کار را می‌کنید.</p></div>
+  </div>
+  <div class="note ok"><b>جمله‌ی کلیدی که باید جا بیفتد</b>
+  هوش مصنوعی جای برنامه‌نویس را نمی‌گیرد؛ ولی جای <b>«بلد نبودن شروع کردن»</b> را می‌گیرد.</div>
+  <div class="notes">
+    اینجا <b>انتظار را تنظیم کن</b>. نگو «متخصص می‌شین»؛ بگو «راه‌انداز می‌شین».
+    <span class="say">«من قرار نیست دو ساعته شما رو برنامه‌نویس کنم — کسی نمی‌تونه. ولی قراره کاری کنم که دیگه هیچ‌وقت جمله‌ی "بلد نیستم سایت بسازم" رو نگین.»</span>
+    اگر دمویی از سایت آماده داری، <b>همین‌جا</b> نشانش بده (۲۰ ثانیه). دیدن نتیجه‌ی نهایی در ابتدا، انگیزه‌ی کل کارگاه را می‌سازد.
+  </div>
+</section>
+
+<!-- ============ 2. RULES ============ -->
+<section class="slide" data-sec="شروع" data-min="6">
+  <span class="eyebrow">قوانین دوستانه</span>
+  <h2>چطور بیشترین استفاده را ببرید</h2>
+  <ul class="bullets">
+    <li><b>میکروفن‌ها بسته، چت باز.</b> هر سؤالی داشتید همان لحظه در چت بنویسید؛ من سر هر بخش جواب می‌دهم.</li>
+    <li><b>هرجا گم شدید، بنویسید «گم شدم».</b> جدی می‌گویم — این جمله برای من مهم‌ترین بازخورد است.</li>
+    <li><b>جلسه ضبط می‌شود.</b> پس اگر جایی جا ماندید، استرس نگیرید؛ لینک ضبط برایتان ارسال می‌شود.</li>
+    <li><b>همراه من انجام بدهید.</b> اگر می‌توانید، پنجره را نصف کنید: نصف من، نصف کار خودتان.</li>
+    <li><b>اشتباه کردن بخشی از کار است.</b> خطا گرفتن یعنی دارید واقعاً کار می‌کنید.</li>
+  </ul>
+  <div class="note warn"><b>پیش‌نیاز فنی (همین حالا چک کنید)</b>
+  یک مرورگر · اینترنت · حساب کاربری در یک ابزار هوش مصنوعی (ChatGPT / Claude / Gemini) · حدود ۱۵۰ مگابایت فضای خالی برای XAMPP</div>
+  <div class="notes">
+    این اسلاید را سریع رد کن (۹۰ ثانیه). ولی روی «گم شدم» تأکید کن — <b>اجازه دادن برای نفهمیدن</b>، ریزش کلاس را کم می‌کند.
+    <span class="say">«یه قانون داریم: هرکی هرجا گم شد، فقط تو چت بنویسه "گم شدم". من صبر می‌کنم. اینجا کسی قرار نیست ادای بلد بودن دربیاره.»</span>
+  </div>
+</section>
+
+<!-- ============ 3. ROADMAP ============ -->
+<section class="slide" data-sec="شروع" data-min="8">
+  <span class="eyebrow">نقشه راه</span>
+  <h2>مسیر امروز، در ۵ قدم</h2>
+  <div class="flow">
+    <div class="step"><div class="n">۱</div><b>مفاهیم پایه</b><small>دامنه، هاست، SSL، cPanel<br>سایت اصلاً چیست؟</small></div>
+    <div class="step"><div class="n">۲</div><b>لوکال‌هاست</b><small>XAMPP، آشنایی با PHP و MySQL<br>سایت روی کامپیوتر خودم</small></div>
+    <div class="step"><div class="n">۳</div><b>ساخت با AI</b><small>پرامپت‌نویسی، گرفتن کد<br>قلب کارگاه</small></div>
+    <div class="step"><div class="n">۴</div><b>کار با کد AI</b><small>اصلاح، ریسپانسیو، رفع خطا<br>بدون دانش قبلی</small></div>
+    <div class="step"><div class="n">۵</div><b>انتقال به هاست</b><small>File Manager، اتصال دامنه<br>سایت روی اینترنت</small></div>
+  </div>
+  <div class="note"><b>ذهنیت درست</b>
+  قدم‌های ۱ و ۲ «زیرساخت»‌اند و کمی خشک — ولی بدون آن‌ها قدم ۵ ممکن نیست. تحمل کنید، شیرینی کار از قدم ۳ شروع می‌شود.</div>
+  <div class="notes">
+    این اسلاید <b>لنگر ذهنی</b> کلاس است. هر بار که بخش عوض می‌شود، به همین تصویر برگرد و بگو «الان اینجاییم».
+    <span class="say">«این پنج تا قدم رو یادتون باشه. من سر هر قدم برمی‌گردم به همین تصویر و می‌گم کجای مسیریم، که هیچ‌وقت گم نشین.»</span>
+    زمان‌بندی تقریبی هر قدم: ۱۲ + ۱۵ + ۲۵ + ۲۰ + ۲۰ دقیقه، با ۱۵ دقیقه پرسش و پاسخ پراکنده.
+  </div>
+</section>
+
+<!-- ============ SECTION 1: BASICS ============ -->
+<section class="slide" data-sec="۱. مفاهیم پایه" data-min="10">
+  <span class="eyebrow">قدم ۱ از ۵</span>
+  <h1>سایت اصلاً چیست؟</h1>
+  <p class="lead">قبل از اینکه چیزی بسازیم، باید بدانیم داریم چه می‌سازیم. با یک تشبیه ساده جلو می‌رویم: <b class="hl-g">ساختن یک مغازه</b>.</p>
+  <div class="grid g4" style="margin-top:22px">
+    <div class="card center"><div style="font-size:34px">🏠</div><h4 style="justify-content:center">هاست</h4><p>زمین و ساختمان مغازه</p></div>
+    <div class="card center"><div style="font-size:34px">🪧</div><h4 style="justify-content:center">دامنه</h4><p>تابلو و آدرس مغازه</p></div>
+    <div class="card center"><div style="font-size:34px">🗺</div><h4 style="justify-content:center">DNS</h4><p>نقشه‌ای که آدرس را به مغازه می‌رساند</p></div>
+    <div class="card center"><div style="font-size:34px">🔒</div><h4 style="justify-content:center">SSL</h4><p>قفل و دوربین امنیتی مغازه</p></div>
+  </div>
+  <div class="notes">
+    این تشبیه را <b>تا آخر کارگاه</b> نگه دار و مدام به آن ارجاع بده. ذهن غیرفنی با استعاره یاد می‌گیرد، نه با تعریف.
+    <span class="say">«فرض کنین می‌خواین یه مغازه بزنین. اول یه ملک می‌خواین — این می‌شه هاست. بعد یه تابلو با اسم مغازه — این می‌شه دامنه. بعد باید تو نقشه‌های شهر ثبت بشه که مردم پیداش کنن — این می‌شه DNS. و آخرش یه قفل و دزدگیر — این می‌شه SSL.»</span>
+  </div>
+</section>
+
+<section class="slide" data-sec="۱. مفاهیم پایه" data-min="13">
+  <span class="eyebrow">دامنه</span>
+  <h2>🪧 دامنه: آدرس سایت شما</h2>
+  <p class="lead">همان چیزی که کاربر در مرورگر تایپ می‌کند: <code>sobhan-efati.ir</code></p>
+  <div class="grid g3">
+    <div class="card"><h4>پسوند (TLD)</h4><p><span class="pill ltr">.com</span><span class="pill ltr">.ir</span><span class="pill ltr">.org</span><span class="pill ltr">.net</span><span class="pill ltr">.me</span><span class="pill ltr">.app</span></p></div>
+    <div class="card"><h4>قیمت تقریبی سالانه</h4><p><b class="ltr">.ir</b> حدود ۳۰ هزار تومان — ارزان‌ترین گزینه<br><b class="ltr">.com</b> حدود ۸۰۰ هزار تا ۱ میلیون تومان</p></div>
+    <div class="card"><h4>از کجا بخریم؟</h4><p><b class="ltr">.ir</b> از <a href="https://www.nic.ir" target="_blank" rel="noopener">ایرنیک (nic.ir)</a> یا نمایندگی‌ها<br><b class="ltr">.com</b> از هر ارائه‌دهنده معتبر</p></div>
+  </div>
+  <details><summary>چطور یک نام دامنه‌ی خوب انتخاب کنم؟</summary><div class="in">
+    <ul class="bullets sm">
+      <li><b>کوتاه و قابل تلفظ:</b> اگر نتوانید پای تلفن بگویید، نام بدی است.</li>
+      <li><b>بدون خط تیره و عدد</b> تا جای ممکن (باعث اشتباه تایپی می‌شود).</li>
+      <li><b>نام خودتان عالی است</b> برای رزومه علمی: <code>name-family.ir</code></li>
+      <li><b>اول ثبت، بعد تبلیغ:</b> قبل از چاپ روی کارت ویزیت، مطمئن شوید ثبت شده.</li>
+      <li>در <a href="https://www.nic.ir" target="_blank" rel="noopener">ایرنیک</a> می‌توانید آزاد بودن دامنه <code>.ir</code> را رایگان استعلام کنید.</li>
+    </ul>
+  </div></details>
+  <details><summary>دامنه‌ی رایگان هم داریم؟</summary><div class="in">
+    <p>بله، اما با محدودیت. اگر فعلاً نمی‌خواهید هزینه کنید، می‌توانید از زیردامنه‌های رایگان استفاده کنید:</p>
+    <p><span class="pill ltr">username.github.io</span><span class="pill ltr">yoursite.netlify.app</span><span class="pill ltr">yoursite.vercel.app</span></p>
+    <p>این‌ها برای نمونه‌کار و رزومه کاملاً کافی‌اند و در انتهای کارگاه به آن‌ها برمی‌گردیم. فقط توجه کنید: این‌ها <b>PHP اجرا نمی‌کنند</b> (فقط HTML/CSS/JS).</p>
+  </div></details>
+  <div class="notes">
+    اینجا پرسش «چقدر هزینه دارد؟» حتماً می‌آید. <b>خودت زودتر جوابش را بده</b> تا اعتماد بسازی.
+    <span class="say">«یه نکته‌ی مهم: دامنه‌ی .ir سالی حدود سی هزار تومنه. یعنی کمتر از یه فنجون قهوه. پس بهونه‌ی گرون بودن نداریم.»</span>
+    اگر وقت داری، زنده در nic.ir یک دامنه را استعلام کن — این «دیدن با چشم» خیلی مؤثرتر از توضیح است.
+  </div>
+</section>
+
+<section class="slide" data-sec="۱. مفاهیم پایه" data-min="16">
+  <span class="eyebrow">هاست</span>
+  <h2>🏠 هاست: جایی که فایل‌های سایت زندگی می‌کنند</h2>
+  <p class="lead">هاست یعنی یک کامپیوتر (سرور) که <b>۲۴ ساعته روشن است</b> و به اینترنت وصل، و فایل‌های سایت شما روی آن قرار دارد.</p>
+  <table>
+    <tr><th>نوع</th><th>مناسب چه کسی</th><th>قیمت تقریبی</th></tr>
+    <tr><td><b>هاست اشتراکی</b><br>Shared Hosting</td><td>۹۵٪ افراد این جلسه — سایت شخصی، رزومه، وبلاگ، سایت کلینیک</td><td>سالی ۳۰۰ تا ۸۰۰ هزار تومان</td></tr>
+    <tr><td><b>سرور مجازی</b><br>VPS</td><td>سایت‌های پربازدید یا پروژه‌های خاص</td><td>ماهی ۳۰۰ هزار تومان به بالا</td></tr>
+    <tr><td><b>سرور اختصاصی</b></td><td>شرکت‌ها و سرویس‌های بزرگ</td><td>خیلی گران</td></tr>
+  </table>
+  <div class="note"><b>برای امروز</b> هاست اشتراکی لینوکسی با کنترل‌پنل cPanel بگیرید. دقیقاً همان چیزی است که در این کارگاه کار می‌کنیم.</div>
+  <details><summary>هاست ایرانی یا خارجی؟</summary><div class="in">
+    <p><b>هاست ایرانی:</b> سرعت بالاتر برای کاربران داخل ایران، پشتیبانی فارسی، پرداخت ریالی ساده، و برای دامنه <code>.ir</code> طبیعی‌تر است. برای سایت شخصی و دانشگاهی گزینه‌ی منطقی است.</p>
+    <p><b>هاست خارجی:</b> برای مخاطب بین‌المللی بهتر است، ولی پرداخت ارزی و گاهی محدودیت‌های دسترسی دارد.</p>
+    <p><b>پیشنهاد من برای شما:</b> هاست ایرانی، لینوکس، cPanel، پلن اقتصادی با حداقل ۵۰۰ مگابایت فضا. همین کافی است.</p>
+  </div></details>
+  <details><summary>موقع خرید هاست دنبال چه چیزهایی باشم؟</summary><div class="in">
+    <ul class="bullets sm">
+      <li><b>کنترل‌پنل cPanel</b> (یا DirectAdmin) — نه پنل اختصاصی ناشناخته</li>
+      <li><b>پشتیبانی PHP نسخه ۸ به بالا</b> و <b>MySQL / MariaDB</b></li>
+      <li><b>SSL رایگان (Let's Encrypt)</b> — نباید بابتش پول بگیرند</li>
+      <li><b>بکاپ‌گیری خودکار</b> و <b>گارانتی بازگشت وجه</b></li>
+      <li><b>پشتیبانی ۲۴ ساعته با تیکت</b> — این را با یک تیکت تست کنید</li>
+    </ul>
+  </div></details>
+  <div class="notes">
+    <b>هیچ برند خاصی را تبلیغ نکن.</b> فقط معیار بده. اگر پرسیدند «کدوم شرکت؟» بگو معیارها را بگویم شما مقایسه کنید — این حرفه‌ای‌تر است و جای شبهه نمی‌گذارد.
+    <span class="say">«من اسم هیچ شرکتی رو نمی‌برم، چون قرار نیست اینجا تبلیغ بشه. به‌جاش بهتون معیار می‌دم؛ با این معیارها خودتون بهترین رو انتخاب می‌کنین.»</span>
+  </div>
+</section>
+
+<section class="slide" data-sec="۱. مفاهیم پایه" data-min="19">
+  <span class="eyebrow">DNS و SSL</span>
+  <h2>🗺 DNS و 🔒 SSL — دو قطعه‌ی گمشده</h2>
+  <div class="grid g2">
+    <div class="card">
+      <h4><span class="ico">🗺</span> DNS چیست؟</h4>
+      <p>دفترچه تلفن اینترنت. کاربر می‌نویسد <code>mysite.ir</code>، DNS آن را ترجمه می‌کند به آدرس عددی سرور (مثل <code>185.4.x.x</code>).</p>
+      <p style="margin-top:10px">کار عملی شما فقط یک چیز است: <b>Nameserver های هاست را در پنل دامنه وارد کنید.</b></p>
+    </div>
+    <div class="card">
+      <h4><span class="ico g">🔒</span> SSL چیست؟</h4>
+      <p>گواهی امنیتی که باعث می‌شود آدرس سایت با <b>https</b> و قفل سبز باز شود و اطلاعات کاربر رمزنگاری شود.</p>
+      <p style="margin-top:10px">بدون آن، مرورگر به کاربر هشدار <b>«Not Secure»</b> می‌دهد و گوگل هم سایت را پایین‌تر نشان می‌دهد.</p>
+    </div>
+  </div>
+  <div class="note ok"><b>خبر خوب</b> SSL امروز <b>رایگان</b> است. در cPanel بخشی به نام <b>SSL/TLS Status</b> یا <b>Let's Encrypt</b> هست؛ یک کلیک، و تمام.</div>
+  <div class="note warn"><b>نکته‌ای که همه را گیج می‌کند</b> بعد از وارد کردن Nameserver، تا <b>چند ساعت (گاهی تا ۲۴ ساعت)</b> طول می‌کشد تا در کل اینترنت پخش شود. اگر سایتتان بلافاصله بالا نیامد، خراب نشده — فقط صبر کنید.</div>
+  <div class="notes">
+    نکته‌ی «۲۴ ساعت صبر» را حتماً بگو، وگرنه فردا ۲۰ نفر پیام می‌دهند «سایتم بالا نیومد».
+    <span class="say">«این یکی رو با خط قرمز یادداشت کنین: بعد از وصل کردن دامنه، ممکنه چند ساعت طول بکشه. اگه بلافاصله بالا نیومد، چیزی خراب نشده؛ فقط اینترنت داره خبردار می‌شه.»</span>
+  </div>
+</section>
+
+<section class="slide" data-sec="۱. مفاهیم پایه" data-min="22">
+  <span class="eyebrow">cPanel</span>
+  <h2>🎛 cPanel: داشبورد مدیریت سایت</h2>
+  <p class="lead">cPanel رابط گرافیکی هاست است. یعنی به‌جای دستورهای پیچیده، با کلیک کار می‌کنید. این چند بخش را امروز لازم داریم:</p>
+  <div class="grid g3">
+    <div class="card"><h4>📁 File Manager</h4><p>مدیریت فایل‌های سایت. <b>مهم‌ترین بخش برای ما.</b> آپلود، حذف، ویرایش.</p></div>
+    <div class="card"><h4>🗄 MySQL Databases</h4><p>ساخت دیتابیس و کاربر دیتابیس برای بخش‌های پویای سایت.</p></div>
+    <div class="card"><h4>🔐 SSL/TLS Status</h4><p>فعال کردن گواهی امنیتی و https با یک کلیک.</p></div>
+    <div class="card"><h4>🐘 Select PHP Version</h4><p>انتخاب نسخه‌ی PHP. معمولاً ۸.۱ یا بالاتر انتخاب کنید.</p></div>
+    <div class="card"><h4>📧 Email Accounts</h4><p>ساخت ایمیل روی دامنه‌ی خودتان: <code>info@yoursite.ir</code></p></div>
+    <div class="card"><h4>🔎 phpMyAdmin</h4><p>مشاهده و ویرایش جدول‌های دیتابیس به صورت گرافیکی.</p></div>
+  </div>
+  <div class="note"><b>قانون طلایی</b> فایل‌های سایت شما <b>حتماً</b> باید داخل پوشه‌ای به نام <b class="hl">public_html</b> قرار بگیرند. هرچیزی بیرون این پوشه، از اینترنت دیده نمی‌شود.</div>
+  <div class="notes">
+    اگر به cPanel دسترسی زنده داری، <b>همین‌جا</b> اشتراک صفحه بگذار و یک تور ۲ دقیقه‌ای بده. دیدن محیط واقعی، ترس را می‌ریزد.
+    <span class="say">«این محیط شاید اولش شلوغ به‌نظر برسه، ولی ما فقط با شیش تا از این آیکون‌ها کار داریم. بقیه‌ش رو می‌تونین فعلاً نادیده بگیرین.»</span>
+    اگر دسترسی نداری، از پلن B استفاده کن: اسکرین‌شات‌های از پیش آماده. <b>هرگز وسط کلاس دنبال دسترسی نگرد.</b>
+  </div>
+</section>
+
+<section class="slide" data-sec="۱. مفاهیم پایه" data-min="25">
+  <span class="eyebrow">مفهوم کلیدی</span>
+  <h2>فرانت‌اند و بک‌اند — تفاوت در یک نگاه</h2>
+  <div class="grid g2">
+    <div class="card">
+      <h4><span class="ico">🎨</span> فرانت‌اند (Front-end)</h4>
+      <p>هرچیزی که کاربر <b>می‌بیند</b>: رنگ‌ها، دکمه‌ها، متن‌ها، عکس‌ها، انیمیشن.</p>
+      <p style="margin-top:10px"><span class="pill">HTML — اسکلت</span><span class="pill">CSS — ظاهر</span><span class="pill">JavaScript — رفتار</span></p>
+      <p style="margin-top:10px" class="sm">تشبیه: دکوراسیون و ویترین مغازه.</p>
+    </div>
+    <div class="card">
+      <h4><span class="ico g">⚙️</span> بک‌اند (Back-end)</h4>
+      <p>هرچیزی که <b>پشت صحنه</b> اتفاق می‌افتد: ذخیره اطلاعات فرم، ورود کاربر، جست‌وجو.</p>
+      <p style="margin-top:10px"><span class="pill g">PHP — منطق</span><span class="pill g">MySQL — دیتابیس</span></p>
+      <p style="margin-top:10px" class="sm">تشبیه: انبار و حسابداری مغازه.</p>
+    </div>
+  </div>
+  <div class="note"><b>برای یک سایت رزومه‌ای ساده</b> فقط HTML و CSS کافی است! PHP و MySQL وقتی لازم می‌شوند که بخواهید <b>اطلاعات ذخیره کنید</b> — مثلاً فرم تماس یا لیست مقالات.</div>
+  <div class="notes">
+    این اسلاید ترس «چقدر چیز باید یاد بگیرم» را کم می‌کند.
+    <span class="say">«خبر خوب اینه که برای چیزی که امروز می‌سازیم، شما نیازی ندارین هیچ‌کدوم از این‌ها رو یاد بگیرین. فقط باید بدونین کدوم چیه، که وقتی به هوش مصنوعی می‌گین چی می‌خواین، درست بگین.»</span>
+  </div>
+</section>
+
+<!-- ============ SECTION 2: LOCALHOST ============ -->
+<section class="slide" data-sec="۲. لوکال‌هاست" data-min="28">
+  <span class="eyebrow">قدم ۲ از ۵</span>
+  <h1>لوکال‌هاست<br>سایت روی کامپیوتر خودتان</h1>
+  <p class="lead">قبل از اینکه چیزی را روی اینترنت بفرستیم، آن را روی کامپیوتر خودمان می‌سازیم و تست می‌کنیم. این محیط را <b class="hl">لوکال‌هاست</b> می‌گویند.</p>
+  <div class="grid g3" style="margin-top:20px">
+    <div class="card"><h4>💸 رایگان است</h4><p>برای تمرین لازم نیست هاست بخرید.</p></div>
+    <div class="card"><h4>⚡ سریع است</h4><p>هر تغییر را با یک رفرش می‌بینید، بدون آپلود.</p></div>
+    <div class="card"><h4>🛡 امن است</h4><p>خرابکاری کنید! هیچ‌کس نمی‌بیند و هیچ‌چیز خراب نمی‌شود.</p></div>
+  </div>
+  <div class="notes">
+    <span class="say">«یه اتاق تمرین لازم داریم. جایی که بتونیم هرچقدر می‌خوایم خراب‌کاری کنیم و هیچ‌کس نبینه. اسم این اتاق تمرین لوکال‌هاسته.»</span>
+    اگر وقت کم آوردی، این بخش قابل فشرده‌سازی به ۸ دقیقه است: فقط نصب XAMPP + باز کردن یک فایل HTML. PHP/MySQL را می‌توانی به بخش پرسش و پاسخ موکول کنی.
+  </div>
+</section>
+
+<section class="slide" data-sec="۲. لوکال‌هاست" data-min="31">
+  <span class="eyebrow">عملی</span>
+  <h2>نصب و راه‌اندازی XAMPP</h2>
+  <p class="lead">XAMPP یک بسته‌ی رایگان است که وب‌سرور (Apache)، دیتابیس (MySQL) و PHP را یک‌جا نصب می‌کند.</p>
+  <ol class="steps">
+    <li><b>دانلود:</b> از <a href="https://www.apachefriends.org" target="_blank" rel="noopener">apachefriends.org</a> نسخه مناسب ویندوز/مک را بگیرید.</li>
+    <li><b>نصب:</b> همه‌ی گزینه‌ها را پیش‌فرض بگذارید و Next بزنید. مسیر نصب را تغییر ندهید.</li>
+    <li><b>اجرای Control Panel:</b> بعد از نصب، پنل کنترل XAMPP را باز کنید.</li>
+    <li><b>روشن کردن سرویس‌ها:</b> روبه‌روی <b>Apache</b> و <b>MySQL</b> دکمه <b>Start</b> را بزنید. هر دو باید سبز شوند.</li>
+    <li><b>تست:</b> در مرورگر آدرس <code>http://localhost</code> را باز کنید. اگر صفحه‌ی خوش‌آمد XAMPP آمد، تمام است. ✅</li>
+  </ol>
+  <div class="note warn"><b>شایع‌ترین خطا: Apache روشن نمی‌شود (Port 80 in use)</b>
+  معمولاً اسکایپ، IIS یا یک برنامه دیگر پورت ۸۰ را گرفته. راه‌حل سریع: در XAMPP روی <b>Config → httpd.conf</b> بزنید، عدد <code>Listen 80</code> را به <code>Listen 8080</code> تغییر دهید و سپس سایت را با <code>http://localhost:8080</code> باز کنید.</div>
+  <details><summary>پوشه‌ی سایت من کجاست؟ (خیلی مهم)</summary><div class="in">
+    <p>همه‌ی فایل‌های سایت شما باید در این مسیر باشند:</p>
+    <div class="codewrap"><button class="copy">کپی</button><pre>C:\xampp\htdocs\</pre></div>
+    <p>یک پوشه‌ی جدید داخلش بسازید، مثلاً <code>mysite</code>. آنگاه سایت شما از این آدرس باز می‌شود:</p>
+    <div class="codewrap"><button class="copy">کپی</button><pre>http://localhost/mysite</pre></div>
+    <p>در مک، این مسیر معمولاً <code>/Applications/XAMPP/htdocs/</code> است.</p>
+    <p><b>قاعده‌ی طلایی:</b> <code>htdocs</code> در لوکال‌هاست، دقیقاً معادل <code>public_html</code> روی هاست واقعی است. یعنی همان‌جایی که فایل‌ها باید باشند.</p>
+  </div></details>
+  <div class="notes">
+    <b>پلن B را از قبل آماده داشته باش.</b> همیشه ۲۰٪ کلاس در نصب گیر می‌کنند. به آن‌ها بگو نگران نباشند و با فایل‌های آماده یا ویرایشگر آنلاین ادامه دهند.
+    <span class="say">«اگه نصب براتون طول کشید، اصلاً نگران نباشین. ادامه‌ی کارگاه رو تماشا کنین و بعداً با ویدیوی ضبط‌شده نصب کنین. از قافله عقب نمی‌مونین.»</span>
+    اگر خواستی سریع‌تر پیش بروی، گزینه‌ی بدون‌نصب را معرفی کن: <b>CodePen</b> یا <b>VS Code + Live Server</b> برای HTML/CSS خالص کافی است.
+  </div>
+</section>
+
+<section class="slide" data-sec="۲. لوکال‌هاست" data-min="36">
+  <span class="eyebrow">اولین فایل</span>
+  <h2>اولین صفحه‌ی وب شما — ۶۰ ثانیه</h2>
+  <p class="lead">یک فایل با نام <b class="hl">index.html</b> بسازید، این را داخلش بریزید و ذخیره کنید:</p>
+  <div class="codewrap"><button class="copy">کپی</button><pre>&lt;<span class="t">!DOCTYPE html</span>&gt;
+&lt;<span class="t">html</span> <span class="k">lang</span>=<span class="s">"fa"</span> <span class="k">dir</span>=<span class="s">"rtl"</span>&gt;
+&lt;<span class="t">head</span>&gt;
+  &lt;<span class="t">meta</span> <span class="k">charset</span>=<span class="s">"utf-8"</span>&gt;
+  &lt;<span class="t">title</span>&gt;سایت من&lt;/<span class="t">title</span>&gt;
+&lt;/<span class="t">head</span>&gt;
+&lt;<span class="t">body</span> <span class="k">style</span>=<span class="s">"font-family:Tahoma; text-align:center; padding:60px"</span>&gt;
+  &lt;<span class="t">h1</span>&gt;سلام! این اولین سایت من است 🎉&lt;/<span class="t">h1</span>&gt;
+  &lt;<span class="t">p</span>&gt;ساخته‌شده در کارگاه طراحی سایت با هوش مصنوعی&lt;/<span class="t">p</span>&gt;
+&lt;/<span class="t">body</span>&gt;
+&lt;/<span class="t">html</span>&gt;</pre></div>
+  <div class="grid g3">
+    <div class="card"><h4>index.html</h4><p>این نام <b>جادویی</b> است. سرور به‌طور خودکار این فایل را به‌عنوان صفحه‌ی اول باز می‌کند.</p></div>
+    <div class="card"><h4>dir="rtl"</h4><p>این یعنی متن از راست به چپ. برای سایت فارسی <b>حتماً</b> لازم است.</p></div>
+    <div class="card"><h4>charset="utf-8"</h4><p>بدون این، فارسی به‌صورت علامت‌های نامفهوم نمایش داده می‌شود.</p></div>
+  </div>
+  <div class="notes">
+    این لحظه‌ی <b>«وااای شد!»</b> کلاس است. حتماً زنده انجامش بده و مرورگر را رفرش کن.
+    <span class="say">«همینه. همین ده خط، یه صفحه‌ی وبه. تبریک می‌گم، الان رسماً یه صفحه‌ی وب ساختین.»</span>
+    بعدش یک کار کوچک بده: «متن رو به اسم خودتون تغییر بدین و رفرش کنین». این تعامل ساده، تمام کلاس را درگیر می‌کند.
+  </div>
+</section>
+
+<section class="slide" data-sec="۲. لوکال‌هاست" data-min="40">
+  <span class="eyebrow">آشنایی مقدماتی</span>
+  <h2>🐘 PHP در سه دقیقه</h2>
+  <p class="lead">PHP یک زبان است که <b>روی سرور</b> اجرا می‌شود و خروجی‌اش HTML است. فایلش پسوند <code>.php</code> دارد و <b>حتماً</b> باید از طریق لوکال‌هاست باز شود (نه با دابل‌کلیک).</p>
+  <div class="codewrap"><button class="copy">کپی</button><pre><span class="c">&lt;?php</span>
+  <span class="c">// متغیر: جعبه‌ای برای نگه‌داشتن اطلاعات</span>
+  <span class="k">$name</span> = <span class="s">"سبحان"</span>;
+
+  <span class="c">// چاپ کردن در صفحه</span>
+  <span class="k">echo</span> <span class="s">"سلام "</span> . <span class="k">$name</span>;
+
+  <span class="c">// شرط: اگر ... آنگاه ...</span>
+  <span class="k">if</span> (date(<span class="s">"H"</span>) &lt; 12) {
+      <span class="k">echo</span> <span class="s">" — صبح بخیر!"</span>;
+  } <span class="k">else</span> {
+      <span class="k">echo</span> <span class="s">" — روز بخیر!"</span>;
+  }
+<span class="c">?&gt;</span></pre></div>
+  <div class="note"><b>تفاوت کلیدی با HTML</b>
+  HTML همیشه یک چیز ثابت نشان می‌دهد. PHP می‌تواند <b>بسته به شرایط</b> چیز متفاوتی نشان دهد — مثل نمایش نام کاربر وارد شده، یا لیست مقالات از دیتابیس.</div>
+  <div class="notes">
+    <b>وارد جزئیات سینتکس نشو.</b> هدف فقط «حس گرفتن» است. اگر کسی پرسید «باید اینو حفظ کنم؟» جواب قاطع بده:
+    <span class="say">«نه. اصلاً. هدف این اسلاید فقط اینه که وقتی هوش مصنوعی برای شما کد PHP نوشت، غریبه به‌نظر نرسه و بدونین دارین به چی نگاه می‌کنین.»</span>
+  </div>
+</section>
+
+<section class="slide" data-sec="۲. لوکال‌هاست" data-min="44">
+  <span class="eyebrow">آشنایی مقدماتی</span>
+  <h2>🗄 MySQL در سه دقیقه</h2>
+  <p class="lead">دیتابیس یعنی یک <b>اکسل خیلی قدرتمند</b> که سایت می‌تواند اطلاعات را در آن ذخیره و از آن بازیابی کند.</p>
+  <div class="grid g3">
+    <div class="card"><h4>Database</h4><p>کل فایل اکسل. مثلاً <code>mysite_db</code></p></div>
+    <div class="card"><h4>Table</h4><p>یک شیت. مثلاً <code>messages</code> یا <code>users</code></p></div>
+    <div class="card"><h4>Row / Column</h4><p>هر سطر یک رکورد، هر ستون یک ویژگی (نام، ایمیل، تاریخ)</p></div>
+  </div>
+  <h3>ساخت دیتابیس در لوکال‌هاست</h3>
+  <ol class="steps">
+    <li>مرورگر: <code>http://localhost/phpmyadmin</code></li>
+    <li>روی <b>New</b> در ستون سمت چپ کلیک کنید.</li>
+    <li>یک نام بدهید (مثلاً <code>mysite_db</code>) و <b>Create</b> بزنید.</li>
+    <li>تمام! حالا PHP می‌تواند به آن وصل شود.</li>
+  </ol>
+  <details><summary>نمونه دستور ساخت جدول (لازم نیست حفظ کنید)</summary><div class="in">
+    <div class="codewrap"><button class="copy">کپی</button><pre><span class="k">CREATE TABLE</span> messages (
+  id <span class="k">INT</span> AUTO_INCREMENT <span class="k">PRIMARY KEY</span>,
+  name <span class="k">VARCHAR</span>(100) <span class="k">NOT NULL</span>,
+  email <span class="k">VARCHAR</span>(150) <span class="k">NOT NULL</span>,
+  message <span class="k">TEXT</span> <span class="k">NOT NULL</span>,
+  created_at <span class="k">TIMESTAMP</span> <span class="k">DEFAULT</span> CURRENT_TIMESTAMP
+);</pre></div>
+    <p>این را می‌توانید در phpMyAdmin در تب <b>SQL</b> پیست کنید و Go بزنید. یا ساده‌تر: از هوش مصنوعی بخواهید برایتان بسازد!</p>
+  </div></details>
+  <div class="note ok"><b>خبر خیلی خوب</b> شما قرار نیست این دستورها را بنویسید. فقط باید <b>بدانید وجود دارند</b> تا بتوانید از AI درست بخواهید. در بخش بعد دقیقاً همین کار را می‌کنیم.</div>
+  <div class="notes">
+    اینجا <b>پل بزن به بخش بعدی</b> — تنش را بساز و آزاد کن:
+    <span class="say">«تا اینجا شاید با خودتون گفتین "اینا که همه‌ش کد و دستوره، من که اینا رو بلد نیستم". دقیقاً برای همین اینجاییم. از این لحظه به بعد، دیگه شما این‌ها رو نمی‌نویسین — هوش مصنوعی می‌نویسه. شما فقط باید بلد باشین درست بخواین.»</span>
+    اینجا جای <b>یک استراحت ۳ دقیقه‌ای</b> است اگر کلاس خسته شده. زمان: حدود دقیقه ۴۸.
+  </div>
+</section>
+
+<!-- ============ SECTION 3: AI ============ -->
+<section class="slide" data-sec="۳. ساخت با AI" data-min="48">
+  <span class="eyebrow">قدم ۳ از ۵ · قلب کارگاه</span>
+  <h1>حالا بریم سراغ<br>هوش مصنوعی</h1>
+  <p class="lead">از این‌جا به بعد، شما دیگر «کدنویس» نیستید. شما <b class="hl-g">کارفرما</b> هستید و هوش مصنوعی برنامه‌نویس شماست. و مثل هر کارفرمای خوبی، باید بلد باشید <b>دقیق سفارش بدهید</b>.</p>
+  <div class="note"><b>تغییر ذهنیت</b>
+  سؤال غلط: «چطور این کد را بنویسم؟»<br>
+  سؤال درست: <b class="hl">«چطور توضیح بدهم که دقیقاً چه می‌خواهم؟»</b></div>
+  <div class="notes">
+    اینجا <b>انرژی کلاس را بالا ببر</b>. این نقطه‌ی عطف کارگاه است و بیشترین ارزش اینجاست.
+    <span class="say">«خب! نصف سخت ماجرا تموم شد. از اینجا به بعد بخش شیرینشه. من به شما قول می‌دم تا بیست دقیقه دیگه یه سایت کامل جلوی چشمتون ساخته شده باشه.»</span>
+  </div>
+</section>
+
+<section class="slide" data-sec="۳. ساخت با AI" data-min="50">
+  <span class="eyebrow">مهم‌ترین مهارت</span>
+  <h2>آناتومی یک پرامپت خوب</h2>
+  <p class="lead">تفاوت بین «یه سایت برام بساز» و یک پرامپت حرفه‌ای، تفاوت بین یک خروجی بی‌ربط و یک سایت آماده است. هر پرامپت خوب <b>۵ جزء</b> دارد:</p>
+  <div class="grid g2">
+    <div class="card"><h4><span class="ico">۱</span> نقش</h4><p>به AI بگو کیست. «تو یک طراح وب حرفه‌ای هستی که سایت‌های فارسی می‌سازد.»</p></div>
+    <div class="card"><h4><span class="ico">۲</span> هدف</h4><p>دقیقاً چه می‌خواهی. «یک صفحه رزومه‌ی تک‌صفحه‌ای برای یک دانشجوی پزشکی.»</p></div>
+    <div class="card"><h4><span class="ico">۳</span> جزئیات</h4><p>بخش‌ها، رنگ‌ها، محتوا. «شامل: معرفی، سوابق پژوهشی، مهارت‌ها، تماس. رنگ اصلی آبی.»</p></div>
+    <div class="card"><h4><span class="ico g">۴</span> قالب خروجی</h4><p>چطور تحویل بدهد. «کد کامل در یک فایل HTML، با CSS داخلی، بدون توضیح اضافه.»</p></div>
+    <div class="card" style="grid-column:1/-1"><h4><span class="ico g">۵</span> محدودیت‌ها</h4><p>چه چیزی نباشد. «بدون کتابخانه‌ی خارجی، فونت فارسی وزیرمتن، راست‌چین، ریسپانسیو برای موبایل.»</p></div>
+  </div>
+  <div class="note warn"><b>قانون شماره یک</b> هرچه <b>دقیق‌تر</b> بگویید، خروجی <b>بهتر</b> است. AI ذهن شما را نمی‌خواند؛ فقط چیزی که نوشتید را می‌خواند.</div>
+  <div class="notes">
+    این اسلاید را <b>با یک تضاد زنده</b> نشان بده: اول یک پرامپت بد بنویس و خروجی بی‌کیفیت بگیر، بعد پرامپت خوب. تضاد، بهتر از توضیح یاد می‌دهد.
+    <span class="say">«بذارین یه چیزی نشونتون بدم. اول می‌نویسم "یه سایت برام بساز"... ببینین چی می‌ده. حالا همون رو با جزئیات می‌نویسم... تفاوت رو ببینین.»</span>
+    اگر وقت کم است، فقط پرامپت خوب را اجرا کن و تضاد را شفاهی توضیح بده.
+  </div>
+</section>
+
+<section class="slide" data-sec="۳. ساخت با AI" data-min="54">
+  <span class="eyebrow">دمو زنده ۱</span>
+  <h2>پرامپت ساخت صفحه‌ی اصلی</h2>
+  <p class="lead">این را کپی کنید، اسم و اطلاعات خودتان را جایگزین کنید و به ChatGPT / Claude / Gemini بدهید:</p>
+  <div class="prompt"><div class="body">تو یک طراح وب حرفه‌ای هستی که در ساخت سایت‌های فارسی و راست‌چین تخصص داری.
+
+یک صفحه وب تک‌صفحه‌ای (Landing Page) شخصی برای من بساز با این مشخصات:
+
+• نام: [نام و نام خانوادگی من]
+• عنوان: دانشجوی پزشکی دانشگاه [نام دانشگاه]
+• بخش‌ها به ترتیب: هدر با منوی چسبان، معرفی کوتاه با عکس، سوابق تحصیلی، فعالیت‌های پژوهشی، مهارت‌ها، فرم تماس، فوتر
+
+الزامات فنی:
+• کل کد در یک فایل index.html با CSS داخلی (بدون فایل جداگانه)
+• کاملاً راست‌چین (dir="rtl") و با charset UTF-8
+• فونت فارسی وزیرمتن از Google Fonts
+• طراحی مدرن و تمیز با رنگ اصلی آبی نفتی و رنگ تأکیدی طلایی
+• کاملاً ریسپانسیو (موبایل، تبلت، دسکتاپ)
+• انیمیشن ملایم هنگام اسکرول
+• بدون هیچ کتابخانه یا فریم‌ورک خارجی
+
+خروجی: فقط کد کامل و آماده اجرا، بدون توضیح اضافه.</div>
+  <button class="copy" style="position:static;margin-top:12px">📋 کپی پرامپت</button></div>
+  <div class="note ok"><b>بعد از گرفتن کد</b>
+  کد را کپی کنید → در Notepad یا VS Code پیست کنید → با نام <code>index.html</code> ذخیره کنید (در پوشه <code>htdocs/mysite</code>) → در مرورگر باز کنید. تمام.</div>
+  <div class="notes">
+    <b>این دمو را زنده اجرا کن.</b> کل کلاس منتظر همین لحظه است. در حین تولید کد توسط AI، سکوت نکن — توضیح بده چه اتفاقی دارد می‌افتد.
+    <span class="say">«ببینین داره چی‌کار می‌کنه. داره ساختار صفحه رو می‌چینه، بعد میره سراغ استایل‌ها... این کاری بود که یه نفر باید چند ساعت وقت می‌ذاشت.»</span>
+    <b>مهم:</b> موقع ذخیره در Notepad، حتماً <b>Encoding را UTF-8</b> بگذار و نوع فایل را <b>All Files</b> کن، وگرنه فایل به‌صورت <code>index.html.txt</code> ذخیره می‌شود و فارسی هم خراب می‌شود. این یکی از شایع‌ترین خطاهای کلاس است.
+  </div>
+</section>
+
+<section class="slide" data-sec="۳. ساخت با AI" data-min="60">
+  <span class="eyebrow">دمو زنده ۲</span>
+  <h2>هنر اصلاح کردن (Iteration)</h2>
+  <p class="lead">هیچ‌وقت خروجی اول کامل نیست — و اشکالی هم ندارد. مهارت واقعی این است که <b>بدانید چطور بخواهید تغییرش دهد</b>.</p>
+  <div class="grid g2">
+    <div class="card"><h4>❌ درخواست مبهم</h4><p class="sm">«قشنگ‌ترش کن»<br>«خوب نشد»<br>«یه کاریش کن»</p></div>
+    <div class="card"><h4>✅ درخواست دقیق</h4><p class="sm">«هدر را چسبان کن و موقع اسکرول شیشه‌ای شود»<br>«فاصله بین بخش‌ها را دو برابر کن»<br>«رنگ دکمه‌ها را به طلایی #f5c45e تغییر بده»</p></div>
+  </div>
+  <div class="prompt"><div class="body">همان کد قبلی را نگه دار و فقط این تغییرات را اعمال کن:
+
+۱. هدر هنگام اسکرول چسبان بماند و پس‌زمینه‌اش نیمه‌شفاف با افکت بلور شود
+۲. در بخش معرفی، یک عکس دایره‌ای در سمت راست متن اضافه کن
+۳. فاصله‌ی عمودی بین بخش‌ها را بیشتر کن تا صفحه نفس بکشد
+۴. یک دکمه‌ی «دانلود رزومه» با رنگ طلایی زیر معرفی اضافه کن
+۵. در موبایل، منو به شکل همبرگری جمع شود
+
+کل فایل کامل و اصلاح‌شده را دوباره بده، نه فقط بخش تغییریافته.</div>
+  <button class="copy" style="position:static;margin-top:12px">📋 کپی پرامپت</button></div>
+  <div class="note warn"><b>نکته‌ی حیاتی</b>
+  همیشه بگویید <b>«کل فایل کامل را دوباره بده»</b>. وگرنه AI فقط تکه‌کد می‌دهد و شما باید دستی بچسبانید — که منبع اصلی خطا برای تازه‌کارهاست.</div>
+  <div class="notes">
+    این نکته‌ی «کل فایل کامل» شاید <b>مفیدترین جمله‌ی کل کارگاه</b> باشد. روی آن مکث کن.
+    <span class="say">«این جمله رو یادداشت کنین: "کل فایل کامل رو دوباره بده". این یه جمله، نود درصد دردسرهای بعدیتون رو حل می‌کنه.»</span>
+    یک تغییر را زنده اجرا کن و نتیجه را در مرورگر رفرش کن تا حلقه‌ی «درخواست ← تغییر ← دیدن» کامل جا بیفتد.
+  </div>
+</section>
+
+<section class="slide" data-sec="۳. ساخت با AI" data-min="66">
+  <span class="eyebrow">پرامپت‌های کاربردی</span>
+  <h2>جعبه‌ابزار پرامپت‌های آماده</h2>
+  <details open><summary>📱 ریسپانسیو کردن برای موبایل</summary><div class="in">
+    <div class="prompt" style="margin-top:12px"><div class="body">این کد در موبایل به‌هم می‌ریزد. کل فایل را طوری بازنویسی کن که:
+• در عرض‌های زیر ۷۶۸ پیکسل، ستون‌ها زیر هم بیایند
+• اندازه‌ی فونت‌ها متناسب کوچک شود (از clamp استفاده کن)
+• منو به دکمه‌ی همبرگری تبدیل شود
+• هیچ اسکرول افقی ایجاد نشود
+کل فایل کامل را بده.</div><button class="copy" style="position:static;margin-top:12px">📋 کپی</button></div>
+  </div></details>
+  <details><summary>🎨 عوض کردن کامل ظاهر بدون دست زدن به محتوا</summary><div class="in">
+    <div class="prompt" style="margin-top:12px"><div class="body">محتوا و ساختار HTML را دقیقاً حفظ کن و فقط بخش CSS را بازنویسی کن تا سایت ظاهری مینیمال، روشن و آکادمیک پیدا کند: پس‌زمینه سفید، متن خاکستری تیره، رنگ تأکیدی سرمه‌ای، گوشه‌های کمی گرد، سایه‌های خیلی ملایم. کل فایل کامل را بده.</div><button class="copy" style="position:static;margin-top:12px">📋 کپی</button></div>
+  </div></details>
+  <details><summary>🌙 اضافه کردن حالت شب (دارک مود)</summary><div class="in">
+    <div class="prompt" style="margin-top:12px"><div class="body">به این صفحه یک دکمه‌ی تغییر حالت روز/شب اضافه کن که:
+• با CSS Variables پیاده شود
+• انتخاب کاربر در localStorage ذخیره شود
+• حالت پیش‌فرض از تنظیمات سیستم کاربر خوانده شود
+کل فایل کامل را بده.</div><button class="copy" style="position:static;margin-top:12px">📋 کپی</button></div>
+  </div></details>
+  <details><summary>🔍 بهینه‌سازی برای گوگل (SEO)</summary><div class="in">
+    <div class="prompt" style="margin-top:12px"><div class="body">این صفحه را از نظر سئو بهینه کن: تگ title و meta description مناسب فارسی، تگ‌های Open Graph برای اشتراک در شبکه‌های اجتماعی، ساختار درست هدینگ‌ها (فقط یک h1)، متن alt برای همه‌ی تصاویر، و یک اسکیمای Person به صورت JSON-LD. کل فایل کامل را بده.</div><button class="copy" style="position:static;margin-top:12px">📋 کپی</button></div>
+  </div></details>
+  <div class="notes">
+    این اسلاید را <b>به‌عنوان مرجع</b> معرفی کن، نه برای اجرای همه‌شان. یکی را زنده اجرا کن (پیشنهاد: دارک مود، چون اثرش دراماتیک و دیدنی است).
+    <span class="say">«این‌ها رو همه‌شو الان اجرا نمی‌کنیم، ولی همه‌ش تو فایل ارائه هست و بعداً می‌تونین برش دارین. بذارین یکیشو با هم ببینیم — دارک مود، چون قشنگ‌ترینه.»</span>
+  </div>
+</section>
+
+<section class="slide" data-sec="۳. ساخت با AI" data-min="72">
+  <span class="eyebrow">پویا کردن سایت</span>
+  <h2>فرم تماس واقعی با PHP و MySQL</h2>
+  <p class="lead">تا اینجا سایت ما <b>ایستا</b> بود. حالا کاری می‌کنیم که پیام‌های کاربران واقعاً <b>ذخیره</b> شوند.</p>
+  <div class="prompt"><div class="body">یک فرم تماس کامل و امن برایم بساز که شامل این فایل‌ها باشد:
+
+۱. بخش HTML فرم (نام، ایمیل، موضوع، متن پیام) با ظاهری هماهنگ با سایت راست‌چین من
+۲. فایل contact.php که اطلاعات فرم را در دیتابیس MySQL ذخیره کند
+۳. دستور SQL ساخت جدول مربوطه
+
+الزامات امنیتی (مهم):
+• حتماً از PDO با Prepared Statement استفاده کن تا جلوی SQL Injection گرفته شود
+• ورودی‌ها را اعتبارسنجی و پاک‌سازی کن (htmlspecialchars و filter_var)
+• اطلاعات اتصال به دیتابیس را در یک فایل جداگانه config.php بگذار
+• پیام موفقیت یا خطا را به شکل فارسی و کاربرپسند به کاربر نشان بده
+
+هر فایل را جداگانه و کامل بده و بنویس هرکدام با چه نامی ذخیره شود.</div>
+  <button class="copy" style="position:static;margin-top:12px">📋 کپی پرامپت</button></div>
+  <div class="note bad"><b>چرا روی امنیت تأکید کردیم؟</b>
+  اگر صرفاً بگویید «فرم تماس بساز»، ممکن است کدی بگیرید که در برابر <b>SQL Injection</b> آسیب‌پذیر است. ذکر «PDO با Prepared Statement» در پرامپت، تفاوت بین یک سایت امن و یک سایت هک‌شدنی است.</div>
+  <div class="notes">
+    این اسلاید شما را از یک «مدرس معمولی AI» به یک <b>مدرس مسئول</b> تبدیل می‌کند. مکث کن و اهمیتش را بگو.
+    <span class="say">«یه چیزی رو باید صادقانه بگم: هوش مصنوعی همیشه امن‌ترین کد رو نمی‌ده، مگه اینکه شما ازش بخواین. برای همین تو پرامپت نوشتیم PDO و Prepared Statement. همین یه خط، فرق بین سایت امن و سایت هک‌شدنیه.»</span>
+    اگر وقت کم است، این بخش را فقط توضیح بده و به فایل آماده در <code>starter-files/contact.php</code> ارجاع بده.
+  </div>
+</section>
+
+<section class="slide" data-sec="۳. ساخت با AI" data-min="78">
+  <span class="eyebrow">مهارت حیاتی</span>
+  <h2>🐞 وقتی خطا گرفتید چه کنید؟</h2>
+  <p class="lead">خطا گرفتن عادی است — حتی برای برنامه‌نویس‌های حرفه‌ای. تفاوت در این است که <b>بلد باشید خطا را درست گزارش دهید</b>.</p>
+  <div class="prompt"><div class="body">این کد را تو برایم نوشتی ولی کار نمی‌کند.
+
+۱) کدی که اجرا کردم:
+[کد کامل را اینجا پیست کنید]
+
+۲) خطایی که می‌بینم (عین متن):
+[متن دقیق خطا را اینجا پیست کنید]
+
+۳) چه انتظاری داشتم:
+[مثلاً: انتظار داشتم پیام در دیتابیس ذخیره شود]
+
+۴) چه اتفاقی واقعاً افتاد:
+[مثلاً: صفحه سفید شد و هیچ چیزی ذخیره نشد]
+
+محیط من: XAMPP روی ویندوز، PHP نسخه ۸.۲
+
+لطفاً اول بگو دقیقاً مشکل از کجاست و چرا، بعد کل فایل اصلاح‌شده را بده.</div>
+  <button class="copy" style="position:static;margin-top:12px">📋 کپی قالب گزارش خطا</button></div>
+  <div class="grid g4">
+    <div class="card"><h4>صفحه سفید</h4><p class="sm">معمولاً خطای PHP است. در فایل بالا <code>error_reporting(E_ALL);</code> بگذارید تا خطا نمایش داده شود.</p></div>
+    <div class="card"><h4>فارسی خراب</h4><p class="sm">مشکل UTF-8. فایل را با انکودینگ UTF-8 ذخیره کنید و در دیتابیس <code>utf8mb4</code> بگذارید.</p></div>
+    <div class="card"><h4>عکس نمایش داده نمی‌شود</h4><p class="sm">مسیر فایل اشتباه است. نام فایل و پوشه را دقیقاً چک کنید (حروف بزرگ و کوچک مهم است).</p></div>
+    <div class="card"><h4>کد PHP خام دیده می‌شود</h4><p class="sm">فایل را با دابل‌کلیک باز کرده‌اید. باید از <code>localhost</code> بازش کنید.</p></div>
+  </div>
+  <div class="notes">
+    <b>عمداً یک خطا بساز</b> و جلوی کلاس رفعش کن. این کار قدرتمندترین بخش آموزش است، چون به آن‌ها می‌گوید «خطا پایان کار نیست».
+    <span class="say">«بذارین عمداً یه چیزی رو خراب کنم... ببینین چه خطایی می‌ده. حالا من این خطا رو عیناً کپی می‌کنم و می‌دم به هوش مصنوعی. دقت کنین — من نمی‌گم "کار نمی‌کنه"؛ می‌گم دقیقاً چی شد.»</span>
+  </div>
+</section>
+
+<section class="slide" data-sec="۳. ساخت با AI" data-min="83">
+  <span class="eyebrow">صادقانه</span>
+  <h2>حواستان به این ۶ تله باشد</h2>
+  <div class="grid g3">
+    <div class="card"><h4><span class="ico g">۱</span> توهم‌زنی</h4><p>AI گاهی کتابخانه یا تابعی را معرفی می‌کند که اصلاً وجود ندارد. <b>همیشه تست کنید.</b></p></div>
+    <div class="card"><h4><span class="ico g">۲</span> کد ناامن</h4><p>اگر امنیت را نخواهید، لزوماً نمی‌دهد. برای هر چیزی که با دیتابیس یا ورودی کاربر کار دارد، صریح بخواهید.</p></div>
+    <div class="card"><h4><span class="ico g">۳</span> فراموشی متن</h4><p>در گفت‌وگوهای طولانی، جزئیات قبلی را گم می‌کند. هرچند وقت، کد فعلی را دوباره برایش بفرستید.</p></div>
+    <div class="card"><h4><span class="ico g">۴</span> کد نصفه</h4><p>گاهی می‌نویسد «بقیه مثل قبل». همیشه بخواهید <b>کل فایل کامل</b> را بدهد.</p></div>
+    <div class="card"><h4><span class="ico g">۵</span> اطلاعات حساس</h4><p>رمز عبور، اطلاعات بیمار یا داده‌ی محرمانه را <b>هرگز</b> در پرامپت نگذارید.</p></div>
+    <div class="card"><h4><span class="ico g">۶</span> اعتماد کورکورانه</h4><p>کد را تست نکرده روی سایت واقعی نگذارید. اول لوکال‌هاست، بعد هاست.</p></div>
+  </div>
+  <div class="note"><b>قاعده‌ی نهایی</b> هوش مصنوعی یک <b>دستیار خیلی سریع</b> است، نه یک متخصص بی‌خطا. مسئولیت نهایی خروجی، همیشه با شماست.</div>
+  <div class="notes">
+    این اسلاید <b>اعتبار حرفه‌ای تو را می‌سازد.</b> کسی که فقط تعریف می‌کند، فروشنده است؛ کسی که محدودیت‌ها را هم می‌گوید، مدرس است.
+    <span class="say">«من قرار نیست اینجا فقط از هوش مصنوعی تعریف کنم. باید محدودیت‌هاشو هم بدونین، وگرنه یه جایی بد جوری غافلگیر می‌شین.»</span>
+    مورد ۵ (اطلاعات حساس) برای مخاطب پزشکی <b>خیلی مهم</b> است — روی آن مکث کن و مثال بزن: «اطلاعات بیمار رو هیچ‌وقت تو پرامپت نذارین.»
+  </div>
+</section>
+
+<!-- ============ SECTION 4: DEPLOY ============ -->
+<section class="slide" data-sec="۴. انتقال به هاست" data-min="87">
+  <span class="eyebrow">قدم ۴ و ۵ از ۵</span>
+  <h1>بریم روی اینترنت واقعی</h1>
+  <p class="lead">سایت روی کامپیوتر شما فقط برای خودتان است. حالا می‌خواهیم کاری کنیم که <b class="hl-g">هر کسی در دنیا</b> بتواند با یک آدرس ببیندش.</p>
+  <div class="flow" style="margin-top:22px">
+    <div class="step"><div class="n">۱</div><b>خرید</b><small>هاست + دامنه</small></div>
+    <div class="step"><div class="n">۲</div><b>اتصال</b><small>Nameserver دامنه به هاست</small></div>
+    <div class="step"><div class="n">۳</div><b>آپلود</b><small>فایل‌ها در public_html</small></div>
+    <div class="step"><div class="n">۴</div><b>دیتابیس</b><small>ساخت و ایمپورت</small></div>
+    <div class="step"><div class="n">۵</div><b>SSL</b><small>فعال‌سازی https</small></div>
+  </div>
+  <div class="notes">
+    <span class="say">«تا اینجا سایتتون فقط رو کامپیوتر خودتون بود. مثل یه مغازه که هنوز تو انباره. حالا می‌خوایم ببریمش سر خیابون.»</span>
+    اگر دسترسی به هاست واقعی نداری، این کل بخش را با <b>اسکرین‌شات</b> یا ویدیوی ضبط‌شده جلو ببر و صادقانه بگو که ضبط‌شده است.
+  </div>
+</section>
+
+<section class="slide" data-sec="۴. انتقال به هاست" data-min="90">
+  <span class="eyebrow">مرحله ۱ و ۲</span>
+  <h2>اتصال دامنه به هاست</h2>
+  <ol class="steps">
+    <li><b>هاست را بخرید.</b> بعد از خرید، ایمیلی دریافت می‌کنید که شامل آدرس cPanel، نام کاربری، رمز و <b>دو Nameserver</b> است. مثل: <code>ns1.hostname.com</code> و <code>ns2.hostname.com</code></li>
+    <li><b>وارد پنل دامنه شوید.</b> جایی که دامنه را ثبت کرده‌اید (مثلاً ایرنیک برای <code>.ir</code>).</li>
+    <li><b>بخش DNS / Nameserver را پیدا کنید</b> و دو Nameserver هاست را جایگزین مقادیر فعلی کنید و ذخیره کنید.</li>
+    <li><b>صبر کنید.</b> از چند دقیقه تا ۲۴ ساعت. در این فاصله می‌توانید با آدرس موقت هاست کار کنید.</li>
+  </ol>
+  <div class="note ok"><b>آدرس موقت</b> اکثر هاست‌ها یک آدرس موقت می‌دهند (مثل <code>username.hostname.com</code>) تا قبل از اتصال دامنه هم بتوانید سایتتان را ببینید و تست کنید.</div>
+  <div class="note warn"><b>اشتباه رایج</b> Nameserver را در پنل <b>هاست</b> عوض نکنید! باید در پنل <b>دامنه</b> عوض شود. این دو جای متفاوت‌اند.</div>
+  <div class="notes">
+    این بخش خشک است — <b>سریع رد شو</b> و بگو در ضبط جلسه دوباره ببینند. تمرکز را روی مرحله بعد (آپلود) بگذار که ملموس‌تر است.
+  </div>
+</section>
+
+<section class="slide" data-sec="۴. انتقال به هاست" data-min="94">
+  <span class="eyebrow">مرحله ۳ · دمو زنده</span>
+  <h2>📁 آپلود فایل‌ها با File Manager</h2>
+  <ol class="steps">
+    <li>فایل‌های سایتتان را <b>zip</b> کنید. (نکته: خود فایل‌ها را انتخاب و zip کنید، نه پوشه‌ی بیرونی را)</li>
+    <li>وارد cPanel شوید → روی <b>File Manager</b> کلیک کنید.</li>
+    <li>وارد پوشه‌ی <b class="hl">public_html</b> شوید. <b>این مهم‌ترین قدم است.</b></li>
+    <li>روی <b>Upload</b> بزنید و فایل zip را بکشید و رها کنید.</li>
+    <li>برگردید به File Manager، روی فایل zip <b>راست‌کلیک</b> کنید و <b>Extract</b> بزنید.</li>
+    <li>فایل zip را حذف کنید. مطمئن شوید <code>index.html</code> <b>مستقیماً</b> داخل <code>public_html</code> است.</li>
+    <li>دامنه‌تان را در مرورگر باز کنید. 🎉</li>
+  </ol>
+  <div class="note bad"><b>شایع‌ترین اشتباه کل این مرحله</b>
+  اگر ساختار شما این‌طور شد: <code>public_html/mysite/index.html</code> ← سایت شما در آدرس <code>yoursite.ir</code> باز <b>نمی‌شود</b>، بلکه در <code>yoursite.ir/mysite</code> باز می‌شود.<br>
+  ساختار درست: <code>public_html/index.html</code></div>
+  <div class="notes">
+    این یک اشتباه است که <b>همه</b> بار اول مرتکب می‌شوند. آن را <b>عمداً جلوی کلاس مرتکب شو</b> و بعد درستش کن. یادگیری از اشتباه دیده‌شده چند برابر است.
+    <span class="say">«ببینین من الان عمداً یه اشتباه می‌کنم که شما بعداً نکنین...»</span>
+  </div>
+</section>
+
+<section class="slide" data-sec="۴. انتقال به هاست" data-min="98">
+  <span class="eyebrow">مرحله ۴ و ۵</span>
+  <h2>دیتابیس و فعال‌سازی SSL</h2>
+  <div class="grid g2">
+    <div class="card">
+      <h4><span class="ico">🗄</span> انتقال دیتابیس</h4>
+      <ol class="steps sm" style="margin:10px 0 0">
+        <li>در لوکال phpMyAdmin → دیتابیس → تب <b>Export</b> → Go (فایل .sql دانلود می‌شود)</li>
+        <li>در cPanel → <b>MySQL Databases</b> → یک دیتابیس و یک کاربر بسازید و کاربر را با دسترسی کامل به دیتابیس وصل کنید</li>
+        <li>در cPanel → <b>phpMyAdmin</b> → دیتابیس جدید → تب <b>Import</b> → فایل .sql را آپلود کنید</li>
+        <li>در فایل <code>config.php</code> نام دیتابیس، کاربر و رمز را <b>به مقادیر هاست</b> تغییر دهید</li>
+      </ol>
+    </div>
+    <div class="card">
+      <h4><span class="ico g">🔒</span> فعال‌سازی SSL</h4>
+      <ol class="steps sm" style="margin:10px 0 0">
+        <li>در cPanel → <b>SSL/TLS Status</b></li>
+        <li>دامنه را انتخاب کنید → <b>Run AutoSSL</b></li>
+        <li>چند دقیقه صبر کنید تا تیک سبز بیاید</li>
+        <li>در بخش <b>Domains</b>، گزینه‌ی <b>Force HTTPS Redirect</b> را روشن کنید</li>
+        <li>سایت را با <code>https://</code> باز کنید و قفل را ببینید ✅</li>
+      </ol>
+    </div>
+  </div>
+  <div class="note warn"><b>نکته‌ی حیاتی درباره config.php</b>
+  اطلاعات دیتابیس در لوکال‌هاست معمولاً کاربر <code>root</code> با رمز خالی است. روی هاست واقعی <b>حتماً</b> متفاوت است. اگر بعد از آپلود خطای اتصال به دیتابیس گرفتید، ۹۹٪ مشکل همین است.</div>
+  <div class="notes">
+    اگر وقت تنگ است، <b>این اسلاید را فقط مرور کن</b> و بگو جزئیاتش در فایل ارائه و ضبط جلسه هست. تمرکزت را نگه دار برای اسلاید رفع خطا و جمع‌بندی.
+  </div>
+</section>
+
+<section class="slide" data-sec="۴. انتقال به هاست" data-min="102">
+  <span class="eyebrow">عیب‌یابی</span>
+  <h2>🚨 خطاهای رایج بعد از آپلود — و رفع آن‌ها</h2>
+  <table>
+    <tr><th>خطا</th><th>یعنی چه</th><th>راه‌حل</th></tr>
+    <tr><td><b>404 Not Found</b></td><td>فایل پیدا نشد</td><td>چک کنید <code>index.html</code> مستقیماً در <code>public_html</code> باشد و نامش دقیقاً با حروف کوچک نوشته شده باشد</td></tr>
+    <tr><td><b>403 Forbidden</b></td><td>اجازه دسترسی نیست</td><td>دسترسی (Permission) پوشه‌ها را ۷۵۵ و فایل‌ها را ۶۴۴ کنید (راست‌کلیک ← Change Permissions)</td></tr>
+    <tr><td><b>500 Internal Server Error</b></td><td>خطای PHP یا فایل .htaccess</td><td>در cPanel بخش <b>Errors</b> را ببینید؛ متن خطا را به AI بدهید</td></tr>
+    <tr><td><b>صفحه سفید کامل</b></td><td>خطای PHP پنهان شده</td><td>نسخه PHP را در <b>Select PHP Version</b> عوض کنید و نمایش خطا را موقتاً روشن کنید</td></tr>
+    <tr><td><b>فارسی به‌هم ریخته</b></td><td>مشکل انکودینگ</td><td>فایل را UTF-8 ذخیره کنید و در دیتابیس <code>utf8mb4_persian_ci</code> بگذارید</td></tr>
+    <tr><td><b>سایت قدیمی نشان می‌دهد</b></td><td>کش مرورگر</td><td>با <code>Ctrl+Shift+R</code> رفرش سخت بزنید یا در حالت ناشناس باز کنید</td></tr>
+  </table>
+  <div class="note ok"><b>روش کلی و همیشگی</b> هر خطایی دیدید: <b>متن دقیقش را کپی کنید</b> → به AI بدهید → بگویید محیط شما چیست (هاست اشتراکی، cPanel، PHP نسخه ...) → راه‌حل بگیرید. همین.</div>
+  <div class="notes">
+    این جدول را به‌عنوان <b>«این را ذخیره کنید»</b> معرفی کن. مخاطب دوست دارد چیزی ملموس با خودش ببرد.
+    <span class="say">«از این اسلاید اسکرین‌شات بگیرین. این جدول رو نود درصد مواقع لازم می‌شین.»</span>
+  </div>
+</section>
+
+<!-- ============ SECTION 5: WRAP UP ============ -->
+<section class="slide" data-sec="۵. جمع‌بندی" data-min="106">
+  <span class="eyebrow">اگر هاست ندارید</span>
+  <h2>🆓 مسیر کاملاً رایگان</h2>
+  <p class="lead">اگر فعلاً نمی‌خواهید هزینه کنید، می‌توانید همان سایت HTML را <b>رایگان</b> و برای همیشه منتشر کنید:</p>
+  <div class="grid g3">
+    <div class="card"><h4>GitHub Pages</h4><p>حساب <a href="https://github.com" target="_blank" rel="noopener">github.com</a> بسازید → مخزن جدید → فایل‌ها را آپلود کنید → Settings → Pages → فعال کنید.</p><p class="sm" style="margin-top:8px">آدرس: <code>username.github.io</code></p></div>
+    <div class="card"><h4>Netlify</h4><p>در <a href="https://netlify.com" target="_blank" rel="noopener">netlify.com</a> ثبت‌نام کنید و پوشه‌ی سایت را مستقیماً <b>drag & drop</b> کنید. در ۱۰ ثانیه آنلاین می‌شود.</p></div>
+    <div class="card"><h4>Vercel</h4><p>مشابه Netlify، در <a href="https://vercel.com" target="_blank" rel="noopener">vercel.com</a>. سریع و رایگان برای پروژه‌های شخصی.</p></div>
+  </div>
+  <div class="note warn"><b>محدودیت مهم</b> این سه سرویس <b>PHP اجرا نمی‌کنند</b>. یعنی صفحات HTML/CSS/JS شما کار می‌کند، ولی فرم تماسی که با PHP نوشتید کار نخواهد کرد. برای فرم در این حالت می‌توانید از سرویس‌هایی مثل Formspree استفاده کنید.</div>
+  <div class="notes">
+    این اسلاید برای <b>دانشجویانی که بودجه ندارند</b> طلاست و باعث می‌شود هیچ‌کس با دست خالی از کلاس بیرون نرود.
+    <span class="say">«اگه امروز پول هاست ندارین، اصلاً مشکلی نیست. با همین روش رایگان، تا امشب سایتتون آنلاینه.»</span>
+  </div>
+</section>
+
+<section class="slide" data-sec="۵. جمع‌بندی" data-min="110">
+  <span class="eyebrow">بعد از کارگاه</span>
+  <h2>مسیر ۳۰ روزه‌ی شما</h2>
+  <div class="grid g4">
+    <div class="card"><h4>هفته ۱</h4><p>سایت امروز را کامل کنید: عکس واقعی، متن واقعی، رزومه‌ی خودتان. <b>منتشرش کنید.</b></p></div>
+    <div class="card"><h4>هفته ۲</h4><p>یک صفحه‌ی دوم اضافه کنید (مقالات یا پروژه‌ها) و آن را به منو وصل کنید.</p></div>
+    <div class="card"><h4>هفته ۳</h4><p>فرم تماس با PHP را راه بیندازید و اولین پیام واقعی را دریافت کنید.</p></div>
+    <div class="card"><h4>هفته ۴</h4><p>سئو، سرعت و موبایل را بهینه کنید. لینک سایت را در رزومه و لینکدین بگذارید.</p></div>
+  </div>
+  <div class="note ok"><b>یک توصیه‌ی جدی</b>
+  بهترین کاری که می‌توانید بکنید این است که <b>همین امشب</b>، قبل از اینکه انگیزه سرد شود، یک نسخه‌ی خیلی ساده را منتشر کنید. سایت ناقصِ منتشرشده، هزار برابر ارزشمندتر از سایت کاملِ منتشرنشده است.</div>
+  <div class="notes">
+    این اسلاید <b>ضد فراموشی</b> است. اکثر شرکت‌کننده‌های کارگاه‌ها هیچ‌وقت کار را ادامه نمی‌دهند؛ یک برنامه‌ی مشخص این را تغییر می‌دهد.
+    <span class="say">«یه خواهش دارم ازتون: امشب، همین امشب، حتی یه صفحه‌ی خیلی ساده رو منتشر کنین. چون اگه به فردا بیفته، به هفته‌ی بعد می‌افته، و بعد اصلاً نمی‌شه.»</span>
+  </div>
+</section>
+
+<section class="slide" data-sec="۵. جمع‌بندی" data-min="113">
+  <span class="eyebrow">منابع</span>
+  <h2>🧰 ابزارها و منابع</h2>
+  <div class="grid g2">
+    <div class="card">
+      <h4><span class="ico">🤖</span> هوش مصنوعی</h4>
+      <p><a href="https://claude.ai" target="_blank" rel="noopener">Claude</a> — عالی برای کدهای بلند و کامل<br>
+      <a href="https://chatgpt.com" target="_blank" rel="noopener">ChatGPT</a> — همه‌کاره و شناخته‌شده<br>
+      <a href="https://gemini.google.com" target="_blank" rel="noopener">Gemini</a> — رایگان و در دسترس</p>
+    </div>
+    <div class="card">
+      <h4><span class="ico">🛠</span> ابزارهای کار</h4>
+      <p><a href="https://code.visualstudio.com" target="_blank" rel="noopener">VS Code</a> — ویرایشگر کد رایگان<br>
+      <a href="https://www.apachefriends.org" target="_blank" rel="noopener">XAMPP</a> — لوکال‌هاست<br>
+      <a href="https://codepen.io" target="_blank" rel="noopener">CodePen</a> — تست سریع کد بدون نصب</p>
+    </div>
+    <div class="card">
+      <h4><span class="ico g">📚</span> یادگیری</h4>
+      <p><a href="https://developer.mozilla.org/fa/" target="_blank" rel="noopener">MDN Web Docs</a> — مرجع رسمی وب<br>
+      <a href="https://www.w3schools.com" target="_blank" rel="noopener">W3Schools</a> — آموزش ساده و تعاملی<br>
+      <a href="https://roadmap.sh/frontend" target="_blank" rel="noopener">roadmap.sh</a> — نقشه راه یادگیری</p>
+    </div>
+    <div class="card">
+      <h4><span class="ico g">🎨</span> محتوا و طراحی</h4>
+      <p><a href="https://fonts.google.com/?subset=arabic" target="_blank" rel="noopener">Google Fonts</a> — فونت فارسی رایگان (وزیرمتن)<br>
+      <a href="https://unsplash.com" target="_blank" rel="noopener">Unsplash</a> — عکس رایگان باکیفیت<br>
+      <a href="https://coolors.co" target="_blank" rel="noopener">Coolors</a> — ساخت پالت رنگ</p>
+    </div>
+  </div>
+  <div class="notes">
+    بگو که همین فایل ارائه با تمام لینک‌ها برایشان ارسال می‌شود. این باعث می‌شود به‌جای یادداشت‌برداری، <b>گوش بدهند</b>.
+    <span class="say">«لازم نیست اینا رو یادداشت کنین. کل همین فایلی که دارم نشونتون می‌دم رو براتون می‌فرستم، با همه‌ی لینک‌ها و پرامپت‌ها.»</span>
+  </div>
+</section>
+
+<section class="slide" data-sec="۵. جمع‌بندی" data-min="116">
+  <span class="eyebrow">جمع‌بندی</span>
+  <h2>امروز چه یاد گرفتیم؟</h2>
+  <ul class="bullets gold">
+    <li>سایت از چه اجزایی ساخته می‌شود: <b>دامنه، هاست، DNS، SSL، cPanel</b></li>
+    <li>چطور یک محیط تمرین امن روی کامپیوتر خودمان بسازیم: <b>XAMPP و لوکال‌هاست</b></li>
+    <li>چطور از هوش مصنوعی <b>کد باکیفیت بگیریم</b> — با پرامپت دقیق و پنج‌جزئی</li>
+    <li>چطور کد را <b>اصلاح، ریسپانسیو و امن</b> کنیم بدون دانش برنامه‌نویسی</li>
+    <li>چطور خطا را <b>درست گزارش بدهیم</b> و با AI رفعش کنیم</li>
+    <li>چطور سایت را روی هاست <b>منتشر کنیم</b> و دامنه و https را وصل کنیم</li>
+  </ul>
+  <div class="note ok" style="font-size:18px"><b>و مهم‌تر از همه</b>
+  فهمیدیم که فاصله‌ی بین «یه ایده دارم» و «سایتش آماده‌ست»، دیگر ماه‌ها نیست — چند ساعت است.</div>
+  <div class="notes">
+    این اسلاید را <b>آرام</b> بخوان. جمع‌بندی، حس «چیز یاد گرفتم» را تثبیت می‌کند و همان چیزی است که در نظرسنجی می‌نویسند.
+  </div>
+</section>
+
+<section class="slide" data-sec="۵. جمع‌بندی" data-min="118">
+  <div class="cover">
+    <span class="eyebrow">پایان</span>
+    <h1>حالا نوبت شماست 🚀</h1>
+    <p class="lead" style="margin:0 auto">هر سؤالی دارید بپرسید — من هستم.</p>
+    <div class="meta">
+      <div><b>گواهی</b> بعد از کارگاه صادر و ارسال می‌شود</div>
+      <div><b>ضبط جلسه</b> لینکش برایتان ارسال می‌شود</div>
+      <div><b>فایل ارائه</b> همین فایل، با تمام پرامپت‌ها</div>
+    </div>
+    <p class="lead" style="margin:34px auto 0;font-size:22px;color:var(--gold)">
+      «بهترین زمان برای ساختن سایتت، دیروز بود.<br>دومین بهترین زمان، همین امشب است.»
+    </p>
+    <p class="muted" style="margin-top:26px">سبحان عفتی · کارگاه طراحی سایت با هوش مصنوعی · شهریور ۱۴۰۵</p>
+  </div>
+  <div class="notes">
+    <b>پرسش و پاسخ را با یک سؤال از خودت شروع کن</b>، چون معمولاً اول کسی حرف نمی‌زند:
+    <span class="say">«تا سؤالاتتون رو تایپ می‌کنین، من به یه سؤالی که همیشه ازم می‌پرسن جواب می‌دم: "آیا سایت ساخته‌شده با AI، سایت واقعیه؟" جوابم اینه: کدی که رو سرور اجرا می‌شه و کار می‌کنه، واقعیه. مهم نیست کی نوشتتش.»</span>
+    فراموش نکن: <b>راه ارتباطی</b> بدهی، <b>نظرسنجی/فرم گواهی</b> را در چت بگذاری، و <b>از حاضرین تشکر</b> کنی.
+  </div>
+</section>
+
+</main>
+
+<div class="nav">
+  <button class="btn" id="prev">◀ قبلی</button>
+  <span class="pos"><b id="cur">۱</b> / <span id="tot">۱</span></span>
+  <button class="btn" id="next">بعدی ▶</button>
+  <span class="sect" id="sectName"></span>
+</div>
+
+<!-- ============ TOC DRAWER ============ -->
+<div class="drawer" id="drawer">
+  <div class="panel">
+    <button class="btn ghost" style="float:left" id="closeToc">✕</button>
+    <h3>فهرست اسلایدها</h3>
+    <ul class="toc" id="tocList"></ul>
+    <hr style="border:0;border-top:1px solid var(--line);margin:22px 0">
+    <button class="btn" id="btnPrint" style="width:100%;justify-content:center">🖨 چاپ / خروجی PDF همه اسلایدها</button>
+  </div>
+</div>
+
+<!-- ============ RUN OF SHOW MODAL ============ -->
+<div class="modal" id="guide">
+  <div class="sheet">
+    <button class="btn ghost x" id="closeGuide">✕ بستن</button>
+    <span class="eyebrow">فقط برای مدرس</span>
+    <h2>📋 پلن اجرای کارگاه</h2>
+
+    <h3>۱) چک‌لیست ۳۰ دقیقه قبل از شروع</h3>
+    <ul class="checklist" id="cl">
+      <li><input type="checkbox" id="c1"><label for="c1">اسکای‌روم تست شد: میکروفن، صدا، <b>اشتراک صفحه</b>، و ضبط جلسه روشن است</label></li>
+      <li><input type="checkbox" id="c2"><label for="c2">XAMPP روشن است و <code>localhost</code> بالا می‌آید</label></li>
+      <li><input type="checkbox" id="c3"><label for="c3">پوشه‌ی دمو آماده است و یک <code>index.html</code> خالی در آن هست</label></li>
+      <li><input type="checkbox" id="c4"><label for="c4">تب ابزار هوش مصنوعی باز و <b>لاگین</b> است (و یک گفت‌وگوی خالی آماده)</label></li>
+      <li><input type="checkbox" id="c5"><label for="c5">تب cPanel باز و لاگین است (یا اسکرین‌شات‌های جایگزین آماده)</label></li>
+      <li><input type="checkbox" id="c6"><label for="c6"><b>نسخه‌ی نهایی سایت دمو</b> از قبل آماده است (پلن B اگر AI کند بود)</label></li>
+      <li><input type="checkbox" id="c7"><label for="c7">فونت مرورگر بزرگ شده (<code>Ctrl + +</code> تا ۱۲۵٪) تا کد در ویدیو خوانا باشد</label></li>
+      <li><input type="checkbox" id="c8"><label for="c8">نوتیفیکیشن‌ها، تلگرام و ایمیل <b>خاموش</b> است (حالت مزاحم نشوید)</label></li>
+      <li><input type="checkbox" id="c9"><label for="c9">لینک فرم نظرسنجی/گواهی آماده است تا در چت بگذارم</label></li>
+      <li><input type="checkbox" id="c10"><label for="c10">یک لیوان آب کنار دست است 💧</label></li>
+    </ul>
+
+    <h3>۲) زمان‌بندی دقیق (۱۲۰ دقیقه)</h3>
+    <table>
+      <tr><th>زمان</th><th>بخش</th><th>هدف اصلی</th></tr>
+      <tr><td><b>۰ – ۱۰</b></td><td>خوش‌آمد، قرار کارگاه، قوانین، نقشه راه</td><td>ساختن انگیزه و تنظیم انتظار</td></tr>
+      <tr><td><b>۱۰ – ۲۸</b></td><td>مفاهیم پایه: دامنه، هاست، DNS، SSL، cPanel</td><td>ساختن نقشه‌ی ذهنی</td></tr>
+      <tr><td><b>۲۸ – ۴۸</b></td><td>XAMPP، اولین فایل HTML، آشنایی با PHP و MySQL</td><td>محیط کار آماده شود</td></tr>
+      <tr><td><b>۴۸ – ۵۰</b></td><td>🫖 استراحت کوتاه + پاسخ به چت</td><td>بازیابی تمرکز</td></tr>
+      <tr><td><b>۵۰ – ۸۷</b></td><td>هوش مصنوعی: پرامپت، ساخت زنده، اصلاح، امنیت، رفع خطا</td><td>قلب کارگاه — بیشترین ارزش</td></tr>
+      <tr><td><b>۸۷ – ۱۰۶</b></td><td>انتقال به هاست، آپلود، دیتابیس، SSL، عیب‌یابی</td><td>رسیدن به خروجی واقعی</td></tr>
+      <tr><td><b>۱۰۶ – ۱۲۰</b></td><td>مسیر رایگان، مسیر ۳۰ روزه، منابع، پرسش و پاسخ</td><td>تداوم بعد از کارگاه</td></tr>
+    </table>
+    <div class="note warn"><b>قانون طلایی زمان</b> اگر دقیقه ۶۰ شد و هنوز وارد بخش هوش مصنوعی نشده‌ای، <b>بخش PHP و MySQL را حذف کن</b> و مستقیم برو سراغ AI. آن بخش دیدنی‌ترین و ارزشمندترین قسمت کارگاه است و هرگز نباید قربانی شود.</div>
+
+    <h3>۳) جمله‌ی شروع (کلمه به کلمه)</h3>
+    <div class="note"><span class="say" style="border-color:var(--teal)">«سلام به همگی، خیلی خوش اومدین. من سبحان عفتی هستم، دانشجوی پزشکی شهید صدوقی یزد.<br><br>
+    قبل از اینکه شروع کنیم، یه سؤال: چند نفرتون تا حالا فکر کردین "کاش یه سایت داشتم" ولی چون فکر می‌کردین باید برنامه‌نویسی بلد باشین بی‌خیال شدین؟ تو چت بنویسین.<br><br>
+    خب... تو دو ساعت آینده، اون فکر رو کاملاً می‌ذاریم کنار. قراره با هم یه سایت واقعی بسازیم و ببریمش رو اینترنت. بدون اینکه حتی یه خط کد بنویسیم.»</span></div>
+
+    <h3>۴) نقشه‌ی اضطراری</h3>
+    <table>
+      <tr><th>اگر این شد...</th><th>این کار را بکن</th></tr>
+      <tr><td>اینترنت قطع شد یا AI جواب نداد</td><td>سراغ فایل‌های آماده در <code>starter-files/</code> برو و بگو «این خروجی همون پرامپته که از قبل گرفتم» — کلاس متوقف نمی‌شود</td></tr>
+      <tr><td>عقب افتادی (دقیقه ۷۰ و هنوز بخش AI تمام نشده)</td><td>بخش دیتابیس و فرم PHP را حذف کن؛ فقط HTML را روی هاست ببر</td></tr>
+      <tr><td>جلو افتادی (دقیقه ۹۰ و همه‌چیز تمام شده)</td><td>یک دمو اضافه بزن: دارک مود، یا ساخت یک صفحه‌ی دوم، یا پرامپت سئو</td></tr>
+      <tr><td>سؤالی پرسیدند که جوابش را نمی‌دانی</td><td>صادق باش: «الان مطمئن نیستم، بعد از کلاس چک می‌کنم و جواب دقیق می‌دم.» — این اعتبارت را بالا می‌برد، نه پایین</td></tr>
+      <tr><td>یک نفر مدام سؤال‌های خیلی تخصصی می‌پرسد</td><td>«سؤال خیلی خوبیه ولی از سطح این کارگاه بالاتره — بعد از کلاس جداگانه در خدمتم»</td></tr>
+      <tr><td>کلاس ساکت است و کسی چیزی نمی‌نویسد</td><td>سؤال بسته بپرس: «کی تونست صفحه‌ی XAMPP رو ببینه؟ فقط بنویسین بله یا خیر»</td></tr>
+      <tr><td>دمو زنده خراب شد</td><td>پنهانش نکن! بگو «ببینین، این دقیقاً همون چیزیه که براتون هم پیش میاد» و جلوی کلاس با AI رفعش کن — این بهترین لحظه‌ی آموزشی است</td></tr>
+    </table>
+
+    <h3>۵) هفت اصل ارائه‌ی خوب</h3>
+    <ul class="bullets sm">
+      <li><b>نشان بده، بعد توضیح بده.</b> اول خروجی را ببینند، بعد بفهمند چطور ساخته شد.</li>
+      <li><b>هر ۷ تا ۱۰ دقیقه یک تعامل.</b> یک سؤال ساده در چت، حتی «بله/خیر»، کلاس را زنده نگه می‌دارد.</li>
+      <li><b>آهسته‌تر از چیزی که فکر می‌کنی حرف بزن.</b> در ارائه‌ی آنلاین همه سریع‌تر از حد لازم حرف می‌زنند.</li>
+      <li><b>موقع تایپ کردن، حرف بزن.</b> سکوت طولانی در ارائه‌ی آنلاین یعنی از دست دادن مخاطب.</li>
+      <li><b>اعداد بده.</b> «سالی ۳۰ هزار تومان» خیلی مؤثرتر از «ارزان است» است.</li>
+      <li><b>هر بخش را با یک جمله جمع کن</b> قبل از رفتن به بخش بعد.</li>
+      <li><b>محدودیت‌ها را هم بگو.</b> مدرسی که فقط تعریف می‌کند، فروشنده به‌نظر می‌رسد.</li>
+    </ul>
+
+    <h3>۶) بعد از کارگاه</h3>
+    <ul class="bullets sm gold">
+      <li>لینک ضبط جلسه + همین فایل ارائه را برای شرکت‌کنندگان بفرست</li>
+      <li>فرم نظرسنجی کوتاه (۳ سؤال) بفرست — برای کارگاه بعدی طلاست</li>
+      <li>اطلاعات لازم برای صدور گواهی را جمع کن</li>
+      <li>یک گروه یا کانال بساز تا کسانی که سایتشان را ساختند نشان بدهند — این باعث تداوم می‌شود</li>
+    </ul>
+  </div>
+</div>
+
+<script>
+(function(){
+  var fa = function(n){ return String(n).replace(/\d/g, function(d){ return '۰۱۲۳۴۵۶۷۸۹'[d]; }); };
+  var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+  var i = 0, total = slides.length;
+  var bar = document.getElementById('bar');
+  var curEl = document.getElementById('cur'), totEl = document.getElementById('tot');
+  var sectEl = document.getElementById('sectName');
+  totEl.textContent = fa(total);
+
+  /* ---------- TOC ---------- */
+  var tocList = document.getElementById('tocList'), lastSec = null;
+  slides.forEach(function(s, idx){
+    var sec = s.getAttribute('data-sec') || '';
+    if (sec !== lastSec){
+      var h = document.createElement('li');
+      h.className = 'sec';
+      h.innerHTML = '<span>' + sec + '</span><em>دقیقه ' + fa(s.getAttribute('data-min')||0) + '</em>';
+      tocList.appendChild(h); lastSec = sec;
+    }
+    var t = (s.querySelector('h1,h2') || {}).textContent || ('اسلاید ' + (idx+1));
+    var li = document.createElement('li'); li.className = 'item';
+    var a = document.createElement('a');
+    a.href = '#s' + (idx+1);
+    a.innerHTML = '<i>' + fa(idx+1) + '</i><span>' + t.replace(/\s+/g,' ').trim() + '</span>';
+    a.addEventListener('click', function(e){ e.preventDefault(); go(idx); closeDrawer(); });
+    li.appendChild(a); tocList.appendChild(li);
+  });
+  var tocLinks = Array.prototype.slice.call(tocList.querySelectorAll('a'));
+
+  /* ---------- navigation ---------- */
+  function go(n){
+    if (n < 0) n = 0; if (n > total-1) n = total-1;
+    slides[i].classList.remove('active');
+    i = n;
+    slides[i].classList.add('active');
+    curEl.textContent = fa(i+1);
+    bar.style.width = ((i)/(total-1)*100) + '%';
+    sectEl.textContent = slides[i].getAttribute('data-sec') || '';
+    tocLinks.forEach(function(a,k){ a.classList.toggle('cur', k===i); });
+    if (history.replaceState) history.replaceState(null,'','#s'+(i+1));
+    try { localStorage.setItem('ws_slide', i); } catch(e){}
+    window.scrollTo({top:0, behavior:'instant' in document.body.style ? 'instant' : 'auto'});
+    updatePace();
+  }
+  document.getElementById('next').addEventListener('click', function(){ go(i+1); });
+  document.getElementById('prev').addEventListener('click', function(){ go(i-1); });
+
+  document.addEventListener('keydown', function(e){
+    if (/^(INPUT|TEXTAREA)$/.test(e.target.tagName)) return;
+    var k = e.key;
+    if (k === 'ArrowLeft' || k === 'PageDown' || k === ' ') { e.preventDefault(); go(i+1); }
+    else if (k === 'ArrowRight' || k === 'PageUp') { e.preventDefault(); go(i-1); }
+    else if (k === 'Home') go(0);
+    else if (k === 'End') go(total-1);
+    else if (k === 'n' || k === 'N' || k === 'ز') toggleNotes();
+    else if (k === 'm' || k === 'M' || k === 'ئ') toggleDrawer();
+    else if (k === 'g' || k === 'G' || k === 'ل') toggleGuide();
+    else if (k === 't' || k === 'T' || k === 'ن') toggleTimer();
+    else if (k === 'f' || k === 'F' || k === 'ب') toggleFull();
+    else if (k === 'Escape') { closeDrawer(); document.getElementById('guide').classList.remove('open'); }
+  });
+
+  /* swipe on touch */
+  var x0 = null;
+  document.addEventListener('touchstart', function(e){ x0 = e.changedTouches[0].clientX; }, {passive:true});
+  document.addEventListener('touchend', function(e){
+    if (x0 === null) return;
+    var dx = e.changedTouches[0].clientX - x0;
+    if (Math.abs(dx) > 70) { dx < 0 ? go(i-1) : go(i+1); }
+    x0 = null;
+  }, {passive:true});
+
+  /* ---------- notes ---------- */
+  function toggleNotes(){
+    var on = document.body.classList.toggle('shownotes');
+    document.getElementById('btnNotes').classList.toggle('on', on);
+    try { localStorage.setItem('ws_notes', on ? '1' : '0'); } catch(e){}
+  }
+  document.getElementById('btnNotes').addEventListener('click', toggleNotes);
+
+  /* ---------- drawer & guide ---------- */
+  var drawer = document.getElementById('drawer'), guide = document.getElementById('guide');
+  function toggleDrawer(){ drawer.classList.toggle('open'); }
+  function closeDrawer(){ drawer.classList.remove('open'); }
+  function toggleGuide(){ guide.classList.toggle('open'); }
+  document.getElementById('btnToc').addEventListener('click', toggleDrawer);
+  document.getElementById('closeToc').addEventListener('click', closeDrawer);
+  document.getElementById('btnGuide').addEventListener('click', toggleGuide);
+  document.getElementById('closeGuide').addEventListener('click', toggleGuide);
+  drawer.addEventListener('click', function(e){ if (e.target === drawer) closeDrawer(); });
+  guide.addEventListener('click', function(e){ if (e.target === guide) toggleGuide(); });
+  document.getElementById('btnPrint').addEventListener('click', function(){ closeDrawer(); setTimeout(function(){ window.print(); }, 250); });
+
+  function toggleFull(){
+    if (!document.fullscreenElement) { (document.documentElement.requestFullscreen||function(){}).call(document.documentElement); }
+    else { (document.exitFullscreen||function(){}).call(document); }
+  }
+
+  /* ---------- timer & pace ---------- */
+  var t0 = null, tick = null;
+  var timerBox = document.getElementById('timerBox'), paceTag = document.getElementById('paceTag');
+  function fmt(ms){
+    var s = Math.floor(ms/1000), m = Math.floor(s/60);
+    return fa(('0'+m).slice(-2)) + ':' + fa(('0'+(s%60)).slice(-2));
+  }
+  function elapsedMin(){ return t0 ? (Date.now()-t0)/60000 : null; }
+  function updatePace(){
+    var e = elapsedMin();
+    if (e === null){ paceTag.className=''; paceTag.id='paceTag'; paceTag.textContent='تایمر خاموش'; return; }
+    var planned = parseFloat(slides[i].getAttribute('data-min')||0);
+    var d = e - planned;
+    paceTag.className = '';
+    if (d < -3) { paceTag.classList.add('ahead'); paceTag.textContent = 'جلوتر از برنامه (' + fa(Math.round(-d)) + ' دقیقه)'; }
+    else if (d <= 4) { paceTag.classList.add('ahead'); paceTag.textContent = 'طبق برنامه ✓'; }
+    else if (d <= 10) { paceTag.classList.add('behind'); paceTag.textContent = fa(Math.round(d)) + ' دقیقه عقب'; }
+    else { paceTag.classList.add('late'); paceTag.textContent = fa(Math.round(d)) + ' دقیقه عقب — فشرده کن!'; }
+  }
+  function toggleTimer(){
+    if (t0){ t0 = null; clearInterval(tick); tick = null; timerBox.classList.remove('on'); updatePace(); }
+    else {
+      t0 = Date.now(); timerBox.classList.add('on');
+      tick = setInterval(function(){ timerBox.textContent = fmt(Date.now()-t0); updatePace(); }, 1000);
+      timerBox.textContent = fmt(0); updatePace();
+    }
+  }
+  timerBox.addEventListener('click', toggleTimer);
+
+  /* ---------- copy buttons ---------- */
+  document.querySelectorAll('.copy').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var host = btn.closest('.codewrap') || btn.closest('.prompt');
+      var el = host ? (host.querySelector('pre') || host.querySelector('.body')) : null;
+      if (!el) return;
+      var txt = el.innerText;
+      var done = function(){
+        var old = btn.textContent;
+        btn.textContent = '✓ کپی شد'; btn.classList.add('done');
+        setTimeout(function(){ btn.textContent = old; btn.classList.remove('done'); }, 1600);
+      };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(txt).then(done, function(){ fallback(txt, done); });
+      } else fallback(txt, done);
+    });
+  });
+  function fallback(txt, cb){
+    var ta = document.createElement('textarea');
+    ta.value = txt; ta.style.position='fixed'; ta.style.opacity='0';
+    document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); cb(); } catch(e){}
+    document.body.removeChild(ta);
+  }
+
+  /* ---------- checklist persistence ---------- */
+  document.querySelectorAll('#cl input').forEach(function(cb){
+    try { cb.checked = localStorage.getItem('ws_'+cb.id) === '1'; } catch(e){}
+    cb.addEventListener('change', function(){
+      try { localStorage.setItem('ws_'+cb.id, cb.checked ? '1':'0'); } catch(e){}
+    });
+  });
+
+  /* ---------- restore ---------- */
+  try { if (localStorage.getItem('ws_notes') === '1') toggleNotes(); } catch(e){}
+  var fromHash = (location.hash.match(/^#s(\d+)$/) || [])[1];
+  var start = fromHash ? (parseInt(fromHash,10)-1) : 0;
+  if (!fromHash) { try { var v = localStorage.getItem('ws_slide'); if (v !== null) start = parseInt(v,10)||0; } catch(e){} }
+  go(start);
+})();
+</script>
+</body>
+</html>

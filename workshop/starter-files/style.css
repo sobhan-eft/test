@@ -1,0 +1,80 @@
+/* ---- متغیرهای رنگ: فقط این‌ها را عوض کنید تا کل سایت عوض شود ---- */
+:root{
+  --bg:#f6f9fc; --surface:#fff; --text:#12232e; --muted:#5b7181;
+  --brand:#0e4f6e; --accent:#f0b429; --line:#dfe8ef; --radius:16px;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:'Vazirmatn',Tahoma,sans-serif;background:var(--bg);color:var(--text);line-height:2}
+.container{max-width:1080px;margin:0 auto;padding:0 20px}
+a{color:var(--brand);text-decoration:none}
+h1,h2,h3{line-height:1.5}
+
+/* هدر چسبان */
+header{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.85);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+header nav{display:flex;align-items:center;justify-content:space-between;height:66px}
+.logo{font-weight:900;font-size:19px;color:var(--brand)}
+.menu{display:flex;gap:22px;list-style:none;margin:0;padding:0}
+.menu a{color:var(--muted);font-size:15px}
+.menu a:hover{color:var(--brand)}
+.burger{display:none;background:none;border:0;font-size:24px;cursor:pointer;color:var(--brand)}
+
+/* بخش معرفی */
+.hero{background:linear-gradient(160deg,#0e4f6e,#0a3549);color:#fff;padding:70px 0}
+.hero-in{display:flex;align-items:center;gap:40px;justify-content:space-between}
+.eyebrow{color:var(--accent);font-weight:700;margin:0}
+.hero h1{font-size:clamp(28px,5vw,44px);margin:8px 0 14px;font-weight:900}
+.hero h1 span{color:var(--accent)}
+.lead{color:#cfe2ee;max-width:52ch;font-size:18px}
+.avatar{width:170px;height:170px;flex:none;border-radius:50%;background:rgba(255,255,255,.12);
+  display:grid;place-items:center;font-size:72px;border:3px solid var(--accent)}
+
+.btn{display:inline-block;background:var(--accent);color:#2a1c00;font-weight:700;
+  padding:11px 26px;border-radius:30px;margin:18px 0 0 10px;border:0;cursor:pointer;font-family:inherit;font-size:16px}
+.btn.ghost{background:transparent;color:#fff;border:1px solid rgba(255,255,255,.45)}
+.btn:hover{opacity:.9}
+
+/* بخش‌ها */
+.sec{padding:56px 20px}
+.sec h2{font-size:28px;margin:0 0 18px;position:relative;padding-bottom:10px}
+.sec h2::after{content:'';position:absolute;bottom:0;right:0;width:56px;height:4px;background:var(--accent);border-radius:4px}
+
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:22px;transition:.2s}
+.card:hover{transform:translateY(-4px);box-shadow:0 12px 30px rgba(14,79,110,.12)}
+.card h3{margin:0 0 8px;color:var(--brand);font-size:18px}
+.card p{margin:0;color:var(--muted);font-size:15px}
+
+.timeline .item{background:var(--surface);border:1px solid var(--line);border-inline-start:4px solid var(--accent);
+  border-radius:var(--radius);padding:16px 20px;margin-bottom:12px}
+.timeline .item b{display:block}
+.timeline .item span{color:var(--muted);font-size:14px}
+
+.tags span{display:inline-block;background:var(--surface);border:1px solid var(--line);
+  border-radius:30px;padding:6px 16px;margin:0 0 8px 8px;font-size:15px;color:var(--brand)}
+
+/* فرم */
+.form{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:24px;max-width:660px}
+.form .row{display:flex;gap:12px}
+.form input,.form textarea{width:100%;font-family:inherit;font-size:15px;padding:12px 14px;margin-bottom:12px;
+  border:1px solid var(--line);border-radius:10px;background:#fbfdff;color:var(--text)}
+.form input:focus,.form textarea:focus{outline:2px solid var(--brand);border-color:transparent}
+
+footer{background:#0a3549;color:#cfe2ee;padding:28px 0;text-align:center;margin-top:30px}
+footer p{margin:4px 0;font-size:15px}
+.muted{color:#7fa3b8;font-size:13px}
+
+/* انیمیشن ورود هنگام اسکرول */
+.reveal{opacity:0;transform:translateY(22px);transition:.6s ease}
+.reveal.show{opacity:1;transform:none}
+
+/* ---------- موبایل ---------- */
+@media (max-width:820px){
+  .menu{display:none;position:absolute;top:66px;right:0;left:0;background:#fff;
+    flex-direction:column;gap:0;padding:10px 20px;border-bottom:1px solid var(--line)}
+  .menu.open{display:flex}
+  .burger{display:block}
+  .hero-in{flex-direction:column-reverse;text-align:center}
+  .avatar{width:130px;height:130px;font-size:56px}
+  .cards{grid-template-columns:1fr}
+  .form .row{flex-direction:column;gap:0}
+}
